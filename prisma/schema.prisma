@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id             String   @id @default(uuid())
+  logoUrl        String? // Url ảnh logo
+  businessType   String // Loại hình doanh nghiệp (Doanh nghiệp/ Hộ kinh doanh)
+  taxCode        String   @unique // Mã số thuế
+  customerName   String // Tên khách hàng
+  customerGroup  String? // Nhóm khách hàng
+  foundedDate    DateTime // Ngày thành lập
+  vatTaxType     String // Kê khai thuế GTGT (tháng/quý)
+  customerStatus String // Trạng thái khách hàng
+
+  // Thông tin địa chỉ
+  province      String // Tỉnh/Thành phố
+  district      String // Quận/Huyện
+  ward          String? // Phường/Xã
+  streetAddress String // Số nhà, tên đường, phố
+  fullAddress   String // Địa chỉ đầy đủ
+
+  // Thông tin liên hệ
+  fullName    String
+  phoneNumber String // Số điện thoại 
+  email       String @unique
+  position    String // Chức danh
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+}
+
+model Accountant {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  fullName    String // Họ và tên
+  phoneNumber String // Số điện thoại 
+  birthDate   DateTime // Ngày sinh
+  gender      String // Giới tính
+  avatarUrl   String   @default("default-avatar.jpg")
+  address     String   @default("Not provided")
+  zipCode     String   @default("00000")
+  password    String // Mật khẩu
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+}
