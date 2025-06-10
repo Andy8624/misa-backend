@@ -10,7 +10,7 @@ import { Expose, Transform } from 'class-transformer';
 export class CreateCustomerDto {
   @Expose()
   @IsOptional()
-  logoUrl?: string;
+  logoUrl: string;
 
   @Expose()
   @IsNotEmpty({ message: 'Loại hình doanh nghiệp không được để trống' })
@@ -29,7 +29,7 @@ export class CreateCustomerDto {
 
   @Expose()
   @IsOptional()
-  customerGroup?: string;
+  customerGroup: string;
 
   @Expose()
   @IsNotEmpty({ message: 'Ngày thành lập không được để trống' })
@@ -63,7 +63,7 @@ export class CreateCustomerDto {
 
   @Expose()
   @IsOptional()
-  ward?: string;
+  ward: string;
 
   @Expose()
   @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
