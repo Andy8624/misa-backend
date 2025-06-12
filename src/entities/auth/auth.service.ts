@@ -1,5 +1,5 @@
 import { AccountantService } from './../accountant/accountant.service';
-import { PrismaService } from './../prisma.service';
+import { PrismaService } from '../../prisma.service';
 import {
   ConflictException,
   Injectable,

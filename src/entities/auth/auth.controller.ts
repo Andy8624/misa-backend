@@ -6,7 +6,7 @@ import {
   RegisterResponseDto,
 } from './dto/auth.dto';
 import { AuthService } from './auth.service';
-import { Public } from './public.decorator';
+import { Public } from '../../config/custom-decorator/public.decorator';
 
 @Controller('auth')
 export class AuthController {

@@ -75,19 +75,22 @@ export class CreateCustomerDto {
 
   @Expose()
   @IsNotEmpty({ message: 'Họ tên không được để trống' })
-  fullName: string;
+  contactName: string;
 
   @Expose()
   @Matches(/^(0)(9|3|7|8|5)[0-9]{8}$/, {
     message: 'Số điện thoại không hợp lệ',
   })
-  phoneNumber: string;
+  contactPhoneNumber: string;
 
   @Expose()
   @IsEmail({}, { message: 'Email không hợp lệ' })
-  email: string;
+  contactEmail: string;
 
   @Expose()
   @IsNotEmpty({ message: 'Chức danh không được để trống' })
-  position: string;
+  contactPosition: string;
+
+  // @IsNotEmpty({ message: 'Id kế toán không được để trống' })
+  accountantId: string;
 }

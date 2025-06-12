@@ -1,4 +1,3 @@
-import { PrismaService } from './../prisma.service';
 import {
   Injectable,
   BadRequestException,
@@ -14,6 +13,7 @@ import {
 } from './dto/response-accountant.dto';
 import { plainToInstance } from 'class-transformer';
 import { Prisma } from 'generated/prisma';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class AccountantService {

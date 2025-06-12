@@ -14,6 +14,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator erd {
+  provider              = "prisma-erd-generator"
+  output                = "ERD.pdf" // có đuôi .svg hoặc .png hoặc .pdf
+  disableRelationLines  = true
+  includeRelationFields = false
+}
+
+// Bảng lưu thông tin của Kế toán (Accountant)
+model Accountant {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  fullName    String // Họ và tên
+  phoneNumber String // Số điện thoại 
+  birthDate   DateTime // Ngày sinh
+  gender      String // Giới tính
+  password    String // Mật khẩu
+
+  avatarUrl String @default("default-avatar.jpg")
+  address   String @default("Not provided")
+  zipCode   String @default("00000")
+
+  // Auditing
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  // Khóa ngoại
+  customers Customer[] // Một kế toán có nhiều công ty
+}
+
+// Bảng chứa thông tin các công ty (Customer) mà kế toán (Accountant) đang hợp tác làm việc
 model Customer {
   id             String   @id @default(uuid())
   logoUrl        String? // Url ảnh logo
@@ -32,30 +63,126 @@ model Customer {
   streetAddress String // Số nhà, tên đường, phố
   fullAddress   String // Địa chỉ đầy đủ
 
-  // Thông tin liên hệ
-  fullName    String
-  phoneNumber String // Số điện thoại 
-  email       String @unique
-  position    String // Chức danh
+  contactName        String
+  contactPhoneNumber String // Số điện thoại 
+  contactEmail       String
+  contactPosition    String // Chức danh
 
+  // Auditing
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
+
+  // Quan hệ với accountant
+  accountant   Accountant @relation(fields: [accountantId], references: [id])
+  accountantId String
+
+  // Mang danh sách đối tượng khác
+  partners  Partner[] // Một công ty có nhiều đối tác (KHÁCH HÀNG - NHÀ CUNG CẤP)
+  employees Employee[] // Một công ty có nhiều nhân viên
 }
 
-model Accountant {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  fullName    String // Họ và tên
-  phoneNumber String // Số điện thoại 
-  birthDate   DateTime // Ngày sinh
-  gender      String // Giới tính
-  avatarUrl   String   @default("default-avatar.jpg")
-  address     String   @default("Not provided")
-  zipCode     String   @default("00000")
-  password    String // Mật khẩu
+// Bảng lưu thông tin các đối tác (Partners) 
+// của từng công ty (Customer) mà kế toán (Accountant) đang làm
+// Partners có thể là KHÁCH HÀNG hoặc NHÀ CUNG CẤP
+model Partner {
+  id          String  @id @default(uuid())
+  partnerCode String // Mã khách hàng
+  partnerType String // Loại đối tác (CLIENT', 'SUPPLIER')
+  legalType   String // Loại pháp lý (Cá nhân - tổ chức)
+  taxCode     String // Mã số thuế
+  govUnitCode String? // Mã số đơn vị có quan hệ với Ngân sách
 
+  fullName    String // Tên 
+  address     String // Địa chỉ 
+  phoneNumber String // Số điện thoại 
+  websiteUrl  String? // Đường dẫn đến website của đối tác (Partners)
+
+  // Auditing
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
+
+  // Khóa ngoại
+  // Quan hệ với customer
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+
+  // Bao gồm các tài khoản của đối tượng này
+  bankAccounts BankAccount[] // Một đối tác có nhiều tài khoản ngân hàng
+}
+
+model Bank {
+  id                 String @id @default(uuid())
+  fullName           String // Tên tiếng việt
+  shortName          String // Tên viết tắt
+  englishName        String // Tên tiếng anh
+  headquarterAddress String // Địa chỉ trụ sở chính
+  description        String // Mô tả
+  logoUrl            String // Địa chỉ logo ngân hàng
+
+  // Auditing
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  // Bao gồm danh sách các tài khoản thuộc ngân hàng này
+  bankAccounts BankAccount[]
+}
+
+model BankAccount {
+  id                   String @id @default(uuid())
+  accountNumber        String // Số tài khoản
+  provinceOrCity       String // Tỉnh thành phố
+  branchName           String // Tên chi nhánh
+  branchAddress        String // Địa chỉ chi nhánh
+  deltailBranchAddress String // Địa chỉ chi tiết chi nhánh
+
+  // Auditing
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  // Khóa ngoại
+  // Quan hệ với đối tác
+  Partner   Partner? @relation(fields: [partnerId], references: [id])
+  partnerId String?
+
+  // Quan hệ với nhân viên
+  Employee   Employee? @relation(fields: [employeeId], references: [id])
+  employeeId String?
+
+  // Quan hệ với ngân hàng
+  Bank   Bank?   @relation(fields: [bankId], references: [id])
+  bankId String?
+}
+
+model Employee {
+  id           String @id @default(uuid())
+  employeeCode String @unique // Mã nhâ viên (NV0001)
+
+  // Thông tin cá nhân
+  fullName           String
+  dob                DateTime // Ngày sinh
+  sex                String // Giới tính Male - Female - Other
+  address            String // Địa chỉ
+  position           String // Chức danh
+  passportNumber     String? // Số hộ chiếu
+  phoneNumber        String // Số điện thoại
+  idCardNumber       String // Số CCCD
+  idCardIssuedDate   String // Ngày cấp CCCD
+  idCardPlaceOfIssue String // Nơi cấp CCCD
+
+  // Auditing
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  // Khóa ngoại
+  // Quan hệ với customer
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+
+  // Mang danh sách đối tượng khác
+  bankAccounts BankAccount[] // Một nhân viên có nhiều tài khoản ngân hàng
 }

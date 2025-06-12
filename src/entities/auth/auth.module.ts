@@ -3,11 +3,11 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from '../config/jwt/jwt.strategy';
-import { AccountantModule } from '../accountant/accountant.module';
+import { JwtStrategy } from '../../config/jwt/jwt.strategy';
 import { PrismaService } from 'src/prisma.service';
-import { AccountantService } from 'src/accountant/accountant.service';
 import { jwtConfig } from 'src/config/jwt/jwt.config';
+import { AccountantService } from '../accountant/accountant.service';
+import { AccountantModule } from '../accountant/accountant.module';
 
 @Module({
   imports: [

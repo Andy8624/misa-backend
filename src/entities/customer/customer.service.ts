@@ -1,7 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { plainToInstance } from 'class-transformer';
 import {
   CustomerFilterType,
@@ -17,12 +21,12 @@ export class CustomerService {
   async create(dto: CreateCustomerDto) {
     const existingCustomer = await this.prismaService.customer.findFirst({
       where: {
-        OR: [{ email: dto.email }, { taxCode: dto.taxCode }],
+        OR: [{ taxCode: dto.taxCode }],
       },
     });
 
     if (existingCustomer) {
-      throw new BadRequestException('Email hoặc mã số thuế đã tồn tại');
+      throw new BadRequestException('Mã số thuế đã tồn tại');
     }
 
     const customer = await this.prismaService.customer.create({
@@ -40,8 +44,8 @@ export class CustomerService {
     const pageSize = Number(filters.pageSize) || 20;
     const page = Number(filters.page) || 1;
     const search = filters.search || '';
-
     const skip = page > 1 ? (page - 1) * pageSize : 0;
+
     const condition: Prisma.CustomerWhereInput = {
       OR: [
         {
@@ -86,7 +90,7 @@ export class CustomerService {
     });
 
     if (!customer || customer.deletedAt) {
-      throw new BadRequestException('Không tìm thấy khách hàng');
+      throw new NotFoundException('Không tìm thấy khách hàng (Công ty)');
     }
 
     return plainToInstance(ResponseCustomerDto, customer, {
@@ -97,13 +101,13 @@ export class CustomerService {
   async update(id: string, dto: UpdateCustomerDto) {
     const existing = await this.findOne(id);
 
-    if (dto.email && dto.email !== existing.email) {
+    if (dto.taxCode && dto.taxCode !== existing.taxCode) {
       const exists = await this.prismaService.customer.findFirst({
-        where: { email: dto.email, id: { not: id } },
+        where: { taxCode: dto.taxCode, id: { not: id } },
       });
 
       if (exists) {
-        throw new BadRequestException('Email đã tồn tại');
+        throw new BadRequestException('TaxCode đã tồn tại');
       }
     }
 

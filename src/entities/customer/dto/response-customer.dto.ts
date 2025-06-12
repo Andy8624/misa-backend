@@ -58,16 +58,16 @@ export class ResponseCustomerDto {
   fullAddress: string;
 
   @Expose()
-  fullName: string;
+  contactName: string;
 
   @Expose()
-  phoneNumber: string;
+  contactPhoneNumber: string;
 
   @Expose()
-  email: string;
+  contactEmail: string;
 
   @Expose()
-  position: string;
+  contactPosition: string;
 
   @Expose()
   @Transform(({ value }) => value.toISOString())

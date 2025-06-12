@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { AuthModule } from './auth/auth.module';
-import { AccountantModule } from './accountant/accountant.module';
-import { CustomerModule } from './customer/customer.module';
+import { AuthModule } from './entities/auth/auth.module';
+import { CustomerModule } from './entities/customer/customer.module';
+import { PartnersModule } from './entities/partners/partners.module';
+import { AccountantModule } from './entities/accountant/accountant.module';
 
 @Module({
-  imports: [AuthModule, AccountantModule, CustomerModule],
+  imports: [AuthModule, AccountantModule, CustomerModule, PartnersModule],
   controllers: [AppController],
   providers: [AppService],
 })
