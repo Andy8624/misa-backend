@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsEnum, IsNotEmpty, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, Matches } from 'class-validator';
 import { LegalType, PartnerType } from 'src/interfaces/partner.interface';
 
 export class CreatePartnerDto {
@@ -47,7 +47,7 @@ export class CreatePartnerDto {
   phoneNumber: string; // Số điện thoại
 
   @Expose()
-  @IsNotEmpty({ message: 'Địa chỉ trang web không được để trống' })
+  @IsOptional()
   websiteUrl: string; // Đường dẫn đến website của đối tác (Partners)
 
   @Expose()

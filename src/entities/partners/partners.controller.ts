@@ -34,11 +34,13 @@ export class PartnersController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePartnerDto: UpdatePartnerDto) {
-    return this.partnersService.update(+id, updatePartnerDto);
+    console.log('Partner ID', id);
+    console.log('Partner request', updatePartnerDto);
+    return this.partnersService.update(id, updatePartnerDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.partnersService.remove(+id);
+    return this.partnersService.remove(id);
   }
 }

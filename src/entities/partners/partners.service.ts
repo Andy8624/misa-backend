@@ -1,15 +1,19 @@
 import { CustomerService } from '../customer/customer.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePartnerDto } from './dto/create-partner.dto';
-import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
-import { ResponsePartnerDto } from './dto/response-partner-dto';
 import { Prisma } from 'generated/prisma';
 import {
   PartnerFilterType,
   PartnerPaginationResponseType,
 } from 'src/interfaces/partner.interface';
+import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { ResponsePartnerDto } from './dto/response-partner-dto';
 
 @Injectable()
 export class PartnersService {
@@ -20,6 +24,31 @@ export class PartnersService {
 
   async create(createPartnerDto: CreatePartnerDto) {
     await this.customerService.findOne(createPartnerDto.customerId);
+    const existsPartnerCode = await this.prismaService.partner.findFirst({
+      where: {
+        partnerCode: createPartnerDto.partnerCode,
+      },
+    });
+    if (existsPartnerCode) {
+      if (createPartnerDto.partnerType === 'client') {
+        throw new ConflictException('Mã khách hàng đã tồn tại');
+      }
+      throw new ConflictException('Mã nhà cung cấp đã tồn tại');
+    }
+
+    const exists = await this.prismaService.partner.findFirst({
+      where: {
+        taxCode: createPartnerDto.taxCode,
+        partnerType: createPartnerDto.partnerType,
+      },
+    });
+
+    if (exists) {
+      if (createPartnerDto.partnerType === 'client') {
+        throw new ConflictException('Khách hàng với mã số thuế này đã tồn tại');
+      }
+      throw new ConflictException('Nhà cung cấp với mã số thuế này đã tồn tại');
+    }
 
     const newPartner = await this.prismaService.partner.create({
       data: createPartnerDto,
@@ -50,6 +79,11 @@ export class PartnersService {
           taxCode: {
             contains: search,
             mode: 'insensitive',
+          },
+        },
+        {
+          customerId: {
+            equals: search,
           },
         },
       ],
@@ -89,11 +123,51 @@ export class PartnersService {
     });
   }
 
-  update(id: number, updatePartnerDto: UpdatePartnerDto) {
-    return `This action updates a #${id} partner`;
+  async update(id: string, updatePartnerDto: UpdatePartnerDto) {
+    const existPartner = await this.findOne(id);
+
+    if (
+      (updatePartnerDto.taxCode &&
+        updatePartnerDto.taxCode !== existPartner.taxCode) ||
+      updatePartnerDto.partnerType
+    ) {
+      const exists = await this.prismaService.partner.findFirst({
+        where: {
+          taxCode: updatePartnerDto.taxCode,
+          partnerType: updatePartnerDto.partnerType,
+          id: { not: id },
+        },
+      });
+      // console.log(exists);
+
+      if (exists) {
+        if (updatePartnerDto.partnerType === 'client') {
+          throw new ConflictException(
+            'Khách hàng với mã số thuế này đã tồn tại',
+          );
+        }
+        throw new ConflictException(
+          'Nhà cung cấp với mã số thuế này đã tồn tại',
+        );
+      }
+
+      const updated = await this.prismaService.partner.update({
+        where: { id },
+        data: updatePartnerDto,
+      });
+
+      return plainToInstance(ResponsePartnerDto, updated, {
+        excludeExtraneousValues: true,
+      });
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} partner`;
+  async remove(id: string): Promise<{ message: string }> {
+    await this.findOne(id);
+    await this.prismaService.partner.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+    return { message: 'Xóa thành công' };
   }
 }

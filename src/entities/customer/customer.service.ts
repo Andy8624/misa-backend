@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -107,7 +108,7 @@ export class CustomerService {
       });
 
       if (exists) {
-        throw new BadRequestException('TaxCode đã tồn tại');
+        throw new ConflictException('TaxCode đã tồn tại');
       }
     }
 
