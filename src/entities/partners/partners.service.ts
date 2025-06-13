@@ -1,4 +1,3 @@
-import { PartnerType } from './../../interfaces/partner.interface';
 import { CustomerService } from '../customer/customer.service';
 import {
   ConflictException,
@@ -29,6 +28,7 @@ export class PartnersService {
     const existsPartnerCode = await this.prismaService.partner.findFirst({
       where: {
         partnerCode: createPartnerDto.partnerCode,
+        customerId: createPartnerDto.customerId,
       },
     });
     if (existsPartnerCode) {
@@ -42,6 +42,7 @@ export class PartnersService {
       where: {
         taxCode: createPartnerDto.taxCode,
         partnerType: createPartnerDto.partnerType,
+        customerId: createPartnerDto.customerId,
       },
     });
 
