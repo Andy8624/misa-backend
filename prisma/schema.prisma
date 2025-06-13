@@ -49,8 +49,8 @@ model Customer {
   id             String   @id @default(uuid())
   logoUrl        String? // Url ảnh logo
   businessType   String // Loại hình doanh nghiệp (Doanh nghiệp/ Hộ kinh doanh)
-  taxCode        String   @unique // Mã số thuế
-  customerName   String // Tên khách hàng
+  taxCode        String // Mã số thuếgit stat
+  customerName   String // Tên khách hànggit stat
   customerGroup  String? // Nhóm khách hàng
   foundedDate    DateTime // Ngày thành lập
   vatTaxType     String // Kê khai thuế GTGT (tháng/quý)
@@ -159,7 +159,7 @@ model BankAccount {
 
 model Employee {
   id           String @id @default(uuid())
-  employeeCode String @unique // Mã nhâ viên (NV0001)
+  employeeCode String // Mã nhâ viên (NV0001)
 
   // Thông tin cá nhân
   fullName           String
