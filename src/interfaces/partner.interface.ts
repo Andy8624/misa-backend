@@ -14,6 +14,8 @@ export interface PartnerFilterType {
   pageSize?: number;
   page?: number;
   search?: string;
+  partnerType?: 'client' | 'supplier';
+  customerId?: string;
 }
 
 export interface PartnerPaginationResponseType {

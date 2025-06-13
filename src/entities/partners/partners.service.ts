@@ -1,3 +1,4 @@
+import { PartnerType } from './../../interfaces/partner.interface';
 import { CustomerService } from '../customer/customer.service';
 import {
   ConflictException,
@@ -23,6 +24,7 @@ export class PartnersService {
   ) {}
 
   async create(createPartnerDto: CreatePartnerDto) {
+    console.log(createPartnerDto);
     await this.customerService.findOne(createPartnerDto.customerId);
     const existsPartnerCode = await this.prismaService.partner.findFirst({
       where: {
@@ -65,29 +67,58 @@ export class PartnersService {
     const pageSize = Number(filters.pageSize) || 20;
     const page = Number(filters.page) || 1;
     const search = filters.search || '';
+    const partnerType = filters.partnerType || '';
+    const customerId = filters.customerId || '';
+    // console.log(partnerType);
     const skip = page > 1 ? (page - 1) * pageSize : 0;
 
     const condition: Prisma.PartnerWhereInput = {
-      OR: [
+      AND: [
+        // Điều kiện tìm kiếm
         {
-          fullName: {
-            contains: search,
-            mode: 'insensitive',
-          },
+          OR: [
+            {
+              fullName: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              taxCode: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
         },
+
+        // Điều kiện lọc theo loại đối tác
+        ...(partnerType
+          ? [
+              {
+                partnerType: {
+                  equals: partnerType,
+                },
+              },
+            ]
+          : []),
+
+        // Điều kiện lọc theo customerId
+        ...(customerId
+          ? [
+              {
+                customerId: {
+                  equals: customerId,
+                },
+              },
+            ]
+          : []),
+
+        // Điều kiện lọc soft delete
         {
-          taxCode: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-        {
-          customerId: {
-            equals: search,
-          },
+          deletedAt: null,
         },
       ],
-      deletedAt: null,
     };
 
     const [partners, total] = await Promise.all([
