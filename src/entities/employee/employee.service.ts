@@ -48,23 +48,33 @@ export class EmployeeService {
     const pageSize = Number(filters.pageSize) || 20;
     const page = Number(filters.page) || 1;
     const search = filters.search || '';
+    const customerId = filters.customerId || '';
+
     const skip = page > 1 ? (page - 1) * pageSize : 0;
     const condition: Prisma.EmployeeWhereInput = {
-      OR: [
+      AND: [
+        // Search conditions
         {
-          fullName: {
-            contains: search,
-            mode: 'insensitive',
-          },
+          OR: [
+            {
+              fullName: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              employeeCode: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
         },
-        {
-          employeeCode: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
+        // Customer filter
+        ...(customerId ? [{ customerId }] : []),
+        // Only non-deleted records
+        { deletedAt: null },
       ],
-      deletedAt: null,
     };
 
     const [employees, total] = await Promise.all([

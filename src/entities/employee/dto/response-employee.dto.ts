@@ -4,6 +4,7 @@ export interface EmployeeFilterType {
   pageSize?: number;
   page?: number;
   search?: string;
+  customerId?: string;
 }
 
 export interface EmployeePaginationResponseType {
