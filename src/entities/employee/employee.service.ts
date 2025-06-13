@@ -1,26 +1,142 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import {
+  EmployeeFilterType,
+  EmployeePaginationResponseType,
+  ResponseEmployeeDto,
+} from './dto/response-employee.dto';
+import { plainToInstance } from 'class-transformer';
+import { Prisma } from 'generated/prisma';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class EmployeeService {
-  create(createEmployeeDto: CreateEmployeeDto) {
-    return 'This action adds a new employee';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createEmployeeDto: CreateEmployeeDto) {
+    const existingEmployee = await this.prismaService.employee.findFirst({
+      where: {
+        AND: [
+          {
+            idCardNumber: createEmployeeDto.idCardNumber,
+            customerId: createEmployeeDto.customerId,
+          },
+        ],
+      },
+    });
+    if (existingEmployee) {
+      throw new ConflictException('Nhân viên đã tồn tại');
+    }
+
+    const employee = await this.prismaService.employee.create({
+      data: createEmployeeDto,
+    });
+
+    return plainToInstance(ResponseEmployeeDto, employee, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  findAll() {
-    return `This action returns all employee`;
+  async findAll(
+    filters: EmployeeFilterType,
+  ): Promise<EmployeePaginationResponseType> {
+    const pageSize = Number(filters.pageSize) || 20;
+    const page = Number(filters.page) || 1;
+    const search = filters.search || '';
+    const skip = page > 1 ? (page - 1) * pageSize : 0;
+    const condition: Prisma.EmployeeWhereInput = {
+      OR: [
+        {
+          fullName: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          employeeCode: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ],
+      deletedAt: null,
+    };
+
+    const [employees, total] = await Promise.all([
+      this.prismaService.employee.findMany({
+        where: condition,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prismaService.employee.count({ where: condition }),
+    ]);
+
+    return {
+      data: plainToInstance(ResponseEmployeeDto, employees, {
+        excludeExtraneousValues: true,
+      }),
+      total,
+      page,
+      pageSize,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} employee`;
+  async findOne(id: string) {
+    const employee = await this.prismaService.employee.findUnique({
+      where: { id },
+    });
+
+    if (!employee || employee.deletedAt) {
+      throw new NotFoundException('Không tìm thấy nhân viên');
+    }
+
+    return plainToInstance(ResponseEmployeeDto, employee, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-    return `This action updates a #${id} employee`;
+  async update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
+    const existing = await this.findOne(id);
+    if (
+      updateEmployeeDto.idCardNumber &&
+      updateEmployeeDto.idCardNumber !== existing.idCardNumber
+    ) {
+      const exists = await this.prismaService.employee.findFirst({
+        where: {
+          idCardNumber: updateEmployeeDto.idCardNumber,
+          customerId: updateEmployeeDto.customerId,
+          id: { not: id },
+        },
+      });
+
+      if (exists) {
+        throw new ConflictException('Mã số định danh (CCCD) đã tồn tại');
+      }
+    }
+
+    const updated = await this.prismaService.employee.update({
+      where: { id },
+      data: updateEmployeeDto,
+    });
+
+    return plainToInstance(ResponseEmployeeDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} employee`;
+  async remove(id: string): Promise<{ message: string }> {
+    await this.findOne(id);
+    await this.prismaService.employee.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return { message: 'Xóa thành công' };
   }
 }

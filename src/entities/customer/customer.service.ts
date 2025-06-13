@@ -1,6 +1,5 @@
 import {
   Injectable,
-  BadRequestException,
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
@@ -22,12 +21,12 @@ export class CustomerService {
   async create(dto: CreateCustomerDto) {
     const existingCustomer = await this.prismaService.customer.findFirst({
       where: {
-        OR: [{ taxCode: dto.taxCode }],
+        AND: [{ taxCode: dto.taxCode, accountantId: dto.accountantId }],
       },
     });
 
     if (existingCustomer) {
-      throw new BadRequestException('Mã số thuế đã tồn tại');
+      throw new ConflictException('Mã số thuế đã tồn tại');
     }
 
     const customer = await this.prismaService.customer.create({
