@@ -25,61 +25,65 @@ generator erd {
 model Accountant {
   id          String   @id @default(uuid())
   email       String   @unique
-  fullName    String // Họ và tên
-  phoneNumber String // Số điện thoại 
-  birthDate   DateTime // Ngày sinh
+  fullName    String   @map("full_name") // Họ và tên
+  phoneNumber String   @map("phone_number") // Số điện thoại 
+  birthDate   DateTime @map("birth_date") // Ngày sinh
   gender      String // Giới tính
   password    String // Mật khẩu
 
-  avatarUrl String @default("default-avatar.jpg")
+  avatarUrl String @default("default-avatar.jpg") @map("avatar_url")
   address   String @default("Not provided")
-  zipCode   String @default("00000")
+  zipCode   String @default("00000") @map("zip_code")
 
   // Auditing
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Khóa ngoại
   customers Customer[] // Một kế toán có nhiều công ty
+
+  @@map("accountants")
 }
 
 // Bảng chứa thông tin các công ty (Customer) mà kế toán (Accountant) đang hợp tác làm việc
 model Customer {
   id             String   @id @default(uuid())
-  logoUrl        String? // Url ảnh logo
-  businessType   String // Loại hình doanh nghiệp (Doanh nghiệp/ Hộ kinh doanh)
-  taxCode        String // Mã số thuếgit stat
-  customerName   String // Tên khách hànggit stat
-  customerGroup  String? // Nhóm khách hàng
-  foundedDate    DateTime // Ngày thành lập
-  vatTaxType     String // Kê khai thuế GTGT (tháng/quý)
-  customerStatus String // Trạng thái khách hàng
+  logoUrl        String?  @map("logo_url") // Url ảnh logo
+  businessType   String   @map("business_type") // Loại hình doanh nghiệp (Doanh nghiệp/ Hộ kinh doanh)
+  taxCode        String   @map("tax_code") // Mã số thuế
+  customerName   String   @map("customer_name") // Tên khách hàng
+  customerGroup  String?  @map("customer_group") // Nhóm khách hàng
+  foundedDate    DateTime @map("founded_date") // Ngày thành lập
+  vatTaxType     String   @map("vat_tax_type") // Kê khai thuế GTGT (tháng/quý)
+  customerStatus String   @map("customer_status") // Trạng thái khách hàng
 
   // Thông tin địa chỉ
   province      String // Tỉnh/Thành phố
   district      String // Quận/Huyện
   ward          String? // Phường/Xã
-  streetAddress String // Số nhà, tên đường, phố
-  fullAddress   String // Địa chỉ đầy đủ
+  streetAddress String  @map("street_address") // Số nhà, tên đường, phố
+  fullAddress   String  @map("full_address") // Địa chỉ đầy đủ
 
-  contactName        String
-  contactPhoneNumber String // Số điện thoại 
-  contactEmail       String
-  contactPosition    String // Chức danh
+  contactName        String @map("contact_name")
+  contactPhoneNumber String @map("contact_phone_number") // Số điện thoại 
+  contactEmail       String @map("contact_email")
+  contactPosition    String @map("contact_position") // Chức danh
 
   // Auditing
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Quan hệ với accountant
   accountant   Accountant @relation(fields: [accountantId], references: [id])
-  accountantId String
+  accountantId String     @map("accountant_id")
 
   // Mang danh sách đối tượng khác
   partners  Partner[] // Một công ty có nhiều đối tác (KHÁCH HÀNG - NHÀ CUNG CẤP)
   employees Employee[] // Một công ty có nhiều nhân viên
+
+  @@map("customers")
 }
 
 // Bảng lưu thông tin các đối tác (Partners) 
@@ -87,102 +91,110 @@ model Customer {
 // Partners có thể là KHÁCH HÀNG hoặc NHÀ CUNG CẤP
 model Partner {
   id          String  @id @default(uuid())
-  partnerCode String // Mã khách hàng
-  partnerType String // Loại đối tác (CLIENT', 'SUPPLIER')
-  legalType   String // Loại pháp lý (Cá nhân - tổ chức)
-  taxCode     String // Mã số thuế
-  govUnitCode String? // Mã số đơn vị có quan hệ với Ngân sách
+  partnerCode String  @map("partner_code") // Mã khách hàng
+  partnerType String  @map("partner_type") // Loại đối tác (CLIENT', 'SUPPLIER')
+  legalType   String  @map("legal_type") // Loại pháp lý (Cá nhân - tổ chức)
+  taxCode     String  @map("tax_code") // Mã số thuế
+  govUnitCode String? @map("gov_unit_code") // Mã số đơn vị có quan hệ với Ngân sách
 
-  fullName    String // Tên 
+  fullName    String  @map("full_name") // Tên 
   address     String // Địa chỉ 
-  phoneNumber String // Số điện thoại 
-  websiteUrl  String? // Đường dẫn đến website của đối tác (Partners)
+  phoneNumber String  @map("phone_number") // Số điện thoại 
+  websiteUrl  String? @map("website_url") // Đường dẫn đến website của đối tác (Partners)
 
   // Auditing
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Khóa ngoại
   // Quan hệ với customer
   customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
+  customerId String   @map("customer_id")
 
   // Bao gồm các tài khoản của đối tượng này
   bankAccounts BankAccount[] // Một đối tác có nhiều tài khoản ngân hàng
+
+  @@map("partners")
 }
 
 model Bank {
   id                 String @id @default(uuid())
-  fullName           String // Tên tiếng việt
-  shortName          String // Tên viết tắt
-  englishName        String // Tên tiếng anh
-  headquarterAddress String // Địa chỉ trụ sở chính
+  fullName           String @map("full_name") // Tên tiếng việt
+  shortName          String @map("short_name") // Tên viết tắt
+  englishName        String @map("english_name") // Tên tiếng anh
+  headquarterAddress String @map("headquarter_address") // Địa chỉ trụ sở chính
   description        String // Mô tả
-  logoUrl            String // Địa chỉ logo ngân hàng
+  logoUrl            String @map("logo_url") // Địa chỉ logo ngân hàng
 
   // Auditing
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Bao gồm danh sách các tài khoản thuộc ngân hàng này
   bankAccounts BankAccount[]
+
+  @@map("banks")
 }
 
 model BankAccount {
   id                   String @id @default(uuid())
-  accountNumber        String // Số tài khoản
-  provinceOrCity       String // Tỉnh thành phố
-  branchName           String // Tên chi nhánh
-  branchAddress        String // Địa chỉ chi nhánh
-  deltailBranchAddress String // Địa chỉ chi tiết chi nhánh
+  accountNumber        String @map("account_number") // Số tài khoản
+  provinceOrCity       String @map("province_or_city") // Tỉnh thành phố
+  branchName           String @map("branch_name") // Tên chi nhánh
+  branchAddress        String @map("branch_address") // Địa chỉ chi nhánh
+  deltailBranchAddress String @map("detail_branch_address") // Địa chỉ chi tiết chi nhánh
 
   // Auditing
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Khóa ngoại
   // Quan hệ với đối tác
   Partner   Partner? @relation(fields: [partnerId], references: [id])
-  partnerId String?
+  partnerId String?  @map("partner_id")
 
   // Quan hệ với nhân viên
   Employee   Employee? @relation(fields: [employeeId], references: [id])
-  employeeId String?
+  employeeId String?   @map("employee_id")
 
   // Quan hệ với ngân hàng
   Bank   Bank?   @relation(fields: [bankId], references: [id])
-  bankId String?
+  bankId String? @map("bank_id")
+
+  @@map("bank_accounts")
 }
 
 model Employee {
   id           String @id @default(uuid())
-  employeeCode String // Mã nhâ viên (NV0001)
+  employeeCode String @map("employee_code") // Mã nhân viên (NV0001)
 
   // Thông tin cá nhân
-  fullName           String
+  fullName           String   @map("full_name")
   dob                DateTime // Ngày sinh
   sex                String // Giới tính Male - Female - Other
   address            String // Địa chỉ
   position           String // Chức danh
-  passportNumber     String? // Số hộ chiếu
-  phoneNumber        String // Số điện thoại
-  idCardNumber       String // Số CCCD
-  idCardIssuedDate   String // Ngày cấp CCCD
-  idCardPlaceOfIssue String // Nơi cấp CCCD
+  passportNumber     String?  @map("passport_number") // Số hộ chiếu
+  phoneNumber        String   @map("phone_number") // Số điện thoại
+  idCardNumber       String   @map("id_card_number") // Số CCCD
+  idCardIssuedDate   String   @map("id_card_issued_date") // Ngày cấp CCCD
+  idCardPlaceOfIssue String   @map("id_card_place_of_issue") // Nơi cấp CCCD
 
   // Auditing
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Khóa ngoại
   // Quan hệ với customer
   customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
+  customerId String   @map("customer_id")
 
   // Mang danh sách đối tượng khác
   bankAccounts BankAccount[] // Một nhân viên có nhiều tài khoản ngân hàng
+
+  @@map("employees")
 }
