@@ -47,21 +47,29 @@ export class CustomerService {
     const skip = page > 1 ? (page - 1) * pageSize : 0;
 
     const condition: Prisma.CustomerWhereInput = {
-      OR: [
-        {
-          customerName: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-        {
-          taxCode: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
+      AND: [
+        ...(search
+          ? [
+              {
+                OR: [
+                  {
+                    customerName: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                  {
+                    taxCode: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                ],
+              },
+            ]
+          : []),
+        { deletedAt: null },
       ],
-      deletedAt: null,
     };
 
     const [customers, total] = await Promise.all([

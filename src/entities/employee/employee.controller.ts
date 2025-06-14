@@ -11,7 +11,7 @@ import {
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { EmployeeFilterType } from './dto/response-employee.dto';
+import { EmployeeFilterType } from 'src/interfaces/employee.interface';
 
 @Controller('employees')
 export class EmployeeController {

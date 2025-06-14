@@ -54,43 +54,53 @@ export class AccountantService {
     const search = filters.search || '';
 
     const skip = page > 1 ? (page - 1) * pageSize : 0;
-    const condition: Prisma.AccountantWhereInput = {
-      OR: [
-        {
-          fullName: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-        {
-          email: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-      ],
-      AND: {
-        deletedAt: null,
-      },
-    };
-    const accountants = await this.prismaService.accountant.findMany({
-      take: pageSize,
-      skip,
-      where: condition,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
 
-    const total = await this.prismaService.accountant.count({
-      where: condition,
-    });
+    const condition: Prisma.AccountantWhereInput = {
+      AND: [
+        ...(search
+          ? [
+              {
+                OR: [
+                  {
+                    fullName: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                  {
+                    email: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                ],
+              },
+            ]
+          : []),
+        { deletedAt: null },
+      ],
+    };
+
+    // Query song song
+    const [accountants, total] = await Promise.all([
+      this.prismaService.accountant.findMany({
+        take: pageSize,
+        skip,
+        where: condition,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prismaService.accountant.count({
+        where: condition,
+      }),
+    ]);
 
     return {
-      page,
-      data: accountants,
-      pageSize,
+      data: plainToInstance(ResponseAccountantDto, accountants, {
+        excludeExtraneousValues: true,
+      }),
       total,
+      page,
+      pageSize,
     };
   }
 

@@ -1,19 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
 
-export interface EmployeeFilterType {
-  pageSize?: number;
-  page?: number;
-  search?: string;
-  customerId?: string;
-}
-
-export interface EmployeePaginationResponseType {
-  data: ResponseEmployeeDto[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
 export class ResponseEmployeeDto {
   @Expose()
   id: string;

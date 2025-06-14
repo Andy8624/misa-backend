@@ -82,6 +82,7 @@ model Customer {
   // Mang danh sách đối tượng khác
   partners  Partner[] // Một công ty có nhiều đối tác (KHÁCH HÀNG - NHÀ CUNG CẤP)
   employees Employee[] // Một công ty có nhiều nhân viên
+  units     Unit[] // Một công ty có nhiều đơn vị tính
 
   @@map("customers")
 }
@@ -325,6 +326,10 @@ model Unit {
 
   // Mang danh sách đối tượng khác
   goodsAndServices GoodsAndServices[]
+
+  // Quan hệ với Customer (Công ty)
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 
   @@map("units")
 }

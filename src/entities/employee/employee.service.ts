@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import {
-  EmployeeFilterType,
-  EmployeePaginationResponseType,
-  ResponseEmployeeDto,
-} from './dto/response-employee.dto';
+import { ResponseEmployeeDto } from './dto/response-employee.dto';
 import { plainToInstance } from 'class-transformer';
 import { Prisma } from 'generated/prisma';
 import { PrismaService } from 'src/prisma.service';
+import {
+  EmployeeFilterType,
+  EmployeePaginationResponseType,
+} from 'src/interfaces/employee.interface';
 
 @Injectable()
 export class EmployeeService {
@@ -54,25 +54,30 @@ export class EmployeeService {
     const condition: Prisma.EmployeeWhereInput = {
       AND: [
         // Search conditions
-        {
-          OR: [
-            {
-              fullName: {
-                contains: search,
-                mode: 'insensitive',
+        ...(search
+          ? [
+              {
+                OR: [
+                  {
+                    fullName: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                  {
+                    employeeCode: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                ],
               },
-            },
-            {
-              employeeCode: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
+            ]
+          : []),
+
         // Customer filter
         ...(customerId ? [{ customerId }] : []),
-        // Only non-deleted records
+
         { deletedAt: null },
       ],
     };

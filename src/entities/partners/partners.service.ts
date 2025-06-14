@@ -70,55 +70,37 @@ export class PartnersService {
     const search = filters.search || '';
     const partnerType = filters.partnerType || '';
     const customerId = filters.customerId || '';
-    // console.log(partnerType);
     const skip = page > 1 ? (page - 1) * pageSize : 0;
 
     const condition: Prisma.PartnerWhereInput = {
       AND: [
-        // Điều kiện tìm kiếm
-        {
-          OR: [
-            {
-              fullName: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              taxCode: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-
-        // Điều kiện lọc theo loại đối tác
-        ...(partnerType
+        // Search condition
+        ...(search
           ? [
               {
-                partnerType: {
-                  equals: partnerType,
-                },
+                OR: [
+                  {
+                    fullName: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                  {
+                    taxCode: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
+                ],
               },
             ]
           : []),
 
-        // Điều kiện lọc theo customerId
-        ...(customerId
-          ? [
-              {
-                customerId: {
-                  equals: customerId,
-                },
-              },
-            ]
-          : []),
+        ...(partnerType ? [{ partnerType }] : []),
 
-        // Điều kiện lọc soft delete
-        {
-          deletedAt: null,
-        },
+        ...(customerId ? [{ customerId }] : []),
+
+        { deletedAt: null },
       ],
     };
 
@@ -131,6 +113,7 @@ export class PartnersService {
       }),
       this.prismaService.partner.count({ where: condition }),
     ]);
+
     return {
       data: plainToInstance(ResponsePartnerDto, partners, {
         excludeExtraneousValues: true,
@@ -161,19 +144,22 @@ export class PartnersService {
     if (
       (updatePartnerDto.taxCode &&
         updatePartnerDto.taxCode !== existPartner.taxCode) ||
-      updatePartnerDto.partnerType
+      (updatePartnerDto.partnerType &&
+        updatePartnerDto.partnerType !== existPartner.partnerType)
     ) {
       const exists = await this.prismaService.partner.findFirst({
         where: {
-          taxCode: updatePartnerDto.taxCode,
-          partnerType: updatePartnerDto.partnerType,
+          taxCode: updatePartnerDto.taxCode || existPartner.taxCode,
+          partnerType: updatePartnerDto.partnerType || existPartner.partnerType,
+          customerId: existPartner.customerId,
           id: { not: id },
+          deletedAt: null,
         },
       });
-      // console.log(exists);
 
       if (exists) {
-        if (updatePartnerDto.partnerType === 'client') {
+        const type = updatePartnerDto.partnerType || existPartner.partnerType;
+        if (type === 'client') {
           throw new ConflictException(
             'Khách hàng với mã số thuế này đã tồn tại',
           );
@@ -182,16 +168,16 @@ export class PartnersService {
           'Nhà cung cấp với mã số thuế này đã tồn tại',
         );
       }
-
-      const updated = await this.prismaService.partner.update({
-        where: { id },
-        data: updatePartnerDto,
-      });
-
-      return plainToInstance(ResponsePartnerDto, updated, {
-        excludeExtraneousValues: true,
-      });
     }
+
+    const updated = await this.prismaService.partner.update({
+      where: { id },
+      data: updatePartnerDto,
+    });
+
+    return plainToInstance(ResponsePartnerDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async remove(id: string): Promise<{ message: string }> {
