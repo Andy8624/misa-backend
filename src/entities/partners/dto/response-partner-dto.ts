@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 
 export class ResponsePartnerDto {
   @Expose()
@@ -33,4 +33,8 @@ export class ResponsePartnerDto {
 
   @Expose()
   customerId: string;
+
+  @Expose()
+  @Transform(({ value }) => value.toISOString())
+  createdAt: Date;
 }

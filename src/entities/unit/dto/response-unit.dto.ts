@@ -12,4 +12,7 @@ export class ResponseUnitDto {
 
   @Expose()
   description: string;
+
+  @Expose()
+  customerId: string;
 }

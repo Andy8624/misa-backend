@@ -80,9 +80,12 @@ model Customer {
   accountantId String     @map("accountant_id")
 
   // Mang danh sách đối tượng khác
-  partners  Partner[] // Một công ty có nhiều đối tác (KHÁCH HÀNG - NHÀ CUNG CẤP)
-  employees Employee[] // Một công ty có nhiều nhân viên
-  units     Unit[] // Một công ty có nhiều đơn vị tính
+  partners            Partner[] // Một công ty có nhiều đối tác (KHÁCH HÀNG - NHÀ CUNG CẤP)
+  employees           Employee[] // Một công ty có nhiều nhân viên
+  units               Unit[] // Một công ty có nhiều đơn vị tính
+  vatTax              VatTax[] // Một công ty có nhiều mức thuế
+  goodAndServiceGroup GoodsAndServicesGroup[] // Một công ty có nhiều nhóm hàng hóa dịch vụ
+  goodsAndServices    GoodsAndServices[] // Một công ty có nhiều loại hàng hóa dịch vụ
 
   @@map("customers")
 }
@@ -266,6 +269,10 @@ model GoodsAndServices {
   // Mang danh sách đối tượng khác
   GoodsAndServicesGroupMapping GoodsAndServicesGroupMapping[]
 
+  // Quan hệ với công ty
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+
   @@map("goods_and_services")
 }
 
@@ -284,6 +291,10 @@ model GoodsAndServicesGroup {
 
   // Quan hệ ngược - các nhóm con
   childGroups GoodsAndServicesGroup[] @relation("ParentGroup")
+
+  // QUan hệ với công ty
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -314,10 +325,10 @@ model GoodsAndServicesGroupMapping {
 }
 
 model Unit {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   status      String
-  description String
+  description String?
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -346,6 +357,10 @@ model VatTax {
 
   // Mang danh sách đối tượng khác
   goodsAndServices GoodsAndServices[]
+
+  // Quan hệ với bảng công ty 
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 
   @@map("vat_taxes")
 }

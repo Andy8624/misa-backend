@@ -19,24 +19,47 @@ export class UnitService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(dto: CreateUnitDto) {
-    const existingUnit = await this.prismaService.unit.findFirst({
-      where: {
-        name: dto.name,
-        deletedAt: null,
-      },
-    });
+    try {
+      const existingUnit = await this.prismaService.unit.findFirst({
+        where: {
+          name: dto.name,
+          customerId: dto.customerId,
+          deletedAt: null,
+        },
+      });
 
-    if (existingUnit) {
-      throw new ConflictException('Tên đơn vị tính đã tồn tại');
+      if (existingUnit) {
+        throw new ConflictException(
+          'Tên đơn vị tính đã tồn tại trong công ty này',
+        );
+      }
+
+      const unit = await this.prismaService.unit.create({
+        data: dto,
+      });
+
+      return plainToInstance(ResponseUnitDto, unit, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      console.log(error);
+      if (error.code === 'P2003') {
+        throw new ConflictException('Công ty không tồn tại');
+      }
+
+      if (error.code === 'P2002') {
+        throw new ConflictException('Đơn vị tính đã tồn tại');
+      }
+
+      if (
+        error instanceof ConflictException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+
+      throw new Error('Tạo đơn vị tính thất bại');
     }
-
-    const unit = await this.prismaService.unit.create({
-      data: dto,
-    });
-
-    return plainToInstance(ResponseUnitDto, unit, {
-      excludeExtraneousValues: true,
-    });
   }
 
   async findAll(filters: UnitFilterType): Promise<UnitPaginationResponseType> {
@@ -114,30 +137,49 @@ export class UnitService {
   }
 
   async update(id: string, dto: UpdateUnitDto) {
-    const existing = await this.findOne(id);
+    try {
+      const existing = await this.findOne(id);
 
-    if (dto.name && dto.name !== existing.name) {
-      const exists = await this.prismaService.unit.findFirst({
-        where: {
-          name: dto.name,
-          id: { not: id },
-          deletedAt: null,
-        },
+      if (dto.name && dto.name !== existing.name) {
+        const exists = await this.prismaService.unit.findFirst({
+          where: {
+            name: dto.name,
+            customerId: existing.customerId,
+            id: { not: id },
+            deletedAt: null,
+          },
+        });
+
+        if (exists) {
+          throw new ConflictException(
+            'Tên đơn vị tính đã tồn tại trong công ty này',
+          );
+        }
+      }
+
+      const updated = await this.prismaService.unit.update({
+        where: { id },
+        data: dto,
       });
 
-      if (exists) {
-        throw new ConflictException('Tên đơn vị tính đã tồn tại');
+      return plainToInstance(ResponseUnitDto, updated, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      if (error.code === 'P2003') {
+        throw new ConflictException('Công ty không tồn tại');
       }
+
+      if (
+        error instanceof ConflictException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+
+      console.error('Update unit error:', error);
+      throw new Error('Cập nhật đơn vị tính thất bại');
     }
-
-    const updated = await this.prismaService.unit.update({
-      where: { id },
-      data: dto,
-    });
-
-    return plainToInstance(ResponseUnitDto, updated, {
-      excludeExtraneousValues: true,
-    });
   }
 
   async remove(id: string): Promise<{ message: string }> {
