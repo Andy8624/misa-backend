@@ -12,7 +12,10 @@ import { GoodsAndServicesGroupService } from './goods_and_services_group.service
 import { CreateGoodsAndServicesGroupDto } from './dto/create-goods_and_services_group.dto';
 import { UpdateGoodsAndServicesGroupDto } from './dto/update-goods_and_services_group.dto';
 import { GoodAndServiceGroupFilterType } from 'src/interfaces/good_and_service_group.interface';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
+@ApiTags('Goods & Services Group')
 @Controller('goods-and-services-groups')
 export class GoodsAndServicesGroupController {
   constructor(
@@ -20,6 +23,7 @@ export class GoodsAndServicesGroupController {
   ) {}
 
   @Post()
+  @ApiProtectedEndpoint('Create Good And Service Group')
   create(
     @Body() createGoodsAndServicesGroupDto: CreateGoodsAndServicesGroupDto,
   ) {
@@ -29,16 +33,19 @@ export class GoodsAndServicesGroupController {
   }
 
   @Get()
+  @ApiProtectedEndpoint('Find All Good And Service Group')
   findAll(@Query() param: GoodAndServiceGroupFilterType) {
     return this.goodsAndServicesGroupService.findAll(param);
   }
 
   @Get(':id')
+  @ApiProtectedEndpoint('Find Good And Service Group by ID')
   findOne(@Param('id') id: string) {
     return this.goodsAndServicesGroupService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiProtectedEndpoint('Update Good And Service Group')
   update(
     @Param('id') id: string,
     @Body() updateGoodsAndServicesGroupDto: UpdateGoodsAndServicesGroupDto,
@@ -50,6 +57,7 @@ export class GoodsAndServicesGroupController {
   }
 
   @Delete(':id')
+  @ApiProtectedEndpoint('Delete Good And Service Group')
   remove(@Param('id') id: string) {
     return this.goodsAndServicesGroupService.remove(id);
   }
