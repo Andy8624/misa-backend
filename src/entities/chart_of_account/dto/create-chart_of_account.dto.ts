@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateAccountMainSystemDto {
+export class CreateChartOfAccountDto {
   @Expose()
   @IsNotEmpty({ message: 'Mã tài khoản không được để trống' })
   accountCode: string;

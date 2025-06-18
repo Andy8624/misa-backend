@@ -3,23 +3,23 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAccountMainSystemDto } from './dto/create-account_main_system.dto';
-import { UpdateAccountMainSystemDto } from './dto/update-account_main_system.dto';
+import { CreateChartOfAccountDto } from './dto/create-chart_of_account.dto';
+import { UpdateChartOfAccountDto } from './dto/update-chart_of_account.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
-import { ResponseAccountMainSystemDto } from './dto/response-account_main_system.dto';
+import { ResponseChartOfAccountDto } from './dto/response-chart_of_account.dto';
 import {
-  AccountMainSystemFilterType,
-  AccountMainSystemPaginationResponseType,
+  ChartOfAccountFilterType,
+  ChartOfAccountPaginationResponseType,
 } from 'src/interfaces/account_main_systerm.interface';
 import { Prisma } from 'generated/prisma';
 
 @Injectable()
-export class AccountMainSystemService {
+export class ChartOfAccountService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(request: CreateAccountMainSystemDto) {
-    const existing = await this.prismaService.accountMainSystem.findFirst({
+  async create(request: CreateChartOfAccountDto) {
+    const existing = await this.prismaService.ChartOfAccount.findFirst({
       where: {
         AND: [
           {
@@ -34,25 +34,25 @@ export class AccountMainSystemService {
       throw new ConflictException('Tài khoản đã tồn tại');
     }
 
-    const newAccount = await this.prismaService.accountMainSystem.create({
+    const newAccount = await this.prismaService.ChartOfAccount.create({
       data: request,
     });
 
-    return plainToInstance(ResponseAccountMainSystemDto, newAccount, {
+    return plainToInstance(ResponseChartOfAccountDto, newAccount, {
       excludeExtraneousValues: true,
     });
   }
 
   async findAll(
-    filters: AccountMainSystemFilterType,
-  ): Promise<AccountMainSystemPaginationResponseType> {
+    filters: ChartOfAccountFilterType,
+  ): Promise<ChartOfAccountPaginationResponseType> {
     const pageSize = Number(filters.pageSize) || 20;
     const page = Number(filters.page) || 1;
     const search = filters.search || '';
     const customerId = filters.customerId || '';
 
     const skip = page > 1 ? (page - 1) * pageSize : 0;
-    const condition: Prisma.AccountMainSystemWhereInput = {
+    const condition: Prisma.ChartOfAccountWhereInput = {
       AND: [
         ...(search
           ? [
@@ -94,17 +94,17 @@ export class AccountMainSystemService {
     };
 
     const [response, total] = await Promise.all([
-      this.prismaService.accountMainSystem.findMany({
+      this.prismaService.ChartOfAccount.findMany({
         where: condition,
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
       }),
-      this.prismaService.accountMainSystem.count({ where: condition }),
+      this.prismaService.ChartOfAccount.count({ where: condition }),
     ]);
 
     return {
-      data: plainToInstance(ResponseAccountMainSystemDto, response, {
+      data: plainToInstance(ResponseChartOfAccountDto, response, {
         excludeExtraneousValues: true,
       }),
       total,
@@ -114,7 +114,7 @@ export class AccountMainSystemService {
   }
 
   async findOne(id: string) {
-    const account = await this.prismaService.accountMainSystem.findUnique({
+    const account = await this.prismaService.ChartOfAccount.findUnique({
       where: { id },
     });
 
@@ -122,14 +122,14 @@ export class AccountMainSystemService {
       throw new NotFoundException('Không tìm thấy tài khoản');
     }
 
-    return plainToInstance(ResponseAccountMainSystemDto, account, {
+    return plainToInstance(ResponseChartOfAccountDto, account, {
       excludeExtraneousValues: true,
     });
   }
 
-  async update(id: string, request: UpdateAccountMainSystemDto) {
+  async update(id: string, request: UpdateChartOfAccountDto) {
     await this.findOne(id);
-    const duplicate = await this.prismaService.accountMainSystem.findFirst({
+    const duplicate = await this.prismaService.ChartOfAccount.findFirst({
       where: {
         accountCode: request.accountCode,
         customerId: request.customerId,
@@ -142,12 +142,12 @@ export class AccountMainSystemService {
       throw new ConflictException('Mã tài khoản này đã tồn tại');
     }
 
-    const updatedEntity = await this.prismaService.accountMainSystem.update({
+    const updatedEntity = await this.prismaService.ChartOfAccount.update({
       where: { id },
       data: request,
     });
 
-    return plainToInstance(ResponseAccountMainSystemDto, updatedEntity, {
+    return plainToInstance(ResponseChartOfAccountDto, updatedEntity, {
       excludeExtraneousValues: true,
     });
   }
@@ -155,7 +155,7 @@ export class AccountMainSystemService {
   async remove(id: string) {
     await this.findOne(id);
 
-    await this.prismaService.accountMainSystem.update({
+    await this.prismaService.ChartOfAccount.update({
       where: { id },
       data: { deletedAt: new Date() },
     });

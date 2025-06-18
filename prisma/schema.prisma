@@ -86,8 +86,11 @@ model Customer {
   vatTax              VatTax[] // Một công ty có nhiều mức thuế
   goodAndServiceGroup GoodsAndServicesGroup[] // Một công ty có nhiều nhóm hàng hóa dịch vụ
   goodsAndServices    GoodsAndServices[] // Một công ty có nhiều loại hàng hóa dịch vụ
-  accountMainSystem   AccountMainSystem[] // Một công ty có nhiều tài khoản
+  chartOfAccount      ChartOfAccount[] // Một công ty có nhiều tài khoản
   warrantyPeriod      WarrantyPeriod[] // Một công ty có thể có nhiều mức bảo hành
+  Warehouse           Warehouse[] // Một công ty có nhiều kho
+  InventoryIn         InventoryIn[] // Một công ty có nhiều phiếu nhập
+  InventoryOut        InventoryOut[] // Một công ty có nhiều phiếu xuất
 
   @@map("customers")
 }
@@ -120,6 +123,14 @@ model Partner {
 
   // Bao gồm các tài khoản của đối tượng này
   bankAccounts BankAccount[] // Một đối tác có nhiều tài khoản ngân hàng
+
+  // Relations với InventoryIn
+  asClient InventoryIn[] @relation("InventoryInClient")
+  asObject InventoryIn[] @relation("InventoryInObject")
+
+  // Relations với InventoryOut
+  asClientOut InventoryOut[] @relation("InventoryOutClient")
+  asObjectOut InventoryOut[] @relation("InventoryOutObject")
 
   @@map("partners")
 }
@@ -201,6 +212,8 @@ model Employee {
 
   // Mang danh sách đối tượng khác
   bankAccounts BankAccount[] // Một nhân viên có nhiều tài khoản ngân hàng
+  InventoryIns InventoryIn[] // Một nhân viên
+  InventoryOut InventoryOut[]
 
   @@map("employees")
 }
@@ -254,24 +267,24 @@ model GoodsAndServices {
   VatTax   VatTax? @relation(fields: [vatTaxId], references: [id])
   vatTaxId String? @map("vat_tax_id")
 
-  // Quan hệ với AccountMainSystem (nhiều foreign keys)
-  WarehouseAccount   AccountMainSystem? @relation("WarehouseAccount", fields: [warehouseAccountId], references: [id])
-  warehouseAccountId String?            @map("warehouse_account_id")
+  // Quan hệ với ChartOfAccount (nhiều foreign keys)
+  WarehouseAccount   ChartOfAccount? @relation("WarehouseAccount", fields: [warehouseAccountId], references: [id])
+  warehouseAccountId String?         @map("warehouse_account_id")
 
-  ReturnAccount   AccountMainSystem? @relation("ReturnAccount", fields: [returnAccountId], references: [id])
-  returnAccountId String?            @map("return_account_id")
+  ReturnAccount   ChartOfAccount? @relation("ReturnAccount", fields: [returnAccountId], references: [id])
+  returnAccountId String?         @map("return_account_id")
 
-  RevenueAccount   AccountMainSystem? @relation("RevenueAccount", fields: [revenueAccountId], references: [id])
-  revenueAccountId String?            @map("revenue_account_id")
+  RevenueAccount   ChartOfAccount? @relation("RevenueAccount", fields: [revenueAccountId], references: [id])
+  revenueAccountId String?         @map("revenue_account_id")
 
-  ExpenseAccount   AccountMainSystem? @relation("ExpenseAccount", fields: [expenseAccountId], references: [id])
-  expenseAccountId String?            @map("expense_account_id")
+  ExpenseAccount   ChartOfAccount? @relation("ExpenseAccount", fields: [expenseAccountId], references: [id])
+  expenseAccountId String?         @map("expense_account_id")
 
-  SalesAllowanceAccount   AccountMainSystem? @relation("SalesAllowanceAccount", fields: [salesAllowanceAccountId], references: [id])
-  salesAllowanceAccountId String?            @map("sales_allowance_account_id")
+  SalesAllowanceAccount   ChartOfAccount? @relation("SalesAllowanceAccount", fields: [salesAllowanceAccountId], references: [id])
+  salesAllowanceAccountId String?         @map("sales_allowance_account_id")
 
-  DiscountAccount   AccountMainSystem? @relation("DiscountAccount", fields: [discountAccountId], references: [id])
-  discountAccountId String?            @map("discount_account_id")
+  DiscountAccount   ChartOfAccount? @relation("DiscountAccount", fields: [discountAccountId], references: [id])
+  discountAccountId String?         @map("discount_account_id")
 
   // Quan hệ với công ty
   Customer   Customer? @relation(fields: [customerId], references: [id])
@@ -279,6 +292,8 @@ model GoodsAndServices {
 
   // Mang danh sách đối tượng khác
   GoodsAndServicesGroupMapping GoodsAndServicesGroupMapping[]
+  InventoryOutItems            InventoryOutItem[]
+  inventoryInItems             InventoryInItem[]
 
   @@map("goods_and_services")
 }
@@ -346,8 +361,10 @@ model Unit {
   goodsAndServices GoodsAndServices[]
 
   // Quan hệ với Customer (Công ty)
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  Customer         Customer?          @relation(fields: [customerId], references: [id])
+  customerId       String?
+  InventoryOutItem InventoryOutItem[]
+  InventoryInItem  InventoryInItem[]
 
   @@map("units")
 }
@@ -372,20 +389,24 @@ model VatTax {
   @@map("vat_taxes")
 }
 
-model AccountMainSystem {
+model ChartOfAccount {
   id              String @id @default(uuid())
-  accountCode     String @map("account_code")
+  accountNumber   String @map("account_number")
   accountName     String @map("account_name")
-  accountType     String @map("account_type")
-  engAccountName  String @map("eng_account_name")
-  describeAccount String @map("describe_account")
+  particular      String
+  englishName     String @map("english_name")
+  characteristics String
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  // Quan hệ ngược với GoodsAndServices (1 AccountMainSystem có thể được sử dụng bởi nhiều GoodsAndServices)
+  // Self-referencing relation
+  primaryAccount   ChartOfAccount? @relation("ChartOfAccountPrimary", fields: [primaryAccountId], references: [id])
+  primaryAccountId String?         @map("primary_account_id")
+
+  // Quan hệ ngược với GoodsAndServices (1 ChartOfAccount có thể được sử dụng bởi nhiều GoodsAndServices)
   warehouseGoods      GoodsAndServices[] @relation("WarehouseAccount")
   returnGoods         GoodsAndServices[] @relation("ReturnAccount")
   revenueGoods        GoodsAndServices[] @relation("RevenueAccount")
@@ -393,9 +414,236 @@ model AccountMainSystem {
   salesAllowanceGoods GoodsAndServices[] @relation("SalesAllowanceAccount")
   discountGoods       GoodsAndServices[] @relation("DiscountAccount")
 
+  // Relation ngược lại - danh sách các tài khoản con
+  subAccounts ChartOfAccount[] @relation("ChartOfAccountPrimary")
+
+  // Chứa danh sách kho
+  warehouses Warehouse[] // Một tài khoản có nhiều kho
+
   // Quan hệ với bảng công ty
   Customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?
 
-  @@map("account_main_systems")
+  creditInventoryOutItems InventoryOutItem[] @relation("InventoryOutItemCredit")
+  debitInventoryOutItems  InventoryOutItem[] @relation("InventoryOutItemDebit")
+  creditInventoryInItems  InventoryInItem[]  @relation("InventoryInItemCredit")
+  debitInventoryInItems   InventoryInItem[]  @relation("InventoryInItemDebit")
+
+  @@map("chart_of_accounts")
+}
+
+model Warehouse {
+  id      String @id @default(uuid())
+  code    String // Mã kho
+  name    String // Tên kho
+  account String // 
+  status  String // Trạng thái kho
+  address String // Địa chỉ kho
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với công ty
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?   @map("customer_id")
+
+  // Quan hệ với bảng tài khoản
+  ChartOfAccount   ChartOfAccount?    @relation(fields: [chartOfAccountId], references: [id])
+  chartOfAccountId String?            @map("chart_of_account_id")
+  InventoryOutItem InventoryOutItem[]
+  InventoryInItem  InventoryInItem[]
+
+  @@map("warehouses")
+}
+
+model InventoryIn {
+  id                      String   @id @default(uuid())
+  inventoryInVoucherType  String   @map("inventory_in_voucher_type")
+  address                 String
+  courier                 String // Chuyển phát nhanh (Người giao hàng)
+  description             String
+  withOriginalVoucher     String   @map("with_original_vouher")
+  postedDate              DateTime @map("posted_date")
+  voucherDate             DateTime @map("voucher_date")
+  voucherNumber           String   @map("voucher_number")
+  costOfInventoryReturned String   @map("cost_of_inventory_returned")
+
+  // Chứa danh sách bảng khác
+  attached File[] // Một phiếu nhập kho có nhiều file
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng nhân viên (Nhân viên bán hàng của loại hàng bị trả lại, và cần nhập vào kho)
+  storePerson   Employee? @relation(fields: [storePersonId], references: [id])
+  storePersonId String?   @map("store_person_id")
+
+  // Relations với Partner
+  client   Partner @relation("InventoryInClient", fields: [clientId], references: [id])
+  clientId String  @map("client_id")
+
+  object   Partner @relation("InventoryInObject", fields: [objectId], references: [id])
+  objectId String  @map("object_id")
+
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+
+  InventoryInItem InventoryInItem[]
+
+  @@map("inventory_ins")
+}
+
+model InventoryOut {
+  id                      String   @id @default(uuid())
+  inventoryOutVoucherType String   @map("inventory_out_voucher_type")
+  address                 String
+  receipient              String
+  particular              String // Lý do xuất
+  withOriginalVoucher     String   @map("with_original_vouher")
+  component               String
+  postedDate              DateTime @map("posted_date")
+  voucherDate             DateTime @map("voucher_date")
+  voucherNumber           String   @map("voucher_number")
+
+  // Chứa danh sách bảng khác
+  attached File[] // Một phiếu xuất kho có nhiều file
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng nhân viên (Nhân viên bán hàng của loại hàng bị trả lại, và cần nhập vào kho)
+  storePerson   Employee? @relation(fields: [storePersonId], references: [id])
+  storePersonId String?   @map("store_person_id")
+
+  // Relations với Partner
+  client   Partner @relation("InventoryOutClient", fields: [clientId], references: [id])
+  clientId String  @map("client_id")
+
+  object   Partner @relation("InventoryOutObject", fields: [objectId], references: [id])
+  objectId String  @map("object_id")
+
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+
+  InventoryOutItem InventoryOutItem[]
+
+  @@map("inventory_outs")
+}
+
+model InventoryOutItem {
+  id                 String  @id @default(uuid())
+  itemName           String  @map("item_name")
+  quantity           Int
+  unitPrice          Int     @map("unit_price")
+  finishedGood       String? @map("finished_good")
+  costClassification String? @map("cost_classification")
+  costObject         String? @map("cost_object")
+
+  creditAccount   ChartOfAccount? @relation("InventoryOutItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("InventoryOutItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  // Các relations khác giữ nguyên
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id])
+  warehouseId String?    @map("warehouse_id")
+
+  item   GoodsAndServices? @relation(fields: [itemId], references: [id])
+  itemId String?           @map("item_id")
+
+  inventoryOut   InventoryOut? @relation(fields: [inventoryOutId], references: [id])
+  inventoryOutId String?       @map("inventory_out_id")
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? @map("unit_id")
+
+  // Lệnh sản xuất (Tìm hiểu sau)
+  productionOrders   productionOrders? @relation(fields: [productionOrdersId], references: [id])
+  productionOrdersId String?
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("inventory_out_items")
+}
+
+model InventoryInItem {
+  id        String @id @default(uuid())
+  itemName  String @map("item_name")
+  quantity  Int
+  unitPrice Int    @map("unit_price")
+
+  // ✅ Thêm relations với ChartOfAccount
+  creditAccount   ChartOfAccount? @relation("InventoryInItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("InventoryInItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  // ✅ Thêm các relations khác
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id])
+  warehouseId String?    @map("warehouse_id")
+
+  item   GoodsAndServices? @relation(fields: [itemId], references: [id])
+  itemId String?           @map("item_id")
+
+  // ✅ Relation với InventoryIn (không phải InventoryOut)
+  inventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
+  inventoryInId String?      @map("inventory_in_id")
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? @map("unit_id")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("inventory_in_items")
+}
+
+model productionOrders {
+  id          String   @id @default(uuid())
+  date        DateTime
+  orderNo     Int      @map("order_no")
+  description String
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  inventoryOutItem InventoryOutItem[]
+}
+
+model File {
+  id        String @id @default(uuid())
+  fileName  String @map("file_name")
+  fileSize  Int    @map("file_size")
+  mimeType  String @map("mime_type")
+  path      String // Đường dẫn lưu trữ
+  extension String // Phần mở rộng: .pdf, .jpg
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với phiếu nhập kho
+  InventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
+  inventoryInId String?      @map("inventory_in_id")
+
+  InventoryOut   InventoryOut? @relation(fields: [inventoryOutId], references: [id])
+  inventoryOutId String?       @map("inventory_out_id")
+
+  @@map("files")
 }

@@ -1,15 +1,15 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { ResponseAccountMainSystemDto } from 'src/entities/account_main_system/dto/response-account_main_system.dto';
+import { ResponseChartOfAccountDto } from 'src/entities/chart_of_account/dto/response-chart_of_account.dto';
 
-export interface AccountMainSystemPaginationResponseType {
-  data: ResponseAccountMainSystemDto[];
+export interface ChartOfAccountPaginationResponseType {
+  data: ResponseChartOfAccountDto[];
   total: number;
   page: number;
   pageSize: number;
 }
 
-export class AccountMainSystemFilterType {
+export class ChartOfAccountFilterType {
   @ApiPropertyOptional({ example: 20, description: 'Số lượng mỗi trang' })
   @IsOptional()
   pageSize?: number;

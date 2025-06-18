@@ -33,9 +33,7 @@ export class GoodsAndServicesService {
     }
 
     const newItem = await this.prismaService.goodsAndServices.create({
-      data: {
-        ...request,
-      },
+      data: request,
     });
 
     return plainToInstance(ResponseGoodsAndServiceDto, newItem, {
@@ -87,6 +85,22 @@ export class GoodsAndServicesService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
+        include: {
+          GoodsAndServicesGroupMapping: {
+            include: {
+              goodsAndServicesGroup: true, // Lấy thông tin group
+            },
+          },
+          Unit: true,
+          WarrantyPeriod: true,
+          VatTax: true,
+          DiscountAccount: true,
+          ExpenseAccount: true,
+          ReturnAccount: true,
+          RevenueAccount: true,
+          SalesAllowanceAccount: true,
+          WarehouseAccount: true,
+        },
       }),
       this.prismaService.goodsAndServices.count({ where: condition }),
     ]);

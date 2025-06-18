@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class ResponseAccountMainSystemDto {
+export class ResponseChartOfAccountDto {
   @Expose()
   id: string;
 

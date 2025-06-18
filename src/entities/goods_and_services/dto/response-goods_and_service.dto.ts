@@ -1,4 +1,9 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ResponseChartOfAccountDto } from 'src/entities/chart_of_account/dto/response-chart_of_account.dto';
+import { ResponseGoodsAndServicesMappingDto } from 'src/entities/goods_and_services_mapping/dto/response-goods_and_services_mapping.dto';
+import { ResponseUnitDto } from 'src/entities/unit/dto/response-unit.dto';
+import { ResponseVatTaxDto } from 'src/entities/vat_tax/dto/response-vat_tax.dto';
+import { ResponseWarrantyPeriodDto } from 'src/entities/warranty_period/dto/response--warranty_period.dto';
 
 export class ResponseGoodsAndServiceDto {
   @Expose()
@@ -66,4 +71,37 @@ export class ResponseGoodsAndServiceDto {
 
   @Expose()
   createdAt: string;
+
+  // ✅ Relations - cần import các DTO tương ứng
+  @Expose()
+  @Type(() => ResponseGoodsAndServicesMappingDto)
+  GoodsAndServicesGroupMapping?: ResponseGoodsAndServicesMappingDto[];
+
+  @Expose()
+  Unit?: ResponseUnitDto[];
+
+  @Expose()
+  WarrantyPeriod?: ResponseWarrantyPeriodDto[];
+
+  @Expose()
+  VatTax?: ResponseVatTaxDto[];
+
+  @Expose()
+  @Type(() => ResponseChartOfAccountDto)
+  WarehouseAccount?: ResponseChartOfAccountDto[];
+
+  @Expose()
+  ReturnAccount?: ResponseChartOfAccountDto[];
+
+  @Expose()
+  RevenueAccount?: ResponseChartOfAccountDto[];
+
+  @Expose()
+  ExpenseAccount?: ResponseChartOfAccountDto[];
+
+  @Expose()
+  SalesAllowanceAccount?: ResponseChartOfAccountDto[];
+
+  @Expose()
+  DiscountAccount?: ResponseChartOfAccountDto[];
 }
