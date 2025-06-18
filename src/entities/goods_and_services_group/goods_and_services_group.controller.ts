@@ -11,9 +11,9 @@ import {
 import { GoodsAndServicesGroupService } from './goods_and_services_group.service';
 import { CreateGoodsAndServicesGroupDto } from './dto/create-goods_and_services_group.dto';
 import { UpdateGoodsAndServicesGroupDto } from './dto/update-goods_and_services_group.dto';
-import { GoodAndServiceGroupFilterType } from 'src/interfaces/good_and_service_group.interface';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
+import { GoodAndServiceGroupFilterType } from 'src/interfaces/good_and_service_group.interface';
 
 @ApiTags('Goods & Services Group')
 @Controller('goods-and-services-groups')

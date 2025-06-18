@@ -1,16 +1,18 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { ResponseGoodsAndServicesGroupDto } from 'src/entities/goods_and_services_group/dto/response-goods_and_services_group.dto';
+import { ResponseGoodsAndServiceDto } from 'src/entities/goods_and_services/dto/response-goods_and_service.dto';
 
-export interface GoodAndServiceGroupPaginationResponseType {
-  data: ResponseGoodsAndServicesGroupDto[];
+export interface GoodAndServicePaginationResponseType {
+  data: ResponseGoodsAndServiceDto[];
   total: number;
   page: number;
   pageSize: number;
 }
 
-export class GoodAndServiceGroupFilterType {
-  @ApiPropertyOptional({ description: 'Tìm kiếm theo tên hoặc mã nhóm' })
+export class GoodAndServiceFilterType {
+  @ApiPropertyOptional({
+    description: 'Tìm kiếm theo tên hoặc mã hàng hóa dịch vụ',
+  })
   @IsOptional()
   search?: string;
 

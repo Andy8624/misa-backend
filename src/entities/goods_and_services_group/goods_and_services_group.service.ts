@@ -140,6 +140,19 @@ export class GoodsAndServicesGroupService {
 
   async update(id: string, request: UpdateGoodsAndServicesGroupDto) {
     await this.findOne(id);
+
+    const duplicate = await this.prismaService.goodsAndServicesGroup.findFirst({
+      where: {
+        code: request.code,
+        customerId: request.customerId,
+        id: { not: id },
+        deletedAt: null,
+      },
+    });
+    if (duplicate) {
+      throw new ConflictException('Mã nhóm hàng hóa vật tư đã tồn tại');
+    }
+
     if (request.parentGroupId != null) {
       const exists = await this.prismaService.goodsAndServicesGroup.findUnique({
         where: { id: request.parentGroupId, deletedAt: null },

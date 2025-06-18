@@ -10,6 +10,9 @@ import { EmployeeModule } from './entities/employee/employee.module';
 import { UnitModule } from './entities/unit/unit.module';
 import { VatTaxModule } from './entities/vat_tax/vat_tax.module';
 import { GoodsAndServicesGroupModule } from './entities/goods_and_services_group/goods_and_services_group.module';
+import { AccountMainSystemModule } from './entities/account_main_system/account_main_system.module';
+import { GoodsAndServicesModule } from './entities/goods_and_services/goods_and_services.module';
+import { WarrantyPeriodModule } from './entities/warranty_period/warranty_period.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { GoodsAndServicesGroupModule } from './entities/goods_and_services_group
     UnitModule,
     VatTaxModule,
     GoodsAndServicesGroupModule,
+    AccountMainSystemModule,
+    GoodsAndServicesModule,
+    WarrantyPeriodModule,
   ],
   controllers: [AppController],
   providers: [AppService],

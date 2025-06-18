@@ -86,6 +86,8 @@ model Customer {
   vatTax              VatTax[] // Một công ty có nhiều mức thuế
   goodAndServiceGroup GoodsAndServicesGroup[] // Một công ty có nhiều nhóm hàng hóa dịch vụ
   goodsAndServices    GoodsAndServices[] // Một công ty có nhiều loại hàng hóa dịch vụ
+  accountMainSystem   AccountMainSystem[] // Một công ty có nhiều tài khoản
+  warrantyPeriod      WarrantyPeriod[] // Một công ty có thể có nhiều mức bảo hành
 
   @@map("customers")
 }
@@ -212,23 +214,28 @@ model WarrantyPeriod {
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  goodsAndServices GoodsAndServices[]
+  // Chứa danh sách các bảng khác
+  goodsAndServices GoodsAndServices[] // Một loại bảo hành thuộc nhiều dịch vụ hàng hóa
+
+  // Quan hệ với công ty
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 
   @@map("warranty_periods")
 }
 
 model GoodsAndServices {
-  id                   String @id @default(uuid())
+  id                   String  @id @default(uuid())
   name                 String
   code                 String
-  vatDecrease          String @map("vat_decrease")
-  minimumStockQuantity Int    @map("minimum_stock_quantity")
-  image                String
-  source               String
-  description          String
-  purchaseDescription  String @map("purchase_description")
-  saleDescription      String @map("sale_description")
-  latestPurchasePrice  String @map("latest_purchase_price")
+  vatDecrease          String  @map("vat_decrease")
+  minimumStockQuantity Int     @map("minimum_stock_quantity")
+  image                String?
+  source               String?
+  description          String?
+  purchaseDescription  String? @map("purchase_description")
+  saleDescription      String? @map("sale_description")
+  latestPurchasePrice  Int     @map("latest_purchase_price")
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -266,12 +273,12 @@ model GoodsAndServices {
   DiscountAccount   AccountMainSystem? @relation("DiscountAccount", fields: [discountAccountId], references: [id])
   discountAccountId String?            @map("discount_account_id")
 
-  // Mang danh sách đối tượng khác
-  GoodsAndServicesGroupMapping GoodsAndServicesGroupMapping[]
-
   // Quan hệ với công ty
   Customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?
+
+  // Mang danh sách đối tượng khác
+  GoodsAndServicesGroupMapping GoodsAndServicesGroupMapping[]
 
   @@map("goods_and_services")
 }
@@ -385,6 +392,10 @@ model AccountMainSystem {
   expenseGoods        GoodsAndServices[] @relation("ExpenseAccount")
   salesAllowanceGoods GoodsAndServices[] @relation("SalesAllowanceAccount")
   discountGoods       GoodsAndServices[] @relation("DiscountAccount")
+
+  // Quan hệ với bảng công ty
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 
   @@map("account_main_systems")
 }

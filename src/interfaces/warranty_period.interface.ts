@@ -1,25 +1,15 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
+import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
 
-export enum PartnerType {
-  CLIENT = 'client',
-  SUPPLIER = 'supplier',
-}
-
-export enum LegalType {
-  ORGANIZATION = 'organization',
-  INDIVIDUAL = 'individual',
-}
-
-export interface PartnerPaginationResponseType {
-  data: ResponsePartnerDto[];
+export interface WarrantyPeriodPaginationResponseType {
+  data: ResponseEmployeeDto[];
   total: number;
   page: number;
   pageSize: number;
 }
 
-export class PartnerFilterType {
+export class WarrantyPeriodFilterType {
   @ApiPropertyOptional({ example: 20, description: 'Số lượng mỗi trang' })
   @IsOptional()
   pageSize?: number;
@@ -31,13 +21,6 @@ export class PartnerFilterType {
   @ApiPropertyOptional({ description: 'Từ khóa tìm kiếm' })
   @IsOptional()
   search?: string;
-
-  @IsOptional()
-  @ApiPropertyOptional({
-    example: 'client',
-    description: 'Loại đối tác Khách hàng:"client" - Nhà cung cấp: "supplier" ',
-  })
-  partnerType?: PartnerType;
 
   @ApiPropertyOptional({ description: 'ID khách hàng (Công ty)' })
   @IsOptional()

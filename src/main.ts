@@ -67,6 +67,9 @@ async function bootstrap() {
     .addTag('Employees', 'Employee management')
     .addTag('Partners', 'Partner management')
     .addTag('Goods & Services Group', 'Goods and services group management')
+    .addTag('Account Main System', 'Account main system management')
+    .addTag('Warranty Period', 'Warranty period management')
+    .addTag('Goods & Services', 'Goods and services management')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
