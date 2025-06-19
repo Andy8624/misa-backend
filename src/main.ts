@@ -66,10 +66,17 @@ async function bootstrap() {
     .addTag('VAT Tax', 'VAT tax management')
     .addTag('Employees', 'Employee management')
     .addTag('Partners', 'Partner management')
-    .addTag('Goods & Services Group', 'Goods and services group management')
     .addTag('Chart Of Account', 'Chart of account management')
     .addTag('Warranty Period', 'Warranty period management')
     .addTag('Goods & Services', 'Goods and services management')
+    .addTag('Goods & Services Group', 'Goods and services group management')
+    .addTag('Good & Service Mapping', 'Goods and services mapping management')
+    .addTag('Warehouse', 'Warehouse management')
+    .addTag('InventoryIn', 'Inventory in management')
+    .addTag('InventoryInItem', 'Inventory in item management')
+    .addTag('InventoryOutItem', 'Inventory out item management')
+    .addTag('InventoryOut', 'Inventory out management')
+    .addTag('ProductionOrder', 'Production Order management')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

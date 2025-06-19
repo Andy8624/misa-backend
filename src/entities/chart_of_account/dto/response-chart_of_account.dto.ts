@@ -5,19 +5,22 @@ export class ResponseChartOfAccountDto {
   id: string;
 
   @Expose()
-  accountCode: string;
+  accountNumber: string;
 
   @Expose()
   accountName: string;
 
   @Expose()
-  accountType: string;
+  particular: string;
 
   @Expose()
-  engAccountName: string;
+  englishName: string;
 
   @Expose()
-  describeAccount: string;
+  characteristics: string;
+
+  @Expose()
+  primaryAccountId?: string;
 
   @Expose()
   customerId: string;

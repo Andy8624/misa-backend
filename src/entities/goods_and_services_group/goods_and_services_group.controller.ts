@@ -15,8 +15,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 import { GoodAndServiceGroupFilterType } from 'src/interfaces/good_and_service_group.interface';
 
-@ApiTags('Goods & Services Group')
 @Controller('goods-and-services-groups')
+@ApiTags('Goods & Services Group')
 export class GoodsAndServicesGroupController {
   constructor(
     private readonly goodsAndServicesGroupService: GoodsAndServicesGroupService,

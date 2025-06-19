@@ -16,7 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
 @Controller('goods-and-services')
-@ApiTags('Goods And Services')
+@ApiTags('Goods & Services')
 export class GoodsAndServicesController {
   constructor(
     private readonly goodsAndServicesService: GoodsAndServicesService,

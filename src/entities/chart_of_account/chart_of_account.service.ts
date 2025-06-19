@@ -19,11 +19,11 @@ export class ChartOfAccountService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(request: CreateChartOfAccountDto) {
-    const existing = await this.prismaService.ChartOfAccount.findFirst({
+    const existing = await this.prismaService.chartOfAccount.findFirst({
       where: {
         AND: [
           {
-            accountCode: request.accountCode,
+            accountNumber: request.accountNumber,
             customerId: request.customerId,
           },
         ],
@@ -34,7 +34,7 @@ export class ChartOfAccountService {
       throw new ConflictException('Tài khoản đã tồn tại');
     }
 
-    const newAccount = await this.prismaService.ChartOfAccount.create({
+    const newAccount = await this.prismaService.chartOfAccount.create({
       data: request,
     });
 
@@ -59,7 +59,7 @@ export class ChartOfAccountService {
               {
                 OR: [
                   {
-                    accountCode: {
+                    accountNumber: {
                       contains: search,
                       mode: Prisma.QueryMode.insensitive,
                     },
@@ -71,13 +71,7 @@ export class ChartOfAccountService {
                     },
                   },
                   {
-                    accountType: {
-                      contains: search,
-                      mode: Prisma.QueryMode.insensitive,
-                    },
-                  },
-                  {
-                    engAccountName: {
+                    englishName: {
                       contains: search,
                       mode: Prisma.QueryMode.insensitive,
                     },
@@ -94,13 +88,13 @@ export class ChartOfAccountService {
     };
 
     const [response, total] = await Promise.all([
-      this.prismaService.ChartOfAccount.findMany({
+      this.prismaService.chartOfAccount.findMany({
         where: condition,
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
       }),
-      this.prismaService.ChartOfAccount.count({ where: condition }),
+      this.prismaService.chartOfAccount.count({ where: condition }),
     ]);
 
     return {
@@ -114,7 +108,7 @@ export class ChartOfAccountService {
   }
 
   async findOne(id: string) {
-    const account = await this.prismaService.ChartOfAccount.findUnique({
+    const account = await this.prismaService.chartOfAccount.findUnique({
       where: { id },
     });
 
@@ -129,9 +123,9 @@ export class ChartOfAccountService {
 
   async update(id: string, request: UpdateChartOfAccountDto) {
     await this.findOne(id);
-    const duplicate = await this.prismaService.ChartOfAccount.findFirst({
+    const duplicate = await this.prismaService.chartOfAccount.findFirst({
       where: {
-        accountCode: request.accountCode,
+        accountNumber: request.accountNumber,
         customerId: request.customerId,
         id: { not: id },
         deletedAt: null,
@@ -142,7 +136,7 @@ export class ChartOfAccountService {
       throw new ConflictException('Mã tài khoản này đã tồn tại');
     }
 
-    const updatedEntity = await this.prismaService.ChartOfAccount.update({
+    const updatedEntity = await this.prismaService.chartOfAccount.update({
       where: { id },
       data: request,
     });
@@ -155,7 +149,7 @@ export class ChartOfAccountService {
   async remove(id: string) {
     await this.findOne(id);
 
-    await this.prismaService.ChartOfAccount.update({
+    await this.prismaService.chartOfAccount.update({
       where: { id },
       data: { deletedAt: new Date() },
     });

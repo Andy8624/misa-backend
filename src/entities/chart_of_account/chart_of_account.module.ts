@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ChartOfAccountService } from './account_main_system.service';
-import { ChartOfAccountController } from './account_main_system.controller';
+import { ChartOfAccountService } from './chart_of_account.service';
+import { ChartOfAccountController } from './chart_of_account.controller';
 import { PrismaService } from 'src/prisma.service';
 
 @Module({

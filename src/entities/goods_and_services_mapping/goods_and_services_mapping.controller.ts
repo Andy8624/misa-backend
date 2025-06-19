@@ -16,7 +16,7 @@ import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.d
 import { GoodAndServiceMappingFilterType } from 'src/interfaces/good_and_service_mapping.interface';
 
 @Controller('goods-and-services-mapping')
-@ApiTags('Good And Service Mapping')
+@ApiTags('Good & Service Mapping')
 export class GoodsAndServicesMappingController {
   constructor(
     private readonly goodsAndServicesMappingService: GoodsAndServicesMappingService,

@@ -132,6 +132,15 @@ model Partner {
   asClientOut InventoryOut[] @relation("InventoryOutClient")
   asObjectOut InventoryOut[] @relation("InventoryOutObject")
 
+  CashReceipCustomer CashReceip[] @relation("CashReceipCustomer")
+  CashReceipSubject  CashReceip[] @relation("CashReceipSubject")
+
+  CashPaymentSubject  CashPayment[] @relation("CashPaymentSubject")
+  CashPaymentCustomer CashPayment[] @relation("CashPaymentCustomer")
+
+  CashReceipVoucherItem    CashReceipVoucherItem[]    @relation("CashReceipVoucherItemSubject")
+  PaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItemSubject")
+
   @@map("partners")
 }
 
@@ -151,6 +160,9 @@ model Bank {
 
   // Bao gồm danh sách các tài khoản thuộc ngân hàng này
   bankAccounts BankAccount[]
+
+  CashReceipVoucherItem    CashReceipVoucherItem[]    @relation("CashReceipVoucherItem_Bank")
+  PaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_Bank")
 
   @@map("banks")
 }
@@ -212,8 +224,15 @@ model Employee {
 
   // Mang danh sách đối tượng khác
   bankAccounts BankAccount[] // Một nhân viên có nhiều tài khoản ngân hàng
-  InventoryIns InventoryIn[] // Một nhân viên
-  InventoryOut InventoryOut[]
+
+  InventoryIns InventoryIn[] // Một nhân viên có thể tạo nhiều phiếu nhập kho
+  InventoryOut InventoryOut[] // Một nhân viên có thể tạo nhiều phiếu xuất kho
+
+  CashReceipEmployeeByType CashReceip[] @relation("CashReceipEmployeeByType")
+  CashReceipEmployee       CashReceip[] @relation("CashReceipEmployee")
+
+  CashPaymentEmployee       CashPayment[] @relation("CashPaymentEmployee")
+  CashPaymentEmployeeByType CashPayment[] @relation("CashPaymentEmployeeByType")
 
   @@map("employees")
 }
@@ -390,12 +409,12 @@ model VatTax {
 }
 
 model ChartOfAccount {
-  id              String @id @default(uuid())
-  accountNumber   String @map("account_number")
-  accountName     String @map("account_name")
-  particular      String
-  englishName     String @map("english_name")
-  characteristics String
+  id              String  @id @default(uuid())
+  accountNumber   String? @map("account_number")
+  accountName     String? @map("account_name")
+  englishName     String? @map("english_name")
+  particular      String?
+  characteristics String?
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -426,8 +445,15 @@ model ChartOfAccount {
 
   creditInventoryOutItems InventoryOutItem[] @relation("InventoryOutItemCredit")
   debitInventoryOutItems  InventoryOutItem[] @relation("InventoryOutItemDebit")
-  creditInventoryInItems  InventoryInItem[]  @relation("InventoryInItemCredit")
-  debitInventoryInItems   InventoryInItem[]  @relation("InventoryInItemDebit")
+
+  creditInventoryInItems InventoryInItem[] @relation("InventoryInItemCredit")
+  debitInventoryInItems  InventoryInItem[] @relation("InventoryInItemDebit")
+
+  creditCashReceipVoucherItem CashReceipVoucherItem[] @relation("CashReceipVoucherItem_CreditAccount")
+  debitCashReceipVoucherItem  CashReceipVoucherItem[] @relation("CashReceipVoucherItem_DebitAccount")
+
+  creditPaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_CreditAccount")
+  debitPaymentReceipVoucherItem  PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_DebitAccount")
 
   @@map("chart_of_accounts")
 }
@@ -436,7 +462,6 @@ model Warehouse {
   id      String @id @default(uuid())
   code    String // Mã kho
   name    String // Tên kho
-  account String // 
   status  String // Trạng thái kho
   address String // Địa chỉ kho
 
@@ -450,8 +475,9 @@ model Warehouse {
   customerId String?   @map("customer_id")
 
   // Quan hệ với bảng tài khoản
-  ChartOfAccount   ChartOfAccount?    @relation(fields: [chartOfAccountId], references: [id])
-  chartOfAccountId String?            @map("chart_of_account_id")
+  ChartOfAccount   ChartOfAccount? @relation(fields: [chartOfAccountId], references: [id])
+  chartOfAccountId String?         @map("chart_of_account_id")
+
   InventoryOutItem InventoryOutItem[]
   InventoryInItem  InventoryInItem[]
 
@@ -459,16 +485,16 @@ model Warehouse {
 }
 
 model InventoryIn {
-  id                      String   @id @default(uuid())
-  inventoryInVoucherType  String   @map("inventory_in_voucher_type")
-  address                 String
-  courier                 String // Chuyển phát nhanh (Người giao hàng)
-  description             String
-  withOriginalVoucher     String   @map("with_original_vouher")
-  postedDate              DateTime @map("posted_date")
-  voucherDate             DateTime @map("voucher_date")
-  voucherNumber           String   @map("voucher_number")
-  costOfInventoryReturned String   @map("cost_of_inventory_returned")
+  id                      String    @id @default(uuid())
+  inventoryInVoucherType  String?   @map("inventory_in_voucher_type")
+  address                 String?
+  courier                 String? // Chuyển phát nhanh (Người giao hàng)
+  description             String?
+  withOriginalVoucher     String?   @map("with_original_vouher")
+  postedDate              DateTime? @map("posted_date")
+  voucherDate             DateTime? @map("voucher_date")
+  voucherNumber           String?   @map("voucher_number")
+  costOfInventoryReturned String?   @map("cost_of_inventory_returned")
 
   // Chứa danh sách bảng khác
   attached File[] // Một phiếu nhập kho có nhiều file
@@ -483,11 +509,11 @@ model InventoryIn {
   storePersonId String?   @map("store_person_id")
 
   // Relations với Partner
-  client   Partner @relation("InventoryInClient", fields: [clientId], references: [id])
-  clientId String  @map("client_id")
+  client   Partner? @relation("InventoryInClient", fields: [clientId], references: [id])
+  clientId String?  @map("client_id")
 
-  object   Partner @relation("InventoryInObject", fields: [objectId], references: [id])
-  objectId String  @map("object_id")
+  object   Partner? @relation("InventoryInObject", fields: [objectId], references: [id])
+  objectId String?  @map("object_id")
 
   Customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?
@@ -498,16 +524,16 @@ model InventoryIn {
 }
 
 model InventoryOut {
-  id                      String   @id @default(uuid())
-  inventoryOutVoucherType String   @map("inventory_out_voucher_type")
-  address                 String
-  receipient              String
-  particular              String // Lý do xuất
-  withOriginalVoucher     String   @map("with_original_vouher")
-  component               String
-  postedDate              DateTime @map("posted_date")
-  voucherDate             DateTime @map("voucher_date")
-  voucherNumber           String   @map("voucher_number")
+  id                      String    @id @default(uuid())
+  inventoryOutVoucherType String?   @map("inventory_out_voucher_type")
+  address                 String?
+  receipient              String?
+  particular              String? // Lý do xuất
+  withOriginalVoucher     String?   @map("with_original_vouher")
+  component               String?
+  postedDate              DateTime? @map("posted_date")
+  voucherDate             DateTime? @map("voucher_date")
+  voucherNumber           String?   @map("voucher_number")
 
   // Chứa danh sách bảng khác
   attached File[] // Một phiếu xuất kho có nhiều file
@@ -522,11 +548,11 @@ model InventoryOut {
   storePersonId String?   @map("store_person_id")
 
   // Relations với Partner
-  client   Partner @relation("InventoryOutClient", fields: [clientId], references: [id])
-  clientId String  @map("client_id")
+  client   Partner? @relation("InventoryOutClient", fields: [clientId], references: [id])
+  clientId String?  @map("client_id")
 
-  object   Partner @relation("InventoryOutObject", fields: [objectId], references: [id])
-  objectId String  @map("object_id")
+  object   Partner? @relation("InventoryOutObject", fields: [objectId], references: [id])
+  objectId String?  @map("object_id")
 
   Customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?
@@ -538,9 +564,9 @@ model InventoryOut {
 
 model InventoryOutItem {
   id                 String  @id @default(uuid())
-  itemName           String  @map("item_name")
-  quantity           Int
-  unitPrice          Int     @map("unit_price")
+  itemName           String? @map("item_name")
+  quantity           Int?
+  unitPrice          Int?    @map("unit_price")
   finishedGood       String? @map("finished_good")
   costClassification String? @map("cost_classification")
   costObject         String? @map("cost_object")
@@ -577,10 +603,10 @@ model InventoryOutItem {
 }
 
 model InventoryInItem {
-  id        String @id @default(uuid())
-  itemName  String @map("item_name")
-  quantity  Int
-  unitPrice Int    @map("unit_price")
+  id        String  @id @default(uuid())
+  itemName  String? @map("item_name")
+  quantity  Int?
+  unitPrice Int?    @map("unit_price")
 
   // ✅ Thêm relations với ChartOfAccount
   creditAccount   ChartOfAccount? @relation("InventoryInItemCredit", fields: [creditAccountId], references: [id])
@@ -612,10 +638,10 @@ model InventoryInItem {
 }
 
 model productionOrders {
-  id          String   @id @default(uuid())
-  date        DateTime
-  orderNo     Int      @map("order_no")
-  description String
+  id          String    @id @default(uuid())
+  date        DateTime?
+  orderNo     Int?      @map("order_no")
+  description String?
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -626,12 +652,11 @@ model productionOrders {
 }
 
 model File {
-  id        String @id @default(uuid())
-  fileName  String @map("file_name")
-  fileSize  Int    @map("file_size")
-  mimeType  String @map("mime_type")
-  path      String // Đường dẫn lưu trữ
-  extension String // Phần mở rộng: .pdf, .jpg
+  id       String @id @default(uuid())
+  fileName String @map("file_name")
+  fileSize Int    @map("file_size")
+  mimeType String @map("mime_type")
+  path     String // Đường dẫn lưu trữ
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -646,4 +671,110 @@ model File {
   inventoryOutId String?       @map("inventory_out_id")
 
   @@map("files")
+}
+
+// Phiếu thu tiền mặt
+model CashReceip {
+  id                     String    @id @default(uuid())
+  cashReceiptVoucherType String?   @map("cash_receipt_voucher_type") // Loại phiếu thu
+  payer                  String? // Người nộp
+  address                String?
+  postedDate             DateTime? @map("posted_date") // Ngày hạch toán
+  voucherDate            DateTime? @map("voucher_date") // Ngày chứng từ
+  voucherNumber          String?   @map("voucher_number") // Số chứng từ
+  reason                 String? // Lý do nộp
+  withOriginalVoucher    String?   @map("with_original_vouher")
+
+  // employeeByType  -- employee -- nhân viên
+  EmployeeByType Employee? @relation("CashReceipEmployeeByType", fields: [employeeByType], references: [id])
+  employeeByType String?   @map("employee_by_type")
+
+  // employee -- nhân viên
+  Employee Employee? @relation("CashReceipEmployee", fields: [employee], references: [id])
+  employee String?
+
+  // subject -- partner -- Đối tượng nào
+  Subject Partner? @relation("CashReceipSubject", fields: [subject], references: [id])
+  subject String?
+
+  // customer -- partner -- khách hàng
+  Customer Partner? @relation("CashReceipCustomer", fields: [customer], references: [id])
+  customer String?
+
+  CashReceipVoucherItem    CashReceipVoucherItem[]    @relation("CashReceipVoucherItem_CashReceip")
+  PaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_PaymentReceip")
+}
+
+// Chi tiết phiếu thu tiền mặt
+model CashReceipVoucherItem {
+  id          String  @id @default(uuid())
+  amount      Float?
+  description String?
+
+  CashReceip CashReceip? @relation("CashReceipVoucherItem_CashReceip", fields: [cashReceip], references: [id])
+  cashReceip String?
+
+  Subject Partner? @relation("CashReceipVoucherItemSubject", fields: [subject], references: [id])
+  subject String?
+
+  DebitAccount ChartOfAccount? @relation("CashReceipVoucherItem_DebitAccount", fields: [debitAccount], references: [id])
+  debitAccount String?
+
+  CreditAccount ChartOfAccount? @relation("CashReceipVoucherItem_CreditAccount", fields: [creditAccount], references: [id])
+  creditAccount String?
+
+  Bank Bank?   @relation("CashReceipVoucherItem_Bank", fields: [bank], references: [id])
+  bank String?
+}
+
+// Phiếu chi tiền mặt
+model CashPayment {
+  id                     String    @id @default(uuid())
+  cashPaymentVoucherType String?   @map("cash_receipt_voucher_type") // Loại phiếu thu
+  supplierName           String?   @map("supplier_name") // Tên nhà cung cấp
+  address                String?
+  recipient              String? // Người nhận
+  withOriginalVoucher    String?   @map("with_original_vouher")
+  reason                 String? // Lý do nộp
+  postedDate             DateTime? @map("posted_date") // Ngày hạch toán
+  voucherDate            DateTime? @map("voucher_date") // Ngày chứng từ
+  voucherNumber          String?   @map("voucher_number") // Số chứng từ
+
+  // employeeByType  -- employee -- nhân viên
+  EmployeeByType Employee? @relation("CashPaymentEmployeeByType", fields: [employeeByType], references: [id])
+  employeeByType String?   @map("employee_by_type")
+
+  // employee -- nhân viên
+  Employee Employee? @relation("CashPaymentEmployee", fields: [employee], references: [id])
+  employee String?
+
+  // subject -- partner -- Đối tượng nào
+  Subject Partner? @relation("CashPaymentSubject", fields: [subject], references: [id])
+  subject String?
+
+  // supplier -- partner -- nhà cung cấp
+  Supplier Partner? @relation("CashPaymentCustomer", fields: [supplier], references: [id])
+  supplier String?
+}
+
+// Chi tiết phiếu chi tiền mặt
+model PaymentReceipVoucherItem {
+  id          String  @id @default(uuid())
+  amount      Float?
+  description String?
+
+  PaymentReceip CashReceip? @relation("PaymentReceipVoucherItem_PaymentReceip", fields: [paymentReceip], references: [id])
+  paymentReceip String?
+
+  Subject Partner? @relation("PaymentReceipVoucherItemSubject", fields: [subject], references: [id])
+  subject String?
+
+  DebitAccount ChartOfAccount? @relation("PaymentReceipVoucherItem_DebitAccount", fields: [debitAccount], references: [id])
+  debitAccount String?
+
+  CreditAccount ChartOfAccount? @relation("PaymentReceipVoucherItem_CreditAccount", fields: [creditAccount], references: [id])
+  creditAccount String?
+
+  Bank Bank?   @relation("PaymentReceipVoucherItem_Bank", fields: [bank], references: [id])
+  bank String?
 }
