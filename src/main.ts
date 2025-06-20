@@ -85,7 +85,26 @@ async function bootstrap() {
     .addTag('DepositPayment', 'DepisitPayment management')
     .addTag('DepositPaymentItem', 'DepositPaymentItem management')
     .addTag('DepositReceipItem', 'DepositReceipItem management')
+
+    .addTag('GroupOfPurchaseGood', 'GroupOfPurchaseGood management')
     .addTag('Invoice', 'Invoice management')
+    .addTag('PaymentTerm', 'PaymentTerm management')
+    .addTag('ProvisionServiceVoucher', 'ProvisionServiceVoucher management')
+    .addTag(
+      'ProvisionServiceVoucherItem',
+      'ProvisionServiceVoucherItem management',
+    )
+    .addTag('PurchaseVoucher', 'PurchaseVoucher management')
+    .addTag('PurchaseVoucherItem', 'PurchaseVoucherItem management')
+    .addTag('SaleVoucher', 'SaleVoucher management')
+    .addTag('SaleVoucherItem', 'SaleVoucherItem management')
+    .addTag('ServicePurchaseVoucher', 'ServicePurchaseVoucher management')
+    .addTag(
+      'ServicePurchaseVoucherItem',
+      'ServicePurchaseVoucherItem management',
+    )
+    .addTag('VoucherAccountEntry', 'VoucherAccountEntry management')
+
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

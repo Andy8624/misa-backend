@@ -32,6 +32,17 @@ import { DepositPaymentModule } from './entities/deposit_payment/deposit_payment
 import { DepositPaymentItemModule } from './entities/deposit_payment_item/deposit_payment_item.module';
 import { DepositReceipItemModule } from './entities/deposit_receip_item/deposit_receip_item.module';
 import { PaymentTermModule } from './entities/payment_term/payment_term.module';
+import { InvoiceModule } from './entities/invoice/invoice.module';
+import { VoucherAccountEntryModule } from './entities/voucher_account_entry/voucher_account_entry.module';
+import { ServicePurchaseVoucherModule } from './entities/service_purchase_voucher/service_purchase_voucher.module';
+import { ServicePurchaseVoucherItemModule } from './entities/service_purchase_voucher_item/service_purchase_voucher_item.module';
+import { ProvisionServiceVoucherModule } from './entities/provision_service_voucher/provision_service_voucher.module';
+import { ProvisionServiceVoucherItemModule } from './entities/provision_service_voucher_item/provision_service_voucher_item.module';
+import { SaleVoucherModule } from './entities/sale_voucher/sale_voucher.module';
+import { SaleVoucherItemModule } from './entities/sale_voucher_item/sale_voucher_item.module';
+import { PurchaseVoucherModule } from './entities/purchase_voucher/purchase_voucher.module';
+import { PurchaseVoucherItemModule } from './entities/purchase_voucher_item/purchase_voucher_item.module';
+import { GroupOfPurchaseGoodModule } from './entities/group_of_purchase_good/group_of_purchase_good.module';
 
 @Module({
   imports: [
@@ -65,6 +76,17 @@ import { PaymentTermModule } from './entities/payment_term/payment_term.module';
     DepositPaymentItemModule,
     DepositReceipItemModule,
     PaymentTermModule,
+    InvoiceModule,
+    VoucherAccountEntryModule,
+    ServicePurchaseVoucherModule,
+    ServicePurchaseVoucherItemModule,
+    ProvisionServiceVoucherModule,
+    ProvisionServiceVoucherItemModule,
+    SaleVoucherModule,
+    SaleVoucherItemModule,
+    PurchaseVoucherModule,
+    PurchaseVoucherItemModule,
+    GroupOfPurchaseGoodModule,
   ],
   controllers: [AppController],
   providers: [AppService],
