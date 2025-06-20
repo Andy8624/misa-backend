@@ -173,6 +173,7 @@ model Partner {
   SaleVoucher_CashReceiptVoucherCustomer  SaleVoucher[]             @relation("SaleVoucher_CashReceiptVoucherCustomer")
   SaleVoucher_CashReceiptVoucherPrincipal SaleVoucher[]             @relation("SaleVoucher_CashReceiptVoucherPrincipal")
   SaleVoucher_Customer                    SaleVoucher[]             @relation("SaleVoucher_Customer")
+  PurchaseVoucher_Supplier                PurchaseVoucher[]         @relation("PurchaseVoucher_Supplier")
 
   @@map("partners")
 }
@@ -230,10 +231,12 @@ model BankAccount {
   DepositPaymentBank DepositPayment[] @relation("DepositPaymentBank")
 
   // Auditing
-  createdAt                      DateTime      @default(now()) @map("created_at")
-  updatedAt                      DateTime?     @updatedAt @map("updated_at")
-  deletedAt                      DateTime?     @map("deleted_at")
-  SaleVoucher_InvoiceBankAccount SaleVoucher[] @relation("SaleVoucher_InvoiceBankAccount")
+  createdAt                        DateTime          @default(now()) @map("created_at")
+  updatedAt                        DateTime?         @updatedAt @map("updated_at")
+  deletedAt                        DateTime?         @map("deleted_at")
+  SaleVoucher_InvoiceBankAccount   SaleVoucher[]     @relation("SaleVoucher_InvoiceBankAccount")
+  PurchaseVoucher_RecipientAccount PurchaseVoucher[] @relation("PurchaseVoucher_RecipientAccount")
+  PurchaseVoucher_PaymentAccount   PurchaseVoucher[] @relation("PurchaseVoucher_PaymentAccount")
 
   @@map("bank_accounts")
 }
@@ -292,6 +295,7 @@ model Employee {
   SaleVoucher_DebtVoucherStoreperson                    SaleVoucher[]             @relation("SaleVoucher_DebtVoucherStoreperson")
   SaleVoucher_CashReceiptStoreperson                    SaleVoucher[]             @relation("SaleVoucher_CashReceiptStoreperson")
   SaleVoucher_CashReceiptVoucherStoreperson             SaleVoucher[]             @relation("SaleVoucher_CashReceiptVoucherStoreperson")
+  PurchaseVoucher_PurchasingStaff                       PurchaseVoucher[]         @relation("PurchaseVoucher_PurchasingStaff")
 
   @@map("employees")
 }
@@ -377,6 +381,7 @@ model GoodsAndServices {
   ServicePurchaseVoucherItem_ItemId ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_ItemId")
   ProvisionServiceVoucherItem_Item  ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Item")
   SaleVoucherItem_Item              SaleVoucherItem[]             @relation("SaleVoucherItem_Item")
+  PurchaseVoucherItem_Item          PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_Item")
 
   @@map("goods_and_services")
 }
@@ -452,6 +457,7 @@ model Unit {
   ServicePurchaseVoucherItem_Unit  ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_Unit")
   ProvisionServiceVoucherItem_Unit ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Unit")
   SaleVoucherItem                  SaleVoucherItem[]             @relation("SaleVoucherItem_Unit")
+  PurchaseVoucherItem_Unit         PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_Unit")
 
   @@map("units")
 }
@@ -476,6 +482,7 @@ model VatTax {
   ServicePurchaseVoucherItem_Vat  ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_Vat")
   ProvisionServiceVoucherItem_Vat ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Vat")
   SaleVoucherItem_Vat             SaleVoucherItem[]             @relation("SaleVoucherItem_Vat")
+  PurchaseVoucherItem_Vat         PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_Vat")
 
   @@map("vat_taxes")
 }
@@ -540,19 +547,27 @@ model ChartOfAccount {
   ServicePurchaseVoucherItemCredit ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemCredit")
   ServicePurchaseVoucherItemDebit  ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemDebit")
 
-  ProvisionServiceVoucherItemCredit         ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
-  ProvisionServiceVoucherItemDebit          ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
-  ProvisionServiceVoucherItemDiscount       ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
-  ProvisionServiceVoucherItemVat            ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
-  SaleVoucherItem_ExpenseAccount            SaleVoucherItem[]             @relation("SaleVoucherItem_ExpenseAccount")
-  SaleVoucherItem_InventoryAccount          SaleVoucherItem[]             @relation("SaleVoucherItem_InventoryAccount")
-  SaleVoucherItemDebit                      SaleVoucherItem[]             @relation("SaleVoucherItemDebit")
-  SaleVoucherItemCredit                     SaleVoucherItem[]             @relation("SaleVoucherItemCredit")
-  SaleVoucherItemCash                       SaleVoucherItem[]             @relation("SaleVoucherItemCash")
-  SaleVoucherItemLiability                  SaleVoucherItem[]             @relation("SaleVoucherItemLiability")
-  SaleVoucherItem_liabilityAccountOrExpense SaleVoucherItem[]             @relation("SaleVoucherItem_liabilityAccountOrExpense")
-  SaleVoucherItem_SaleAccount               SaleVoucherItem[]             @relation("SaleVoucherItem_SaleAccount")
-  SaleVoucherItem_ExportTaxAccount          SaleVoucherItem[]             @relation("SaleVoucherItem_ExportTaxAccount")
+  ProvisionServiceVoucherItemCredit                ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
+  ProvisionServiceVoucherItemDebit                 ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
+  ProvisionServiceVoucherItemDiscount              ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
+  ProvisionServiceVoucherItemVat                   ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
+  SaleVoucherItem_ExpenseAccount                   SaleVoucherItem[]             @relation("SaleVoucherItem_ExpenseAccount")
+  SaleVoucherItem_InventoryAccount                 SaleVoucherItem[]             @relation("SaleVoucherItem_InventoryAccount")
+  SaleVoucherItemDebit                             SaleVoucherItem[]             @relation("SaleVoucherItemDebit")
+  SaleVoucherItemCredit                            SaleVoucherItem[]             @relation("SaleVoucherItemCredit")
+  SaleVoucherItemCash                              SaleVoucherItem[]             @relation("SaleVoucherItemCash")
+  SaleVoucherItemLiability                         SaleVoucherItem[]             @relation("SaleVoucherItemLiability")
+  SaleVoucherItem_liabilityAccountOrExpense        SaleVoucherItem[]             @relation("SaleVoucherItem_liabilityAccountOrExpense")
+  SaleVoucherItem_SaleAccount                      SaleVoucherItem[]             @relation("SaleVoucherItem_SaleAccount")
+  SaleVoucherItem_ExportTaxAccount                 SaleVoucherItem[]             @relation("SaleVoucherItem_ExportTaxAccount")
+  PurchaseVoucherItem_CostAccount                  PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_CostAccount")
+  PurchaseVoucherItem_AccountPayable               PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_AccountPayable")
+  PurchaseVoucherItem_CashAccount                  PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_CashAccount")
+  PurchaseVoucherItem_InventoryAccount             PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_InventoryAccount")
+  PurchaseVoucherItem_VatAccount                   PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_VatAccount")
+  PurchaseVoucherItem_ImportTaxAccount             PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_ImportTaxAccount")
+  PurchaseVoucherItem_SpecialConsumptionTaxAccount PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_SpecialConsumptionTaxAccount")
+  PurchaseVoucherItem_VatCorrespondingAccount      PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_VatCorrespondingAccount")
 
   @@map("chart_of_accounts")
 }
@@ -580,7 +595,8 @@ model Warehouse {
   InventoryOutItem InventoryOutItem[]
   InventoryInItem  InventoryInItem[]
 
-  SaleVoucherItem SaleVoucherItem[] @relation("SaleVoucherItem_Warehouse")
+  SaleVoucherItem               SaleVoucherItem[]     @relation("SaleVoucherItem_Warehouse")
+  PurchaseVoucherItem_Warehouse PurchaseVoucherItem[] @relation("PurchaseVoucherItem_Warehouse")
 
   @@map("warehouses")
 }
@@ -775,8 +791,9 @@ model File {
 
   InvoiceFile Invoice[] @relation("InvoiceFile")
 
-  ProvisionServiceVoucher ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_Attached")
-  SaleVoucher_Attached    SaleVoucher[]             @relation("SaleVoucher_Attached")
+  ProvisionServiceVoucher  ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_Attached")
+  SaleVoucher_Attached     SaleVoucher[]             @relation("SaleVoucher_Attached")
+  PurchaseVoucher_Attached PurchaseVoucher[]         @relation("PurchaseVoucher_Attached")
 
   @@map("files")
 }
@@ -1078,6 +1095,7 @@ model PaymentTerms {
 
   ProvisionServiceVoucher_PaymentTAndC ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_PaymentTAndC")
   SaleVoucher_PaymentTAndC             SaleVoucher[]             @relation("SaleVoucher_PaymentTAndC")
+  PurchaseVoucher_PaymentTAndC         PurchaseVoucher[]         @relation("PurchaseVoucher_PaymentTAndC")
 }
 
 model VoucherAccountEntry {
@@ -1593,4 +1611,181 @@ model SaleVoucherItem {
   // export_tax_account
   ExportTaxAccount      ChartOfAccount? @relation("SaleVoucherItem_ExportTaxAccount", fields: [export_tax_account_id], references: [id])
   export_tax_account_id String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model PurchaseVoucher {
+  id             String    @id @default(uuid())
+  purchase_type  String?
+  voucher_number String?
+  payment_status String?
+  payment_method String?
+  posted_date    DateTime?
+  voucher_date   DateTime?
+
+  // payment_t_and_c
+  PaymentTAndC    PaymentTerms? @relation("PurchaseVoucher_PaymentTAndC", fields: [payment_t_and_c], references: [id])
+  payment_t_and_c String?
+
+  pay_within_days Int?
+  due_date        DateTime?
+
+  // supplier
+  Supplier Partner? @relation("PurchaseVoucher_Supplier", fields: [supplier], references: [id])
+  supplier String?
+
+  supplier_name     String?
+  supplier_address  String?
+  supplier_tax_code String?
+
+  courier String?
+
+  // purchasing_staff
+  PurchasingStaff  Employee? @relation("PurchaseVoucher_PurchasingStaff", fields: [purchasing_staff], references: [id])
+  purchasing_staff String?
+
+  receipient               String?
+  quantity_original_number String?
+  inventory_in_voucher_no  String?
+
+  // recipient_account
+  RecipientAccount  BankAccount? @relation("PurchaseVoucher_RecipientAccount", fields: [recipient_account], references: [id])
+  recipient_account String?
+
+  recipient_account_bank_name String?
+
+  description String?
+
+  // payment_account
+  PaymentAccount  BankAccount? @relation("PurchaseVoucher_PaymentAccount", fields: [payment_account], references: [id])
+  payment_account String?
+
+  payment_account_bank_name String?
+  e_invoice_search_id       String?
+  e_invoice_search_url      String?
+
+  // attached 
+  Attached File?   @relation("PurchaseVoucher_Attached", fields: [attached], references: [id])
+  attached String?
+
+  inventory_in_voucher_particular String?
+  cash_payment_voucher_particular String?
+  debt_voucher_particular         String?
+
+  // invoice
+  invoice_form   String?
+  invoice_sign   String?
+  invoice_number String?
+  invoice_date   DateTime?
+  discount       String?
+  discount_rate  String?
+
+  // counter cheque
+  personal_id_number String?
+  issued_date        String?
+  issued_by          String?
+  invoice_inclusion  String?
+
+  createdAt                           DateTime              @default(now()) @map("created_at")
+  updatedAt                           DateTime?             @updatedAt @map("updated_at")
+  deletedAt                           DateTime?             @map("deleted_at")
+  PurchaseVoucherItem_PurchaseVoucher PurchaseVoucherItem[] @relation("PurchaseVoucherItem_PurchaseVoucher")
+}
+
+model PurchaseVoucherItem {
+  id String @id @default(uuid())
+
+  // purchase_voucher
+  PurchaseVoucher  PurchaseVoucher? @relation("PurchaseVoucherItem_PurchaseVoucher", fields: [purchase_voucher], references: [id])
+  purchase_voucher String?
+
+  // item_id
+  Item    GoodsAndServices? @relation("PurchaseVoucherItem_Item", fields: [item_id], references: [id])
+  item_id String?
+
+  item_name String?
+
+  // cost_account
+  CostAccount  ChartOfAccount? @relation("PurchaseVoucherItem_CostAccount", fields: [cost_account], references: [id])
+  cost_account String?
+
+  // account_payable
+  AccountPayable  ChartOfAccount? @relation("PurchaseVoucherItem_AccountPayable", fields: [account_payable], references: [id])
+  account_payable String?
+
+  // cash_account
+  CashAccount  ChartOfAccount? @relation("PurchaseVoucherItem_CashAccount", fields: [cash_account], references: [id])
+  cash_account String?
+
+  // inventory_account
+  InventoryAccount  ChartOfAccount? @relation("PurchaseVoucherItem_InventoryAccount", fields: [inventory_account], references: [id])
+  inventory_account String?
+
+  Unit Unit?   @relation("PurchaseVoucherItem_Unit", fields: [unit], references: [id])
+  unit String?
+
+  quantity   Int?
+  unit_price Float?
+
+  Vat VatTax? @relation("PurchaseVoucherItem_Vat", fields: [vat], references: [id])
+  vat String?
+
+  VatAccount  ChartOfAccount? @relation("PurchaseVoucherItem_VatAccount", fields: [vat_account], references: [id])
+  vat_account String?
+
+  purchase_cost   Float?
+  pre_custom_cost Float?
+
+  // group_of_purchased_goods 
+  GroupOfPurchaseGood      GroupOfPurchasedGood? @relation("PurchaseVoucherItem_GroupOfPurchaseGood", fields: [group_of_purchased_goods], references: [id])
+  group_of_purchased_goods String?
+
+  discount_rate String?
+
+  Warehouse Warehouse? @relation("PurchaseVoucherItem_Warehouse", fields: [warehouse], references: [id])
+  warehouse String?
+
+  // Tax
+  automatically_calculate                 String?
+  pre_customs_cost_in_accounting_currency String?
+  pre_customs_cost_in_foreign_currency    String?
+  custom_exchange_rate                    String?
+  import_tax_rate                         String?
+
+  // import_tax_account 
+  ImportTaxAccount   ChartOfAccount? @relation("PurchaseVoucherItem_ImportTaxAccount", fields: [import_tax_account], references: [id])
+  import_tax_account String?
+
+  special_consumption_tax_rate String?
+
+  // special_consumption_tax_account
+  SpecialConsumptionTaxAccount    ChartOfAccount? @relation("PurchaseVoucherItem_SpecialConsumptionTaxAccount", fields: [special_consumption_tax_account], references: [id])
+  special_consumption_tax_account String?
+
+  vat_description String?
+
+  // vat_corresponding_account
+  VatCorrespondingAccount   ChartOfAccount? @relation("PurchaseVoucherItem_VatCorrespondingAccount", fields: [vat_corresponding_account], references: [id])
+  vat_corresponding_account String?
+
+  fob Float?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model GroupOfPurchasedGood {
+  id          String  @id @default(uuid())
+  code        String?
+  name        String?
+  description String?
+
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime?             @updatedAt @map("updated_at")
+  deletedAt           DateTime?             @map("deleted_at")
+  PurchaseVoucherItem PurchaseVoucherItem[] @relation("PurchaseVoucherItem_GroupOfPurchaseGood")
 }
