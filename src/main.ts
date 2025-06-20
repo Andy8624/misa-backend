@@ -85,6 +85,8 @@ async function bootstrap() {
     .addTag('DepositPayment', 'DepisitPayment management')
     .addTag('DepositPaymentItem', 'DepositPaymentItem management')
     .addTag('DepositReceipItem', 'DepositReceipItem management')
+    .addTag('Bank', 'Bank management')
+    .addTag('BankAccount', 'BankAccount management')
 
     .addTag('GroupOfPurchaseGood', 'GroupOfPurchaseGood management')
     .addTag('Invoice', 'Invoice management')
