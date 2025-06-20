@@ -1688,11 +1688,11 @@ model PurchaseVoucher {
   issued_date        String?
   issued_by          String?
   invoice_inclusion  String?
+  PurchaseVoucherItem_PurchaseVoucher PurchaseVoucherItem[] @relation("PurchaseVoucherItem_PurchaseVoucher")
 
   createdAt                           DateTime              @default(now()) @map("created_at")
   updatedAt                           DateTime?             @updatedAt @map("updated_at")
   deletedAt                           DateTime?             @map("deleted_at")
-  PurchaseVoucherItem_PurchaseVoucher PurchaseVoucherItem[] @relation("PurchaseVoucherItem_PurchaseVoucher")
 }
 
 model PurchaseVoucherItem {
