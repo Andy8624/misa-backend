@@ -1538,10 +1538,11 @@ model SaleVoucher {
   customer_address  String?
   voucher_number    String?
 
-  createdAt                   DateTime          @default(now()) @map("created_at")
-  updatedAt                   DateTime?         @updatedAt @map("updated_at")
-  deletedAt                   DateTime?         @map("deleted_at")
   SaleVoucherItem_SaleVoucher SaleVoucherItem[] @relation("SaleVoucherItem_SaleVoucher")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
 
 model SaleVoucherItem {
@@ -1684,15 +1685,15 @@ model PurchaseVoucher {
   discount_rate  String?
 
   // counter cheque
-  personal_id_number String?
-  issued_date        String?
-  issued_by          String?
-  invoice_inclusion  String?
+  personal_id_number                  String?
+  issued_date                         String?
+  issued_by                           String?
+  invoice_inclusion                   String?
   PurchaseVoucherItem_PurchaseVoucher PurchaseVoucherItem[] @relation("PurchaseVoucherItem_PurchaseVoucher")
 
-  createdAt                           DateTime              @default(now()) @map("created_at")
-  updatedAt                           DateTime?             @updatedAt @map("updated_at")
-  deletedAt                           DateTime?             @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
 
 model PurchaseVoucherItem {
