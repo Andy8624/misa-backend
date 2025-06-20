@@ -22,9 +22,15 @@ import { InventoryOutItemModule } from './entities/inventory_out_item/inventory_
 import { FileModule } from './entities/file/file.module';
 import { ProductionOrderModule } from './entities/production_order/production_order.module';
 import { CashReceipModule } from './entities/cash_receip/cash_receip.module';
-import { PaymentReceipModule } from './entities/payment_receip/payment_receip.module';
 import { CashReceipVoucherItemModule } from './entities/cash_receip_voucher_item/cash_receip_voucher_item.module';
-import { PaymentReceipVoucherItemModule } from './entities/payment_receip_voucher_item/payment_receip_voucher_item.module';
+import { BankModule } from './entities/bank/bank.module';
+import { CashPaymentModule } from './entities/cash-payment/cash-payment.module';
+import { CashPaymentVoucherItemModule } from './entities/cash-payment-voucher-item/cash-payment-voucher-item.module';
+import { BankAccountModule } from './entities/bank_account/bank_account.module';
+import { DepositReceipModule } from './entities/deposit_receip/deposit_receip.module';
+import { DepositPaymentModule } from './entities/deposit_payment/deposit_payment.module';
+import { DepositPaymentItemModule } from './entities/deposit_payment_item/deposit_payment_item.module';
+import { DepositReceipItemModule } from './entities/deposit_receip_item/deposit_receip_item.module';
 
 @Module({
   imports: [
@@ -48,9 +54,15 @@ import { PaymentReceipVoucherItemModule } from './entities/payment_receip_vouche
     FileModule,
     ProductionOrderModule,
     CashReceipModule,
-    PaymentReceipModule,
     CashReceipVoucherItemModule,
-    PaymentReceipVoucherItemModule,
+    BankModule,
+    CashPaymentModule,
+    CashPaymentVoucherItemModule,
+    BankAccountModule,
+    DepositReceipModule,
+    DepositPaymentModule,
+    DepositPaymentItemModule,
+    DepositReceipItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],

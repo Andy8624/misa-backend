@@ -138,20 +138,28 @@ model Partner {
   CashPaymentSubject  CashPayment[] @relation("CashPaymentSubject")
   CashPaymentCustomer CashPayment[] @relation("CashPaymentCustomer")
 
-  CashReceipVoucherItem    CashReceipVoucherItem[]    @relation("CashReceipVoucherItemSubject")
-  PaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItemSubject")
+  CashReceipVoucherItem  CashReceipVoucherItem[]  @relation("CashReceipVoucherItemSubject")
+  CashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItemSubject")
+
+  DepositReceipCustomer  DepositReceip[]  @relation("DepositReceipCustomer")
+  DepositReceipSubject   DepositReceip[]  @relation("DepositReceipSubject")
+  DepositPaymentSupplier DepositPayment[] @relation("DepositPaymentSupplier")
+  DepositPaymentSubject  DepositPayment[] @relation("DepositPaymentSubject")
+
+  DepositReceipItemSubject DepositReceipItem[]  @relation("DepositReceipItemSubject")
+  DepositPaymentItem       DepositPaymentItem[] @relation("DepositPaymentItemSubject")
 
   @@map("partners")
 }
 
 model Bank {
-  id                 String @id @default(uuid())
-  fullName           String @map("full_name") // Tên tiếng việt
-  shortName          String @map("short_name") // Tên viết tắt
-  englishName        String @map("english_name") // Tên tiếng anh
-  headquarterAddress String @map("headquarter_address") // Địa chỉ trụ sở chính
-  description        String // Mô tả
-  logoUrl            String @map("logo_url") // Địa chỉ logo ngân hàng
+  id                 String  @id @default(uuid())
+  fullName           String? @map("full_name") // Tên tiếng việt
+  shortName          String? @map("short_name") // Tên viết tắt
+  englishName        String? @map("english_name") // Tên tiếng anh
+  headquarterAddress String? @map("headquarter_address") // Địa chỉ trụ sở chính
+  description        String? // Mô tả
+  logoUrl            String? @map("logo_url") // Địa chỉ logo ngân hàng
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -161,24 +169,19 @@ model Bank {
   // Bao gồm danh sách các tài khoản thuộc ngân hàng này
   bankAccounts BankAccount[]
 
-  CashReceipVoucherItem    CashReceipVoucherItem[]    @relation("CashReceipVoucherItem_Bank")
-  PaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_Bank")
+  CashReceipVoucherItem  CashReceipVoucherItem[]  @relation("CashReceipVoucherItem_Bank")
+  CashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_Bank")
 
   @@map("banks")
 }
 
 model BankAccount {
-  id                   String @id @default(uuid())
-  accountNumber        String @map("account_number") // Số tài khoản
-  provinceOrCity       String @map("province_or_city") // Tỉnh thành phố
-  branchName           String @map("branch_name") // Tên chi nhánh
-  branchAddress        String @map("branch_address") // Địa chỉ chi nhánh
-  deltailBranchAddress String @map("detail_branch_address") // Địa chỉ chi tiết chi nhánh
-
-  // Auditing
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  id                   String  @id @default(uuid())
+  accountNumber        String? @map("account_number") // Số tài khoản
+  provinceOrCity       String? @map("province_or_city") // Tỉnh thành phố
+  branchName           String? @map("branch_name") // Tên chi nhánh
+  branchAddress        String? @map("branch_address") // Địa chỉ chi nhánh
+  deltailBranchAddress String? @map("detail_branch_address") // Địa chỉ chi tiết chi nhánh
 
   // Khóa ngoại
   // Quan hệ với đối tác
@@ -192,6 +195,14 @@ model BankAccount {
   // Quan hệ với ngân hàng
   Bank   Bank?   @relation(fields: [bankId], references: [id])
   bankId String? @map("bank_id")
+
+  DepositReceipBank  DepositReceip[]  @relation("DepositReceipBank")
+  DepositPaymentBank DepositPayment[] @relation("DepositPaymentBank")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("bank_accounts")
 }
@@ -233,6 +244,12 @@ model Employee {
 
   CashPaymentEmployee       CashPayment[] @relation("CashPaymentEmployee")
   CashPaymentEmployeeByType CashPayment[] @relation("CashPaymentEmployeeByType")
+
+  DebtCollectorEmployee DepositReceip[] @relation("DebtCollectorEmployee")
+  DepositReceipEmployee DepositReceip[] @relation("DepositReceipEmployee")
+
+  DepositPaymentEmployee DepositPayment[] @relation("DepositPaymentEmployee")
+  DepositPayment         DepositPayment[] @relation("DepositPaymentEmployeeByType")
 
   @@map("employees")
 }
@@ -452,8 +469,13 @@ model ChartOfAccount {
   creditCashReceipVoucherItem CashReceipVoucherItem[] @relation("CashReceipVoucherItem_CreditAccount")
   debitCashReceipVoucherItem  CashReceipVoucherItem[] @relation("CashReceipVoucherItem_DebitAccount")
 
-  creditPaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_CreditAccount")
-  debitPaymentReceipVoucherItem  PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_DebitAccount")
+  creditCashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_CreditAccount")
+  debitCashPaymentVoucherItem  CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_DebitAccount")
+  DepositReceipItemCredit      DepositReceipItem[]      @relation("DepositReceipItemCredit")
+  DepositReceipItemDebit       DepositReceipItem[]      @relation("DepositReceipItemDebit")
+
+  DepositPaymentItemCredit DepositPaymentItem[] @relation("DepositPaymentItemCredit")
+  DepositPaymentItemDebit  DepositPaymentItem[] @relation("DepositPaymentItemDebit")
 
   @@map("chart_of_accounts")
 }
@@ -667,8 +689,9 @@ model File {
   InventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
   inventoryInId String?      @map("inventory_in_id")
 
-  InventoryOut   InventoryOut? @relation(fields: [inventoryOutId], references: [id])
-  inventoryOutId String?       @map("inventory_out_id")
+  InventoryOut       InventoryOut?    @relation(fields: [inventoryOutId], references: [id])
+  inventoryOutId     String?          @map("inventory_out_id")
+  DepositPaymentFile DepositPayment[] @relation("DepositPaymentFile")
 
   @@map("files")
 }
@@ -701,8 +724,12 @@ model CashReceip {
   Customer Partner? @relation("CashReceipCustomer", fields: [customer], references: [id])
   customer String?
 
-  CashReceipVoucherItem    CashReceipVoucherItem[]    @relation("CashReceipVoucherItem_CashReceip")
-  PaymentReceipVoucherItem PaymentReceipVoucherItem[] @relation("PaymentReceipVoucherItem_PaymentReceip")
+  CashReceipVoucherItem CashReceipVoucherItem[] @relation("CashReceipVoucherItem_CashReceip")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
 
 // Chi tiết phiếu thu tiền mặt
@@ -725,6 +752,11 @@ model CashReceipVoucherItem {
 
   Bank Bank?   @relation("CashReceipVoucherItem_Bank", fields: [bank], references: [id])
   bank String?
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
 
 // Phiếu chi tiền mặt
@@ -755,26 +787,162 @@ model CashPayment {
   // supplier -- partner -- nhà cung cấp
   Supplier Partner? @relation("CashPaymentCustomer", fields: [supplier], references: [id])
   supplier String?
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  CashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_CashPayment")
 }
 
 // Chi tiết phiếu chi tiền mặt
-model PaymentReceipVoucherItem {
+model CashPaymentVoucherItem {
   id          String  @id @default(uuid())
   amount      Float?
   description String?
 
-  PaymentReceip CashReceip? @relation("PaymentReceipVoucherItem_PaymentReceip", fields: [paymentReceip], references: [id])
-  paymentReceip String?
+  CashPayment CashPayment? @relation("CashPaymentVoucherItem_CashPayment", fields: [cashPayment], references: [id])
+  cashPayment String?
 
-  Subject Partner? @relation("PaymentReceipVoucherItemSubject", fields: [subject], references: [id])
+  Subject Partner? @relation("CashPaymentVoucherItemSubject", fields: [subject], references: [id])
   subject String?
 
-  DebitAccount ChartOfAccount? @relation("PaymentReceipVoucherItem_DebitAccount", fields: [debitAccount], references: [id])
+  DebitAccount ChartOfAccount? @relation("CashPaymentVoucherItem_DebitAccount", fields: [debitAccount], references: [id])
   debitAccount String?
 
-  CreditAccount ChartOfAccount? @relation("PaymentReceipVoucherItem_CreditAccount", fields: [creditAccount], references: [id])
+  CreditAccount ChartOfAccount? @relation("CashPaymentVoucherItem_CreditAccount", fields: [creditAccount], references: [id])
   creditAccount String?
 
-  Bank Bank?   @relation("PaymentReceipVoucherItem_Bank", fields: [bank], references: [id])
+  Bank Bank?   @relation("CashPaymentVoucherItem_Bank", fields: [bank], references: [id])
   bank String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Tiền gửi - thu
+model DepositReceip {
+  id                String    @id @default(uuid())
+  depositReceipType String?   @map("deposit_receip_type")
+  postedDate        DateTime? @map("posted_date") // Ngày hạch toán
+  voucherDate       DateTime? @map("voucher_date") // Ngày chứng từ
+  voucherNumber     String?   @map("voucher_number") // Số chứng từ
+  address           String?
+  reason            String?
+  bankName          String?   @map("bank_name")
+
+  // Nhân viên thu nợ
+  DebtCollector Employee? @relation("DebtCollectorEmployee", fields: [debtCollector], references: [id])
+  debtCollector String?
+
+  Employee Employee? @relation("DepositReceipEmployee", fields: [employee], references: [id])
+  employee String?
+
+  Subject Partner? @relation("DepositReceipSubject", fields: [subject], references: [id])
+  subject String?
+
+  // customer -- partner -- khách hàng
+  Customer Partner? @relation("DepositReceipCustomer", fields: [customer], references: [id])
+  customer String?
+
+  Bank BankAccount? @relation("DepositReceipBank", fields: [bank], references: [id])
+  bank String?
+
+  DepositReceipItem DepositReceipItem[] @relation("DepositReceipItem_DepositReceip")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Chi tiết tiền gửi - thu
+model DepositReceipItem {
+  id          String  @id @default(uuid())
+  description String?
+  ammount     Int?
+
+  // loanAgreement 
+
+  DepositReceip DepositReceip? @relation("DepositReceipItem_DepositReceip", fields: [depositReceip], references: [id])
+  depositReceip String?
+
+  Subject Partner? @relation("DepositReceipItemSubject", fields: [subject], references: [id])
+  subject String?
+
+  creditAccount   ChartOfAccount? @relation("DepositReceipItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("DepositReceipItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Tiền gửi - chi
+model DepositPayment {
+  id                 String    @id @default(uuid())
+  depositPaymentType String?   @map("deposit_receip_type")
+  paymentMethod      String?   @map("payment_method")
+  paymentBankName    String?   @map("payment_bank_name") // Tên ngân hàng chi
+  address            String?
+  receipBankName     String?   @map("receip_bank_name") // Tên ngân hàng thu
+  description        String?
+  idCardNo           String?   @map("id_card_no")
+  issuedBy           String?   @map("issued_by")
+  issuedDate         DateTime? @map("issued_date")
+  voucherNumber      String?   @map("voucher_number")
+  voucherDate        DateTime? @map("voucher_date")
+
+  Employee Employee? @relation("DepositPaymentEmployee", fields: [employee], references: [id])
+  employee String?
+
+  EmployeeByType Employee? @relation("DepositPaymentEmployeeByType", fields: [employeeByType], references: [id])
+  employeeByType String?   @map("employee_by_type")
+
+  Bank BankAccount? @relation("DepositPaymentBank", fields: [bank], references: [id])
+  bank String?
+
+  Supplier Partner? @relation("DepositPaymentSupplier", fields: [supplier], references: [id])
+  supplier String?
+
+  Subject Partner? @relation("DepositPaymentSubject", fields: [subject], references: [id])
+  subject String?
+
+  Attached File?   @relation("DepositPaymentFile", fields: [attached], references: [id])
+  attached String?
+
+  DepositPaymentItem_DepositPayment DepositPaymentItem[] @relation("DepositPaymentItem_DepositPayment")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Chi tiết tiền gửi - chi
+model DepositPaymentItem {
+  id          String  @id @default(uuid())
+  description String?
+  ammount     Int?
+
+  // loanAgreement
+
+  DepositPayment DepositPayment? @relation("DepositPaymentItem_DepositPayment", fields: [depositPayment], references: [id])
+  depositPayment String?
+
+  Subject Partner? @relation("DepositPaymentItemSubject", fields: [subject], references: [id])
+  subject String?
+
+  creditAccount   ChartOfAccount? @relation("DepositPaymentItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("DepositPaymentItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }

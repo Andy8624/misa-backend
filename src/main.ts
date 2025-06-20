@@ -77,6 +77,15 @@ async function bootstrap() {
     .addTag('InventoryOutItem', 'Inventory out item management')
     .addTag('InventoryOut', 'Inventory out management')
     .addTag('ProductionOrder', 'Production Order management')
+    .addTag('CashReceip', 'CashReceip management')
+    .addTag('CashReceipVoucherItem', 'CashReceipVoucherItem management')
+    .addTag('CashPayment', 'PaymentReceip management')
+    .addTag('CashPayemntVoucherItem', 'PayemntReceipVoucherItem management')
+    .addTag('DepositReceip', 'DepositReceip management')
+    .addTag('DepositPayment', 'DepisitPayment management')
+    .addTag('DepositPaymentItem', 'DepositPaymentItem management')
+    .addTag('DepositReceipItem', 'DepositReceipItem management')
+    .addTag('Invoice', 'Invoice management')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
