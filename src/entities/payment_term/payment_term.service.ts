@@ -1,26 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePaymentTermDto } from './dto/create-payment_term.dto';
 import { UpdatePaymentTermDto } from './dto/update-payment_term.dto';
+import { PrismaService } from 'src/prisma.service';
+import { plainToInstance } from 'class-transformer';
+import { ResponsePaymentTermDto } from './dto/response-payment_term.dto';
 
 @Injectable()
 export class PaymentTermService {
-  create(createPaymentTermDto: CreatePaymentTermDto) {
-    return 'This action adds a new paymentTerm';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createPaymentTermDto: CreatePaymentTermDto) {
+    // Create a new payment term
+    const paymentTerm = await this.prismaService.paymentTerms.create({
+      data: createPaymentTermDto,
+    });
+
+    return plainToInstance(ResponsePaymentTermDto, paymentTerm, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  findAll() {
-    return `This action returns all paymentTerm`;
+  async findAll() {
+    const paymentTerms = await this.prismaService.paymentTerms.findMany({
+      where: {
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return plainToInstance(ResponsePaymentTermDto, paymentTerms, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} paymentTerm`;
+  async findOne(id: string) {
+    const paymentTerm = await this.prismaService.paymentTerms.findUnique({
+      where: { id },
+    });
+
+    if (!paymentTerm || paymentTerm.deletedAt) {
+      throw new NotFoundException('Không tìm thấy điều khoản thanh toán');
+    }
+
+    return plainToInstance(ResponsePaymentTermDto, paymentTerm, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  update(id: number, updatePaymentTermDto: UpdatePaymentTermDto) {
-    return `This action updates a #${id} paymentTerm`;
+  async update(id: string, updatePaymentTermDto: UpdatePaymentTermDto) {
+    // Check if the payment term exists
+    await this.findOne(id);
+
+    // Update the payment term
+    const updatedPaymentTerm = await this.prismaService.paymentTerms.update({
+      where: { id },
+      data: updatePaymentTermDto,
+    });
+
+    return plainToInstance(ResponsePaymentTermDto, updatedPaymentTerm, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} paymentTerm`;
+  async remove(id: string): Promise<{ message: string }> {
+    // Check if the payment term exists
+    await this.findOne(id);
+
+    // Soft delete the payment term
+    await this.prismaService.paymentTerms.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return { message: 'Xóa điều khoản thanh toán thành công' };
   }
 }

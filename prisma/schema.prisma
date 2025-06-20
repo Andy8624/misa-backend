@@ -285,7 +285,7 @@ model Employee {
   DepositPaymentEmployee DepositPayment[] @relation("DepositPaymentEmployee")
   DepositPayment         DepositPayment[] @relation("DepositPaymentEmployeeByType")
 
-  Invoice Invoice[] @relation("InvoiceEmployee")
+  Invoice_ExecutinPerson Invoice[] @relation("Invoice_ExecutinPerson")
 
   ServicePurchaseVoucher_PurchasingStaff                ServicePurchaseVoucher[]  @relation("ServicePurchaseVoucher_PurchasingStaff")
   ProvisionServiceVoucher_CashReceiptStoreperson        ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_CashReceiptStoreperson")
@@ -1072,7 +1072,7 @@ model Invoice {
   accountingDocument        String?
   invoiceSource             String?
 
-  ExecutinPerson Employee? @relation("InvoiceEmployee", fields: [executinPerson], references: [id])
+  ExecutinPerson Employee? @relation("Invoice_ExecutinPerson", fields: [executinPerson], references: [id])
   executinPerson String?
 
   File File?   @relation("InvoiceFile", fields: [file], references: [id])

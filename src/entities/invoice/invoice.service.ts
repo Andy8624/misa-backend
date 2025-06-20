@@ -1,26 +1,97 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { PrismaService } from 'src/prisma.service';
+import { plainToInstance } from 'class-transformer';
+import { ResponseInvoiceDto } from './dto/response-invoice.dto';
 
 @Injectable()
 export class InvoiceService {
-  create(createInvoiceDto: CreateInvoiceDto) {
-    return 'This action adds a new invoice';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createInvoiceDto: CreateInvoiceDto) {
+    // Create a new invoice
+    const invoice = await this.prismaService.invoice.create({
+      data: createInvoiceDto,
+      include: {
+        ExecutinPerson: true,
+        File: true,
+      },
+    });
+
+    return plainToInstance(ResponseInvoiceDto, invoice, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  findAll() {
-    return `This action returns all invoice`;
+  async findAll() {
+    const invoices = await this.prismaService.invoice.findMany({
+      where: {
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        ExecutinPerson: true,
+        File: true,
+      },
+    });
+
+    return plainToInstance(ResponseInvoiceDto, invoices, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} invoice`;
+  async findOne(id: string) {
+    const invoice = await this.prismaService.invoice.findUnique({
+      where: { id },
+      include: {
+        ExecutinPerson: true,
+        File: true,
+      },
+    });
+
+    if (!invoice || invoice.deletedAt) {
+      throw new NotFoundException('Không tìm thấy hóa đơn');
+    }
+
+    return plainToInstance(ResponseInvoiceDto, invoice, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  update(id: number, updateInvoiceDto: UpdateInvoiceDto) {
-    return `This action updates a #${id} invoice`;
+  async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
+    // Check if the invoice exists
+    await this.findOne(id);
+
+    // Update the invoice
+    const updatedInvoice = await this.prismaService.invoice.update({
+      where: { id },
+      data: updateInvoiceDto,
+      include: {
+        ExecutinPerson: true,
+        File: true,
+      },
+    });
+
+    return plainToInstance(ResponseInvoiceDto, updatedInvoice, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} invoice`;
+  async remove(id: string): Promise<{ message: string }> {
+    // Check if the invoice exists
+    await this.findOne(id);
+
+    // Soft delete the invoice
+    await this.prismaService.invoice.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return { message: 'Xóa hóa đơn thành công' };
   }
 }
