@@ -31,6 +31,7 @@ import { DepositReceipModule } from './entities/deposit_receip/deposit_receip.mo
 import { DepositPaymentModule } from './entities/deposit_payment/deposit_payment.module';
 import { DepositPaymentItemModule } from './entities/deposit_payment_item/deposit_payment_item.module';
 import { DepositReceipItemModule } from './entities/deposit_receip_item/deposit_receip_item.module';
+import { PaymentTermModule } from './entities/payment_term/payment_term.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { DepositReceipItemModule } from './entities/deposit_receip_item/deposit_
     DepositPaymentModule,
     DepositPaymentItemModule,
     DepositReceipItemModule,
+    PaymentTermModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -149,6 +149,21 @@ model Partner {
   DepositReceipItemSubject DepositReceipItem[]  @relation("DepositReceipItemSubject")
   DepositPaymentItem       DepositPaymentItem[] @relation("DepositPaymentItemSubject")
 
+  VoucherAccountEntrySubject  VoucherAccountEntry[] @relation("VoucherAccountEntrySubject")
+  VoucherAccountEntrySupplier VoucherAccountEntry[] @relation("VoucherAccountEntrySupplier")
+
+  ServicePurchaseVoucher_Supplier ServicePurchaseVoucher[] @relation("ServicePurchaseVoucher_Supplier")
+
+  ServicePurchaseVoucherItem_Subjet           ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItem_Subjet")
+  ServicePurchaseVoucherItem_Supplier         ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItem_Supplier")
+  ProvisionServiceVoucher_CashReceiptCustomer ProvisionServiceVoucher[]    @relation("ProvisionServiceVoucher_CashReceiptCustomer")
+
+  ProvisionServiceVoucher_CashReceiptVoucherCustomer ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_CashReceiptVoucherCustomer")
+  ProvisionServiceVoucher_DebtVoucherCustomer        ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_DebtVoucherCustomer")
+  ProvisionServiceVoucher_InvoiceCustomer            ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_InvoiceCustomer")
+
+  ProvisionServiceVoucher_Customer ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_Customer")
+
   @@map("partners")
 }
 
@@ -171,6 +186,10 @@ model Bank {
 
   CashReceipVoucherItem  CashReceipVoucherItem[]  @relation("CashReceipVoucherItem_Bank")
   CashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_Bank")
+
+  ServicePurchaseVoucher_RecipientAccount        ServicePurchaseVoucher[]  @relation("ServicePurchaseVoucher_RecipientAccount")
+  ServicePurchaseVoucher_PaymentAccount          ServicePurchaseVoucher[]  @relation("ServicePurchaseVoucher_PaymentAccount")
+  ProvisionServiceVoucher_CashReceiptBankAccount ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_CashReceiptBankAccount")
 
   @@map("banks")
 }
@@ -250,6 +269,13 @@ model Employee {
 
   DepositPaymentEmployee DepositPayment[] @relation("DepositPaymentEmployee")
   DepositPayment         DepositPayment[] @relation("DepositPaymentEmployeeByType")
+
+  Invoice Invoice[] @relation("InvoiceEmployee")
+
+  ServicePurchaseVoucher_PurchasingStaff                ServicePurchaseVoucher[]  @relation("ServicePurchaseVoucher_PurchasingStaff")
+  ProvisionServiceVoucher_CashReceiptStoreperson        ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_CashReceiptStoreperson")
+  ProvisionServiceVoucher_DebtVoucherStoreperson        ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_DebtVoucherStoreperson")
+  ProvisionServiceVoucher_CashReceiptVoucherStoreperson ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_CashReceiptVoucherStoreperson")
 
   @@map("employees")
 }
@@ -331,6 +357,10 @@ model GoodsAndServices {
   InventoryOutItems            InventoryOutItem[]
   inventoryInItems             InventoryInItem[]
 
+  VoucherAccountEntry               VoucherAccountEntry[]         @relation("VoucherAccountEntry_GoodsAndServices")
+  ServicePurchaseVoucherItem_ItemId ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_ItemId")
+  ProvisionServiceVoucherItem_Item  ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Item")
+
   @@map("goods_and_services")
 }
 
@@ -397,10 +427,13 @@ model Unit {
   goodsAndServices GoodsAndServices[]
 
   // Quan hệ với Customer (Công ty)
-  Customer         Customer?          @relation(fields: [customerId], references: [id])
-  customerId       String?
-  InventoryOutItem InventoryOutItem[]
-  InventoryInItem  InventoryInItem[]
+  Customer                         Customer?                     @relation(fields: [customerId], references: [id])
+  customerId                       String?
+  InventoryOutItem                 InventoryOutItem[]
+  InventoryInItem                  InventoryInItem[]
+  VoucherAccountEntryUnit          VoucherAccountEntry[]         @relation("VoucherAccountEntryUnit")
+  ServicePurchaseVoucherItem_Unit  ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_Unit")
+  ProvisionServiceVoucherItem_Unit ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Unit")
 
   @@map("units")
 }
@@ -421,6 +454,9 @@ model VatTax {
   // Quan hệ với bảng công ty 
   Customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?
+
+  ServicePurchaseVoucherItem_Vat  ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_Vat")
+  ProvisionServiceVoucherItem_Vat ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Vat")
 
   @@map("vat_taxes")
 }
@@ -474,8 +510,21 @@ model ChartOfAccount {
   DepositReceipItemCredit      DepositReceipItem[]      @relation("DepositReceipItemCredit")
   DepositReceipItemDebit       DepositReceipItem[]      @relation("DepositReceipItemDebit")
 
-  DepositPaymentItemCredit DepositPaymentItem[] @relation("DepositPaymentItemCredit")
-  DepositPaymentItemDebit  DepositPaymentItem[] @relation("DepositPaymentItemDebit")
+  DepositPaymentItemCredit  DepositPaymentItem[]  @relation("DepositPaymentItemCredit")
+  DepositPaymentItemDebit   DepositPaymentItem[]  @relation("DepositPaymentItemDebit")
+  VoucherAccountEntryCredit VoucherAccountEntry[] @relation("VoucherAccountEntryCredit")
+  VoucherAccountEntryDebit  VoucherAccountEntry[] @relation("VoucherAccountEntryDebit")
+
+  VoucherAccountEntry                   VoucherAccountEntry[]        @relation("VoucherAccountEntryVatAccount")
+  ServicePurchaseVoucherItem_VatAccount ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItem_VatAccount")
+
+  ServicePurchaseVoucherItemCredit ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemCredit")
+  ServicePurchaseVoucherItemDebit  ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemDebit")
+
+  ProvisionServiceVoucherItemCredit   ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
+  ProvisionServiceVoucherItemDebit    ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
+  ProvisionServiceVoucherItemDiscount ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
+  ProvisionServiceVoucherItemVat      ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
 
   @@map("chart_of_accounts")
 }
@@ -689,9 +738,14 @@ model File {
   InventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
   inventoryInId String?      @map("inventory_in_id")
 
-  InventoryOut       InventoryOut?    @relation(fields: [inventoryOutId], references: [id])
-  inventoryOutId     String?          @map("inventory_out_id")
+  InventoryOut   InventoryOut? @relation(fields: [inventoryOutId], references: [id])
+  inventoryOutId String?       @map("inventory_out_id")
+
   DepositPaymentFile DepositPayment[] @relation("DepositPaymentFile")
+
+  InvoiceFile Invoice[] @relation("InvoiceFile")
+
+  ProvisionServiceVoucher ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_Attached")
 
   @@map("files")
 }
@@ -945,4 +999,338 @@ model DepositPaymentItem {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+}
+
+model Invoice {
+  id                        String    @id @default(uuid())
+  type                      String?
+  verificationStatus        String?
+  code                      String?
+  invoiceDate               DateTime?
+  taxId                     String?
+  invoiceNumber             String?
+  goodAmount                BigInt?
+  taxAmount                 BigInt?
+  partnerName               String?
+  totalPaymentAmmount       BigInt?
+  invoiceValue              BigInt?
+  formNumber                String?
+  invoiceType               String?
+  invoiceStatus             String?
+  invoiceVerificationResult String?
+  verificationCondition     String?
+  lastVerificationTime      DateTime?
+  accountingStatus          String?
+  accountingDocument        String?
+  invoiceSource             String?
+
+  ExecutinPerson Employee? @relation("InvoiceEmployee", fields: [executinPerson], references: [id])
+  executinPerson String?
+
+  File File?   @relation("InvoiceFile", fields: [file], references: [id])
+  file String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model PaymentTerms {
+  id   String  @id @default(uuid())
+  code String?
+  name String?
+
+  createdAt                          DateTime                 @default(now()) @map("created_at")
+  updatedAt                          DateTime?                @updatedAt @map("updated_at")
+  deletedAt                          DateTime?                @map("deleted_at")
+  ServicePurchaseVoucher_PaymentTerm ServicePurchaseVoucher[] @relation("ServicePurchaseVoucher_PaymentTerm")
+
+  ProvisionServiceVoucher_PaymentTAndC ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_PaymentTAndC")
+}
+
+model VoucherAccountEntry {
+  id             String  @id @default(uuid())
+  serviceVoucher String?
+  type           String?
+  itemName       String?
+
+  ItemId GoodsAndServices? @relation("VoucherAccountEntry_GoodsAndServices", fields: [itemId], references: [id])
+  itemId String?
+
+  // Account Entry
+  customerName String?
+  unitPrice    Float?
+  quantity     Int?
+
+  creditAccount   ChartOfAccount? @relation("VoucherAccountEntryCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("VoucherAccountEntryDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  Subject Partner? @relation("VoucherAccountEntrySubject", fields: [subject], references: [id])
+  subject String?
+
+  Unit   Unit?   @relation("VoucherAccountEntryUnit", fields: [unitId], references: [id])
+  unitId String?
+
+  // Tax
+  supplierName         String?
+  supplierAddress      String?
+  supplierTaxCode      String?
+  groupOfPurchasedGood String?
+  invoiceDate          DateTime?
+  invoiceNumber        String?
+  vatDescription       String?
+
+  VatAccount ChartOfAccount? @relation("VoucherAccountEntryVatAccount", fields: [vatAccount], references: [id])
+  vatAccount String?
+
+  Supplier Partner? @relation("VoucherAccountEntrySupplier", fields: [supplier], references: [id])
+  supplier String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model ServicePurchaseVoucher {
+  id                      String    @id @default(uuid())
+  idCardNo                String?
+  paymentMethod           String?
+  paymentStatus           String?
+  paymentAccountBankName  String?
+  paymentDetail           String?
+  invoiceInclusion        String?
+  description             String?
+  receipient              String?
+  particular              String?
+  quantityOriginalVoucher String?
+  recipient               String?
+  recipientAccountName    String?
+  supplierName            String?
+  supplierAddress         String?
+  issuedDate              DateTime?
+  issuedBy                String?
+  payWithInDays           String?
+  dueDate                 DateTime?
+  cashPaymentVoucherNo    String?
+  cashPaymentVoucherDate  DateTime?
+  postedDate              DateTime?
+  voucherNumber           String?
+  voucherDate             DateTime?
+
+  purchase_without_invoiceInfo_supplier_name String?
+  purchase_without_invoiceInfo_id_card_no    String?
+  purchase_without_invoiceInfo_address       String?
+
+  RecipientAccount Bank?   @relation("ServicePurchaseVoucher_RecipientAccount", fields: [recipientAccount], references: [id])
+  recipientAccount String?
+
+  Supplier Partner? @relation("ServicePurchaseVoucher_Supplier", fields: [supplier], references: [id])
+  supplier String?
+
+  PurchasingStaff Employee? @relation("ServicePurchaseVoucher_PurchasingStaff", fields: [purchasingStaff], references: [id])
+  purchasingStaff String?
+
+  PaymentAccount Bank?   @relation("ServicePurchaseVoucher_PaymentAccount", fields: [paymentAccount], references: [id])
+  paymentAccount String?
+
+  PaymentTerm PaymentTerms? @relation("ServicePurchaseVoucher_PaymentTerm", fields: [paymentTerm], references: [id])
+  paymentTerm String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  ServicePurchaseVoucherItem_ServicePurchaseVoucher ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItem_ServicePurchaseVoucher")
+}
+
+model ServicePurchaseVoucherItem {
+  id                   String  @id @default(uuid())
+  itemName             String?
+  subjectName          String?
+  quantity             Int?
+  unitPrice            Float?
+  invoiceNumber        String?
+  invoiceDate          String?
+  vatDescription       String?
+  groupOfPurchasedGood String?
+  supplierTaxCode      String?
+  supplierName         String?
+  supplierAddress      String?
+
+  Vat VatTax? @relation("ServicePurchaseVoucherItem_Vat", fields: [vat], references: [id])
+  vat String?
+
+  Subject Partner? @relation("ServicePurchaseVoucherItem_Subjet", fields: [subject], references: [id])
+  subject String?
+
+  VatAccount ChartOfAccount? @relation("ServicePurchaseVoucherItem_VatAccount", fields: [vatAccount], references: [id])
+  vatAccount String?
+
+  Supplier Partner? @relation("ServicePurchaseVoucherItem_Supplier", fields: [supplier], references: [id])
+  supplier String?
+
+  creditAccount   ChartOfAccount? @relation("ServicePurchaseVoucherItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("ServicePurchaseVoucherItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  ItemId GoodsAndServices? @relation("ServicePurchaseVoucherItem_ItemId", fields: [itemId], references: [id])
+  itemId String?
+
+  ServicePurchaseVoucher ServicePurchaseVoucher? @relation("ServicePurchaseVoucherItem_ServicePurchaseVoucher", fields: [servicePurchaseVoucher], references: [id])
+  servicePurchaseVoucher String?
+
+  Unit   Unit?   @relation("ServicePurchaseVoucherItem_Unit", fields: [unitId], references: [id])
+  unitId String? @map("unit_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model ProvisionServiceVoucher {
+  id                   String  @id @default(uuid())
+  voucherNumber        String?
+  paymentStatus        String?
+  paymentMethod        String?
+  withInvoice          String?
+  isSubstituteInvoice  String?
+  other_t_and_c        String?
+  e_invoice_search_id  String?
+  e_invoice_search_url String?
+
+  Attached File?   @relation("ProvisionServiceVoucher_Attached", fields: [attached], references: [id])
+  attached String?
+
+  postDate    DateTime?
+  voucherDate DateTime?
+
+  PaymentTAndC PaymentTerms? @relation("ProvisionServiceVoucher_PaymentTAndC", fields: [paymentTAndC], references: [id])
+  paymentTAndC String?
+
+  payWithinDay Int?
+  dueDate      DateTime?
+
+  // cash receipt
+  // cash_receipt_customer_id
+  CashReceiptCustomer      Partner? @relation("ProvisionServiceVoucher_CashReceiptCustomer", fields: [cash_receipt_customer_id], references: [id])
+  cash_receipt_customer_id String?
+
+  cash_receipt_customer_name String?
+  cash_receipt_address       String?
+
+  // cash_receipt_back_account 
+  CashReceiptBankAccount    Bank?   @relation("ProvisionServiceVoucher_CashReceiptBankAccount", fields: [cash_receipt_back_account], references: [id])
+  cash_receipt_back_account String?
+
+  cash_receipt_back_name String?
+
+  // cash_receipt_storeperson
+  CashReceiptStoreperson Employee? @relation("ProvisionServiceVoucher_CashReceiptStoreperson", fields: [cashReceiptStoreperson], references: [id])
+  cashReceiptStoreperson String?
+
+  cash_receipt_particular String?
+
+  // debt voucher
+  // debt_voucher_customer_id 
+  DebtVoucherCustomer Partner? @relation("ProvisionServiceVoucher_DebtVoucherCustomer", fields: [debtVoucherCustomer], references: [id])
+  debtVoucherCustomer String?
+
+  debt_voucher_customer_name String?
+
+  debt_voucher_contact String?
+
+  debt_voucher_tax_code String?
+
+  debt_voucher_address String?
+
+  // debt_voucher_storeperson
+  DebtVoucherStoreperson Employee? @relation("ProvisionServiceVoucher_DebtVoucherStoreperson", fields: [debtVoucherStoreperson], references: [id])
+  debtVoucherStoreperson String?
+
+  debt_voucher_description String?
+
+  // invoice
+  // invoice_customer_id
+  InvoiceCustomer Partner? @relation("ProvisionServiceVoucher_InvoiceCustomer", fields: [invoiceCustomer], references: [id])
+  invoiceCustomer String?
+
+  invoice_customer_name  String?
+  invoice_tax_code       String?
+  invoice_purchaser      String?
+  invoice_payment_method String?
+  invoice_bank_account   String?
+  invoice_address        String?
+  invoice_sign           String?
+  invoice_form           String?
+  invoice_date           DateTime?
+  invoice_number         String?
+
+  // cash receipt voucher
+  // cash_receipt_voucher_customer_id
+  CashReceiptVoucherCustomer                 Partner?  @relation("ProvisionServiceVoucher_CashReceiptVoucherCustomer", fields: [cash_receipt_voucher_customer_id], references: [id])
+  cash_receipt_voucher_customer_id           String?
+  cash_receipt_voucher_customer_name         String?
+  cash_receipt_voucher_address               String?
+  cash_receipt_voucher_payer                 String?
+  // cash_receipt_voucher_storeperson
+  CashReceiptVoucherStoreperson              Employee? @relation("ProvisionServiceVoucher_CashReceiptVoucherStoreperson", fields: [cash_receipt_voucher_storeperson], references: [id])
+  cash_receipt_voucher_storeperson           String?
+  cash_receipt_voucher_particular            String?
+  cash_receipt_voucher_with_original_voucher Int?
+
+  percent_discount_invoice_value Float?
+  discount_type                  String?
+
+  // customer
+  Customer Partner? @relation("ProvisionServiceVoucher_Customer", fields: [customer], references: [id])
+  customer String?
+
+  customer_name     String?
+  customer_tax_code String?
+  customer_address  String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  ProvisionServiceVoucherItem_ProvisionServiceVoucher ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_ProvisionServiceVoucher")
+}
+
+model ProvisionServiceVoucherItem {
+  id                      String                   @id @default(uuid())
+  ProvisionServiceVoucher ProvisionServiceVoucher? @relation("ProvisionServiceVoucherItem_ProvisionServiceVoucher", fields: [provisionServiceVoucher], references: [id])
+  provisionServiceVoucher String?
+
+  Item    GoodsAndServices? @relation("ProvisionServiceVoucherItem_Item", fields: [item_id], references: [id])
+  item_id String?
+
+  itemName String?
+
+  Unit Unit?   @relation("ProvisionServiceVoucherItem_Unit", fields: [unit], references: [id])
+  unit String?
+
+  quantity  Int?
+  unitPrice Float?
+
+  Vat VatTax? @relation("ProvisionServiceVoucherItem_Vat", fields: [vat], references: [id])
+  vat String?
+
+  discountRate Float?
+
+  creditAccount   ChartOfAccount? @relation("ProvisionServiceVoucherItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("ProvisionServiceVoucherItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  discountAccount   ChartOfAccount? @relation("ProvisionServiceVoucherItemDiscount", fields: [discountAccountId], references: [id])
+  discountAccountId String?         @map("discount_account_id")
+
+  vatAccount   ChartOfAccount? @relation("ProvisionServiceVoucherItemVat", fields: [vatAccountId], references: [id])
+  vatAccountId String?         @map("vat_account_id")
 }
