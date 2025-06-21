@@ -28,6 +28,7 @@ export class BankAccountService {
     const bankAccounts = await this.prismaService.bankAccount.findMany({
       where: {
         deletedAt: null,
+        customerId: 
       },
       orderBy: {
         createdAt: 'desc',

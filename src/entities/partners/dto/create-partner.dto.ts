@@ -51,6 +51,6 @@ export class CreatePartnerDto {
   websiteUrl: string; // Đường dẫn đến website của đối tác (Partners)
 
   @Expose()
-  @IsNotEmpty({ message: 'Id khách hàng không được để trống' })
+  @IsNotEmpty({ message: 'Id Công Ty (CustomerId) không được để trống' })
   customerId: string;
 }

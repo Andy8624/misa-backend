@@ -39,6 +39,7 @@ export class CashReceipService {
         Employee: true,
         Subject: true,
         Customer: true,
+        CashReceipVoucherItem: true,
       },
     });
 

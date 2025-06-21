@@ -1,4 +1,5 @@
 import { Expose, Transform, Type } from 'class-transformer';
+import { ResponseCashReceipVoucherItemDto } from 'src/entities/cash_receip_voucher_item/dto/response-cash_receip_voucher_item.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
 
@@ -64,4 +65,9 @@ export class ResponseCashReceipDto {
   @Expose()
   @Type(() => ResponsePartnerDto)
   Customer?: ResponsePartnerDto;
+
+  // CashReceipVoucherItem relation
+  @Expose()
+  @Type(() => ResponseCashReceipVoucherItemDto)
+  CashReceipVoucherItem?: ResponseCashReceipVoucherItemDto[];
 }

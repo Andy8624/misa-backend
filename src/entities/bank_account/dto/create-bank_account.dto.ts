@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateBankAccountDto {
   @Expose()
@@ -33,4 +33,8 @@ export class CreateBankAccountDto {
   @Expose()
   @IsOptional()
   bankId?: string;
+
+  @Expose()
+  @IsNotEmpty({ message: 'Id Công Ty (CustomerId) không được để trống' })
+  customerId: string;
 }

@@ -16,7 +16,7 @@ datasource db {
 
 generator erd {
   provider              = "prisma-erd-generator"
-  output                = "ERD.pdf" // có đuôi .svg hoặc .png hoặc .pdf
+  output                = "ERD.svg" // có đuôi .svg hoặc .png hoặc .pdf
   disableRelationLines  = true
   includeRelationFields = false
 }
@@ -91,6 +91,21 @@ model Customer {
   Warehouse           Warehouse[] // Một công ty có nhiều kho
   InventoryIn         InventoryIn[] // Một công ty có nhiều phiếu nhập
   InventoryOut        InventoryOut[] // Một công ty có nhiều phiếu xuất
+
+  VoucherAccountEntry     VoucherAccountEntry[]
+  GroupOfPurchasedGood    GroupOfPurchasedGood[]
+  PurchaseVoucher         PurchaseVoucher[]
+  SaleVoucher             SaleVoucher[]
+  ProvisionServiceVoucher ProvisionServiceVoucher[]
+  ServicePurchaseVoucher  ServicePurchaseVoucher[]
+  PaymentTerms            PaymentTerms[]
+  Invoice                 Invoice[]
+  DepositPayment          DepositPayment[]
+  DepositReceip           DepositReceip[]
+  CashPayment             CashPayment[]
+  CashReceip              CashReceip[]
+  BankAccount             BankAccount[]
+  File                    File[]
 
   @@map("customers")
 }
@@ -227,6 +242,10 @@ model BankAccount {
   Bank   Bank?   @relation(fields: [bankId], references: [id])
   bankId String? @map("bank_id")
 
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   DepositReceipBank  DepositReceip[]  @relation("DepositReceipBank")
   DepositPaymentBank DepositPayment[] @relation("DepositPaymentBank")
 
@@ -312,9 +331,9 @@ model WarrantyPeriod {
   // Chứa danh sách các bảng khác
   goodsAndServices GoodsAndServices[] // Một loại bảo hành thuộc nhiều dịch vụ hàng hóa
 
-  // Quan hệ với công ty
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   @@map("warranty_periods")
 }
@@ -369,8 +388,8 @@ model GoodsAndServices {
   discountAccountId String?         @map("discount_account_id")
 
   // Quan hệ với công ty
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   // Mang danh sách đối tượng khác
   GoodsAndServicesGroupMapping GoodsAndServicesGroupMapping[]
@@ -403,8 +422,8 @@ model GoodsAndServicesGroup {
   childGroups GoodsAndServicesGroup[] @relation("ParentGroup")
 
   // QUan hệ với công ty
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -449,8 +468,9 @@ model Unit {
   goodsAndServices GoodsAndServices[]
 
   // Quan hệ với Customer (Công ty)
-  Customer                         Customer?                     @relation(fields: [customerId], references: [id])
-  customerId                       String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   InventoryOutItem                 InventoryOutItem[]
   InventoryInItem                  InventoryInItem[]
   VoucherAccountEntryUnit          VoucherAccountEntry[]         @relation("VoucherAccountEntryUnit")
@@ -476,8 +496,8 @@ model VatTax {
   goodsAndServices GoodsAndServices[]
 
   // Quan hệ với bảng công ty 
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   ServicePurchaseVoucherItem_Vat  ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_Vat")
   ProvisionServiceVoucherItem_Vat ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Vat")
@@ -519,8 +539,8 @@ model ChartOfAccount {
   warehouses Warehouse[] // Một tài khoản có nhiều kho
 
   // Quan hệ với bảng công ty
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   creditInventoryOutItems InventoryOutItem[] @relation("InventoryOutItemCredit")
   debitInventoryOutItems  InventoryOutItem[] @relation("InventoryOutItemDebit")
@@ -584,9 +604,9 @@ model Warehouse {
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  // Quan hệ với công ty
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?   @map("customer_id")
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   // Quan hệ với bảng tài khoản
   ChartOfAccount   ChartOfAccount? @relation(fields: [chartOfAccountId], references: [id])
@@ -632,8 +652,9 @@ model InventoryIn {
   object   Partner? @relation("InventoryInObject", fields: [objectId], references: [id])
   objectId String?  @map("object_id")
 
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   InventoryInItem InventoryInItem[]
 
@@ -671,8 +692,9 @@ model InventoryOut {
   object   Partner? @relation("InventoryOutObject", fields: [objectId], references: [id])
   objectId String?  @map("object_id")
 
-  Customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   InventoryOutItem InventoryOutItem[]
 
@@ -775,6 +797,10 @@ model File {
   mimeType String @map("mime_type")
   path     String // Đường dẫn lưu trữ
 
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -808,7 +834,11 @@ model CashReceip {
   voucherDate            DateTime? @map("voucher_date") // Ngày chứng từ
   voucherNumber          String?   @map("voucher_number") // Số chứng từ
   reason                 String? // Lý do nộp
-  withOriginalVoucher    String?   @map("with_original_vouher")
+  withOriginalVoucher    String?   @map("with_original_voucher")
+
+  // Quan hệ với bảng công ty
+  customerCampany Customer? @relation(fields: [customerId], references: [id])
+  customerId      String?   @map("customer_id")
 
   // employeeByType  -- employee -- nhân viên
   EmployeeByType Employee? @relation("CashReceipEmployeeByType", fields: [employeeByType], references: [id])
@@ -874,6 +904,10 @@ model CashPayment {
   voucherDate            DateTime? @map("voucher_date") // Ngày chứng từ
   voucherNumber          String?   @map("voucher_number") // Số chứng từ
 
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   // employeeByType  -- employee -- nhân viên
   EmployeeByType Employee? @relation("CashPaymentEmployeeByType", fields: [employeeByType], references: [id])
   employeeByType String?   @map("employee_by_type")
@@ -935,6 +969,10 @@ model DepositReceip {
   reason            String?
   bankName          String?   @map("bank_name")
 
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   // Nhân viên thu nợ
   DebtCollector Employee? @relation("DebtCollectorEmployee", fields: [debtCollector], references: [id])
   debtCollector String?
@@ -946,8 +984,8 @@ model DepositReceip {
   subject String?
 
   // customer -- partner -- khách hàng
-  Customer Partner? @relation("DepositReceipCustomer", fields: [customer], references: [id])
-  customer String?
+  Customer Partner? @relation("DepositReceipCustomer", fields: [company], references: [id])
+  company  String?
 
   Bank BankAccount? @relation("DepositReceipBank", fields: [bank], references: [id])
   bank String?
@@ -998,6 +1036,10 @@ model DepositPayment {
   issuedDate         DateTime? @map("issued_date")
   voucherNumber      String?   @map("voucher_number")
   voucherDate        DateTime? @map("voucher_date")
+
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   Employee Employee? @relation("DepositPaymentEmployee", fields: [employee], references: [id])
   employee String?
@@ -1078,6 +1120,10 @@ model Invoice {
   File File?   @relation("InvoiceFile", fields: [file], references: [id])
   file String?
 
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -1088,9 +1134,14 @@ model PaymentTerms {
   code String?
   name String?
 
-  createdAt                          DateTime                 @default(now()) @map("created_at")
-  updatedAt                          DateTime?                @updatedAt @map("updated_at")
-  deletedAt                          DateTime?                @map("deleted_at")
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   ServicePurchaseVoucher_PaymentTerm ServicePurchaseVoucher[] @relation("ServicePurchaseVoucher_PaymentTerm")
 
   ProvisionServiceVoucher_PaymentTAndC ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_PaymentTAndC")
@@ -1139,6 +1190,10 @@ model VoucherAccountEntry {
   Supplier Partner? @relation("VoucherAccountEntrySupplier", fields: [supplier], references: [id])
   supplier String?
 
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -1173,6 +1228,10 @@ model ServicePurchaseVoucher {
   purchase_without_invoiceInfo_supplier_name String?
   purchase_without_invoiceInfo_id_card_no    String?
   purchase_without_invoiceInfo_address       String?
+
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   RecipientAccount Bank?   @relation("ServicePurchaseVoucher_RecipientAccount", fields: [recipientAccount], references: [id])
   recipientAccount String?
@@ -1252,6 +1311,10 @@ model ProvisionServiceVoucher {
   other_t_and_c        String?
   e_invoice_search_id  String?
   e_invoice_search_url String?
+
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   Attached File?   @relation("ProvisionServiceVoucher_Attached", fields: [attached], references: [id])
   attached String?
@@ -1337,8 +1400,8 @@ model ProvisionServiceVoucher {
   discount_type                  String?
 
   // customer
-  Customer Partner? @relation("ProvisionServiceVoucher_Customer", fields: [customer], references: [id])
-  customer String?
+  Customer Partner? @relation("ProvisionServiceVoucher_Customer", fields: [company], references: [id])
+  company  String?
 
   customer_name     String?
   customer_tax_code String?
@@ -1400,6 +1463,10 @@ model SaleVoucher {
   other_t_and_c                  String?
   e_invoice_search_id            String?
   e_invoice_search_url           String?
+
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   Attached File?   @relation("SaleVoucher_Attached", fields: [attached], references: [id])
   attached String?
@@ -1529,8 +1596,8 @@ model SaleVoucher {
   cash_receipt_voucher_principal String?
 
   // customer
-  Customer Partner? @relation("SaleVoucher_Customer", fields: [customer], references: [id])
-  customer String?
+  Customer Partner? @relation("SaleVoucher_Customer", fields: [company], references: [id])
+  company  String?
 
   customer_name     String?
   sales_voucher     String?
@@ -1626,6 +1693,10 @@ model PurchaseVoucher {
   payment_method String?
   posted_date    DateTime?
   voucher_date   DateTime?
+
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   // payment_t_and_c
   PaymentTAndC    PaymentTerms? @relation("PurchaseVoucher_PaymentTAndC", fields: [payment_t_and_c], references: [id])
@@ -1784,6 +1855,10 @@ model GroupOfPurchasedGood {
   code        String?
   name        String?
   description String?
+
+  // Quan hệ với bảng công ty
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String   @map("customer_id")
 
   createdAt           DateTime              @default(now()) @map("created_at")
   updatedAt           DateTime?             @updatedAt @map("updated_at")

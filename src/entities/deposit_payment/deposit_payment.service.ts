@@ -43,6 +43,7 @@ export class DepositPaymentService {
         Supplier: true,
         Subject: true,
         Attached: true,
+        DepositPaymentItem_DepositPayment: true,
       },
     });
 

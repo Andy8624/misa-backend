@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateVoucherAccountEntryDto {
   @Expose()
@@ -82,4 +82,8 @@ export class CreateVoucherAccountEntryDto {
   @Expose()
   @IsOptional()
   supplier?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  customerId: string;
 }

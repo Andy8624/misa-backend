@@ -25,4 +25,8 @@ export class CreateBankDto {
   @Expose()
   @IsOptional()
   logoUrl?: string;
+
+  @Expose()
+  @IsOptional()
+  companyId?: string;
 }

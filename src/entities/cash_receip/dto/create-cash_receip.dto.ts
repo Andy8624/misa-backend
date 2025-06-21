@@ -51,4 +51,8 @@ export class CreateCashReceipDto {
   @Expose()
   @IsOptional()
   customer?: string;
+
+  @Expose()
+  @IsOptional()
+  customerId: string;
 }

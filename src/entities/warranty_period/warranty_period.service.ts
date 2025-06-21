@@ -20,6 +20,7 @@ export class WarrantyPeriodService {
         AND: [
           {
             description: request.description,
+            customerId: request.customerId,
           },
         ],
       },
