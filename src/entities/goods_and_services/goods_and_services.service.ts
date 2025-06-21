@@ -29,7 +29,7 @@ export class GoodsAndServicesService {
     });
 
     if (existing) {
-      throw new ConflictException('Hàng hóa dịch vụ đã tồn tại');
+      throw new ConflictException('Goods and service already exists');
     }
 
     const newItem = await this.prismaService.goodsAndServices.create({
@@ -88,7 +88,7 @@ export class GoodsAndServicesService {
         include: {
           GoodsAndServicesGroupMapping: {
             include: {
-              goodsAndServicesGroup: true, // Lấy thông tin group
+              goodsAndServicesGroup: true, // Get group information
             },
           },
           Unit: true,
@@ -121,7 +121,7 @@ export class GoodsAndServicesService {
     });
 
     if (!item || item.deletedAt) {
-      throw new NotFoundException('Không tìm thấy hàng hóa hoặc dịch vụ');
+      throw new NotFoundException('Goods or service not found');
     }
 
     return plainToInstance(ResponseGoodsAndServiceDto, item, {
@@ -142,7 +142,7 @@ export class GoodsAndServicesService {
     });
 
     if (duplicate) {
-      throw new ConflictException('Mã hàng hóa dịch vụ đã tồn tại');
+      throw new ConflictException('Goods and service code already exists');
     }
 
     const updated = await this.prismaService.goodsAndServices.update({
@@ -163,6 +163,6 @@ export class GoodsAndServicesService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

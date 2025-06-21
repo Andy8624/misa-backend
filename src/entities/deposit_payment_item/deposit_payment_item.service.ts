@@ -62,7 +62,7 @@ export class DepositPaymentItemService {
       });
 
     if (!depositPaymentItem || depositPaymentItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chi tiết phiếu chi tiền gửi');
+      throw new NotFoundException('Bank transfer payment voucher not found');
     }
 
     return plainToInstance(ResponseDepositPaymentItemDto, depositPaymentItem, {

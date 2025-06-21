@@ -27,7 +27,7 @@ export class WarrantyPeriodService {
     });
 
     if (existing) {
-      throw new ConflictException('Bảo hành đã tồn tại');
+      throw new ConflictException('Warranty period already exists');
     }
 
     const newWarranty = await this.prismaService.warrantyPeriod.create({
@@ -93,7 +93,7 @@ export class WarrantyPeriodService {
     });
 
     if (!warranty || warranty.deletedAt) {
-      throw new NotFoundException('Không tìm thấy bảo hành');
+      throw new NotFoundException('Warranty period not found');
     }
 
     return plainToInstance(ResponseWarrantyPeriodDto, warranty, {
@@ -113,7 +113,7 @@ export class WarrantyPeriodService {
     });
 
     if (duplicate) {
-      throw new ConflictException('Bảo hành đã tồn tại');
+      throw new ConflictException('Warranty period already exists');
     }
 
     const updated = await this.prismaService.warrantyPeriod.update({
@@ -134,6 +134,6 @@ export class WarrantyPeriodService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

@@ -30,7 +30,7 @@ export class EmployeeService {
       },
     });
     if (existingEmployee) {
-      throw new ConflictException('Nhân viên đã tồn tại');
+      throw new ConflictException('Employee already exists');
     }
 
     const employee = await this.prismaService.employee.create({
@@ -108,7 +108,7 @@ export class EmployeeService {
     });
 
     if (!employee || employee.deletedAt) {
-      throw new NotFoundException('Không tìm thấy nhân viên');
+      throw new NotFoundException('Employee not found');
     }
 
     return plainToInstance(ResponseEmployeeDto, employee, {
@@ -131,7 +131,7 @@ export class EmployeeService {
       });
 
       if (exists) {
-        throw new ConflictException('Mã số định danh (CCCD) đã tồn tại');
+        throw new ConflictException('ID card number (CCCD) already exists');
       }
     }
 
@@ -152,6 +152,6 @@ export class EmployeeService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

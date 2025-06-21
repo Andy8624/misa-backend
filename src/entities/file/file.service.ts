@@ -11,6 +11,7 @@ export class FileService {
     if (!file) {
       throw new Error('No file uploaded');
     }
+    const customerId = '12';
 
     const newFile = await this.prismaService.file.create({
       data: {
@@ -18,6 +19,7 @@ export class FileService {
         fileSize: file.size,
         mimeType: file.mimetype || 'png',
         path: file.path,
+        customerId: customerId,
       },
     });
 

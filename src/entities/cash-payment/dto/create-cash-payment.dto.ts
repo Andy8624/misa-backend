@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCashPaymentDto {
   @Expose()
@@ -55,4 +55,8 @@ export class CreateCashPaymentDto {
   @Expose()
   @IsOptional()
   supplier?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  customerId: string;
 }

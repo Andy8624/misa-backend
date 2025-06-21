@@ -93,7 +93,7 @@ export class ProvisionServiceVoucherService {
       });
 
     if (!provisionServiceVoucher || provisionServiceVoucher.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chứng từ cung cấp dịch vụ');
+      throw new NotFoundException('Service receipt not found');
     }
 
     return plainToInstance(

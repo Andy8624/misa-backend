@@ -75,7 +75,7 @@ export class CashPaymentVoucherItemService {
       });
 
     if (!cashPaymentVoucherItem || cashPaymentVoucherItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chi tiết phiếu chi tiền mặt');
+      throw new NotFoundException('Cash payment voucher not found');
     }
 
     return plainToInstance(

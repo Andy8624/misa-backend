@@ -79,7 +79,7 @@ export class VoucherAccountEntryService {
       });
 
     if (!voucherAccountEntry || voucherAccountEntry.deletedAt) {
-      throw new NotFoundException('Không tìm thấy bút toán chứng từ');
+      throw new NotFoundException('Voucher entry not found');
     }
 
     return plainToInstance(

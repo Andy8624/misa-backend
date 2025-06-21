@@ -41,7 +41,7 @@ export class PaymentTermService {
     });
 
     if (!paymentTerm || paymentTerm.deletedAt) {
-      throw new NotFoundException('Không tìm thấy điều khoản thanh toán');
+      throw new NotFoundException('Payment term not found');
     }
 
     return plainToInstance(ResponsePaymentTermDto, paymentTerm, {

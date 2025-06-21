@@ -47,4 +47,10 @@ export class InvoiceController {
   remove(@Param('id') id: string) {
     return this.invoiceService.remove(id);
   }
+
+  @Post('file')
+  @ApiProtectedEndpoint('Get XML File')
+  getXMLFile(@Param('id') id: string) {
+    return this.invoiceService.getXMLFile(id);
+  }
 }

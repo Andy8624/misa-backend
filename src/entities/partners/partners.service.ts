@@ -33,9 +33,9 @@ export class PartnersService {
     });
     if (existsPartnerCode) {
       if (createPartnerDto.partnerType === 'client') {
-        throw new ConflictException('Mã khách hàng đã tồn tại');
+        throw new ConflictException('Customer code already exists');
       }
-      throw new ConflictException('Mã nhà cung cấp đã tồn tại');
+      throw new ConflictException('Supplier code already exists');
     }
 
     const exists = await this.prismaService.partner.findFirst({
@@ -48,9 +48,11 @@ export class PartnersService {
 
     if (exists) {
       if (createPartnerDto.partnerType === 'client') {
-        throw new ConflictException('Khách hàng với mã số thuế này đã tồn tại');
+        throw new ConflictException(
+          'Customer with this tax code already exists',
+        );
       }
-      throw new ConflictException('Nhà cung cấp với mã số thuế này đã tồn tại');
+      throw new ConflictException('Supplier with this tax code already exists');
     }
 
     const newPartner = await this.prismaService.partner.create({
@@ -130,7 +132,7 @@ export class PartnersService {
     });
 
     if (!partner || partner.deletedAt) {
-      throw new NotFoundException('Không tìm thấy đối tác');
+      throw new NotFoundException('Partner not found');
     }
 
     return plainToInstance(ResponsePartnerDto, partner, {
@@ -161,11 +163,11 @@ export class PartnersService {
         const type = updatePartnerDto.partnerType || existPartner.partnerType;
         if (type === 'client') {
           throw new ConflictException(
-            'Khách hàng với mã số thuế này đã tồn tại',
+            'Customer with this tax code already exists',
           );
         }
         throw new ConflictException(
-          'Nhà cung cấp với mã số thuế này đã tồn tại',
+          'Supplier with this tax code already exists',
         );
       }
     }
@@ -186,6 +188,6 @@ export class PartnersService {
       where: { id },
       data: { deletedAt: new Date() },
     });
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

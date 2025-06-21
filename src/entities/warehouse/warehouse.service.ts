@@ -28,7 +28,7 @@ export class WarehouseService {
     });
 
     if (existingWarehouse) {
-      throw new ConflictException('Kho đã tồn tại');
+      throw new ConflictException('Warehouse already exists');
     }
 
     const warehouse = await this.prismaService.warehouse.create({
@@ -112,7 +112,7 @@ export class WarehouseService {
     });
 
     if (!warehouse || warehouse.deletedAt) {
-      throw new NotFoundException('Không tìm thấy kho');
+      throw new NotFoundException('Warehouse not found');
     }
 
     return plainToInstance(ResponseWarehouseDto, warehouse, {
@@ -134,7 +134,7 @@ export class WarehouseService {
       });
 
       if (exists) {
-        throw new ConflictException('Kho với mã này đã tồn tại');
+        throw new ConflictException('Warehouse with this code already exists');
       }
     }
 
@@ -158,6 +158,6 @@ export class WarehouseService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa kho thành công' };
+    return { message: 'Warehouse deleted successfully' };
   }
 }

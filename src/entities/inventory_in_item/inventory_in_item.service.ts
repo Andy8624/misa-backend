@@ -107,7 +107,7 @@ export class InventoryInItemService {
     );
 
     if (!inventoryInItem || inventoryInItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy item phiếu nhập kho');
+      throw new NotFoundException('Inventory receipt item not found');
     }
 
     return plainToInstance(ResponseInventoryInItemDto, inventoryInItem, {

@@ -73,7 +73,7 @@ export class CashReceipVoucherItemService {
       });
 
     if (!cashReceipVoucherItem || cashReceipVoucherItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chi tiết phiếu thu tiền mặt');
+      throw new NotFoundException('Cash receipt voucher detail not found');
     }
 
     return plainToInstance(

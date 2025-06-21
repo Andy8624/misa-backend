@@ -19,8 +19,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
 
-    // console.log('1. Route có public không: ', isPublic);
-    // console.log('1. Context khi kiểm tra route có public không', context);
+    // console.log('1. Is the route public: ', isPublic);
+    // console.log('1. Context when checking if route is public', context);
 
     if (isPublic) {
       return true;
@@ -30,10 +30,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err: any, user: any) {
-    // console.log('3. User sau khi kiểm tra access_token', user);
-    // console.log('3. Lỗi sau khi kiểm tra access_token', err);
+    // console.log('3. User after checking access_token', user);
+    // console.log('3. Error after checking access_token', err);
     if (err || !user) {
-      throw new UnauthorizedException('Token không hợp lệ hoặc đã hết hạn');
+      throw new UnauthorizedException('Invalid or expired token');
     }
     return user;
   }

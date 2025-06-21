@@ -66,7 +66,7 @@ export class DepositPaymentService {
     });
 
     if (!depositPayment || depositPayment.deletedAt) {
-      throw new NotFoundException('Không tìm thấy phiếu chi tiền gửi');
+      throw new NotFoundException('Bank transfer payment voucher not found');
     }
 
     return plainToInstance(ResponseDepositPaymentDto, depositPayment, {

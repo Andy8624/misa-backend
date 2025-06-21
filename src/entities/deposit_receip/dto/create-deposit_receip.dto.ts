@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateDepositReceipDto {
   @Expose()
@@ -51,4 +51,8 @@ export class CreateDepositReceipDto {
   @Expose()
   @IsOptional()
   bank?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  companyId: string;
 }

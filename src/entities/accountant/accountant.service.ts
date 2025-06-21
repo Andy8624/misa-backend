@@ -26,7 +26,7 @@ export class AccountantService {
 
     if (!accountant || accountant.deletedAt !== null) {
       throw new HttpException(
-        { message: 'Không tìm thấy kế toán viên' },
+        { message: 'Accountant not found' },
         HttpStatus.NOT_FOUND,
       );
     }
@@ -81,7 +81,7 @@ export class AccountantService {
       ],
     };
 
-    // Query song song
+    // Concurrent query
     const [accountants, total] = await Promise.all([
       this.prismaService.accountant.findMany({
         take: pageSize,
@@ -115,21 +115,21 @@ export class AccountantService {
     id: string,
     dto: UpdateAccountantDto,
   ): Promise<ResponseAccountantDto> {
-    // Kiểm tra người dùng có tồn tại không
+    // Check if user exists
     const existing = await this.getAccountantOrThrow(id);
 
-    // Kiểm tra email mới (nếu có) có tồn tại chưa
+    // Check if the new email (if provided) already exists
     if (dto.email && dto.email !== existing.email) {
       const exists = await this.prismaService.accountant.findFirst({
         where: { email: dto.email, id: { not: id } },
       });
 
       if (exists) {
-        throw new BadRequestException('Email đã tồn tại');
+        throw new BadRequestException('Email already exists');
       }
     }
 
-    // Lọc các trường không có trong DTO (Không cho cập nhật ID và mật khẩu)
+    // Filter out fields not in DTO (preventing ID and password updates)
     const cleaned = plainToInstance(UpdateAccountantDto, dto, {
       excludeExtraneousValues: true,
     });
@@ -152,6 +152,6 @@ export class AccountantService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

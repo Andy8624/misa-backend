@@ -70,7 +70,7 @@ export class PurchaseVoucherService {
     );
 
     if (!purchaseVoucher || purchaseVoucher.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chứng từ mua hàng');
+      throw new NotFoundException('Purchase voucher not found');
     }
 
     return plainToInstance(ResponsePurchaseVoucherDto, purchaseVoucher, {

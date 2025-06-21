@@ -52,7 +52,7 @@ export class GroupOfPurchaseGoodService {
       });
 
     if (!groupOfPurchaseGood || groupOfPurchaseGood.deletedAt) {
-      throw new NotFoundException('Không tìm thấy nhóm hàng mua');
+      throw new NotFoundException('Purchase item group not found');
     }
 
     return plainToInstance(

@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateProvisionServiceVoucherDto {
   @Expose()
@@ -213,4 +213,8 @@ export class CreateProvisionServiceVoucherDto {
   @Expose()
   @IsOptional()
   customer_address?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  companyId: string;
 }

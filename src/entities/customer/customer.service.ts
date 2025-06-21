@@ -26,7 +26,7 @@ export class CustomerService {
     });
 
     if (existingCustomer) {
-      throw new ConflictException('Mã số thuế đã tồn tại');
+      throw new ConflictException('Tax code already exists');
     }
 
     const customer = await this.prismaService.customer.create({
@@ -98,7 +98,7 @@ export class CustomerService {
     });
 
     if (!customer || customer.deletedAt) {
-      throw new NotFoundException('Không tìm thấy khách hàng (Công ty)');
+      throw new NotFoundException('Customer (Company) not found');
     }
 
     return plainToInstance(ResponseCustomerDto, customer, {
@@ -115,7 +115,7 @@ export class CustomerService {
       });
 
       if (exists) {
-        throw new ConflictException('TaxCode đã tồn tại');
+        throw new ConflictException('TaxCode already exists');
       }
     }
 
@@ -136,6 +136,6 @@ export class CustomerService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

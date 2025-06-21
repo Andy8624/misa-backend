@@ -28,7 +28,7 @@ export class VatTaxService {
     });
 
     if (existingVatTax) {
-      throw new ConflictException('Thuế vat đã tồn tại');
+      throw new ConflictException('VAT tax already exists');
     }
 
     const vatTax = await this.prismaService.vatTax.create({
@@ -100,7 +100,7 @@ export class VatTaxService {
     });
 
     if (!vatTax || vatTax.deletedAt) {
-      throw new NotFoundException('Không tìm thấy thuế vat');
+      throw new NotFoundException('VAT tax not found');
     }
 
     return plainToInstance(ResponseVatTaxDto, vatTax, {
@@ -125,7 +125,9 @@ export class VatTaxService {
       });
 
       if (exists) {
-        throw new ConflictException('Thuế VAT với tỷ lệ này đã tồn tại');
+        throw new ConflictException(
+          'VAT tax with this percentage already exists',
+        );
       }
     }
 
@@ -146,6 +148,6 @@ export class VatTaxService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

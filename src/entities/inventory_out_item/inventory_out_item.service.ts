@@ -109,7 +109,7 @@ export class InventoryOutItemService {
       });
 
     if (!inventoryOutItem || inventoryOutItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy item phiếu xuất kho');
+      throw new NotFoundException('Inventory out item not found');
     }
 
     return plainToInstance(ResponseInventoryOutItemDto, inventoryOutItem, {

@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreatePaymentTermDto {
   @Expose()
@@ -9,4 +9,8 @@ export class CreatePaymentTermDto {
   @Expose()
   @IsOptional()
   name?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  companyId: string;
 }

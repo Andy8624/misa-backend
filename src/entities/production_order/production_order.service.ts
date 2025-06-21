@@ -91,7 +91,7 @@ export class ProductionOrderService {
       });
 
     if (!productionOrder || productionOrder.deletedAt) {
-      throw new NotFoundException('Không tìm thấy lệnh sản xuất');
+      throw new NotFoundException('Production order not found');
     }
 
     return plainToInstance(ResponseProductionOrderDto, productionOrder, {

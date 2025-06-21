@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateInvoiceDto {
   @Expose()
@@ -103,4 +103,8 @@ export class CreateInvoiceDto {
   @Expose()
   @IsOptional()
   file?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  customerId: string;
 }

@@ -31,7 +31,7 @@ export class ChartOfAccountService {
     });
 
     if (existing) {
-      throw new ConflictException('Tài khoản đã tồn tại');
+      throw new ConflictException('Account already exists');
     }
 
     const newAccount = await this.prismaService.chartOfAccount.create({
@@ -113,7 +113,7 @@ export class ChartOfAccountService {
     });
 
     if (!account || account.deletedAt) {
-      throw new NotFoundException('Không tìm thấy tài khoản');
+      throw new NotFoundException('Account not found');
     }
 
     return plainToInstance(ResponseChartOfAccountDto, account, {
@@ -133,7 +133,7 @@ export class ChartOfAccountService {
     });
 
     if (duplicate) {
-      throw new ConflictException('Mã tài khoản này đã tồn tại');
+      throw new ConflictException('This account number already exists');
     }
 
     const updatedEntity = await this.prismaService.chartOfAccount.update({
@@ -154,6 +154,6 @@ export class ChartOfAccountService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

@@ -91,7 +91,7 @@ export class SaleVoucherItemService {
     );
 
     if (!saleVoucherItem || saleVoucherItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chi tiết chứng từ bán hàng');
+      throw new NotFoundException('Sales voucher detail not found');
     }
 
     return plainToInstance(ResponseSaleVoucherItemDto, saleVoucherItem, {

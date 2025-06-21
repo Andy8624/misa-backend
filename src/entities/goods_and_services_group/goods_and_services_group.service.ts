@@ -33,7 +33,7 @@ export class GoodsAndServicesGroupService {
       });
 
     if (existingGoodAndServiceGroup) {
-      throw new ConflictException('Nhóm hàng hóa vật tư đã tồn tại');
+      throw new ConflictException('Goods and services group already exists');
     }
 
     if (request.parentGroupId != null) {
@@ -43,7 +43,7 @@ export class GoodsAndServicesGroupService {
 
       if (!exists) {
         throw new NotFoundException(
-          'Không tìm thấy nhóm cha của nhóm hàng hóa vật tư "parentGroupId"',
+          'Parent group for goods and services "parentGroupId" not found',
         );
       }
     }
@@ -130,7 +130,7 @@ export class GoodsAndServicesGroupService {
     );
 
     if (!groupItem || groupItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy nhóm hàng hóa dịch vụ');
+      throw new NotFoundException('Goods and services group not found');
     }
 
     return plainToInstance(ResponseGoodsAndServicesGroupDto, groupItem, {
@@ -150,7 +150,9 @@ export class GoodsAndServicesGroupService {
       },
     });
     if (duplicate) {
-      throw new ConflictException('Mã nhóm hàng hóa vật tư đã tồn tại');
+      throw new ConflictException(
+        'Goods and services group code already exists',
+      );
     }
 
     if (request.parentGroupId != null) {
@@ -160,7 +162,7 @@ export class GoodsAndServicesGroupService {
 
       if (!exists) {
         throw new NotFoundException(
-          'Không tìm thấy nhóm cha của nhóm hàng hóa vật tư "parentGroupId"',
+          'Parent group for goods and services "parentGroupId" not found',
         );
       }
     }
@@ -185,6 +187,6 @@ export class GoodsAndServicesGroupService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

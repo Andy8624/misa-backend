@@ -30,7 +30,7 @@ export class UnitService {
 
       if (existingUnit) {
         throw new ConflictException(
-          'Tên đơn vị tính đã tồn tại trong công ty này',
+          'Unit name already exists for this company',
         );
       }
 
@@ -44,11 +44,15 @@ export class UnitService {
     } catch (error) {
       console.log(error);
       if (error.code === 'P2003') {
-        throw new ConflictException('Công ty không tồn tại');
+        throw new ConflictException('Company not found');
       }
 
       if (error.code === 'P2002') {
-        throw new ConflictException('Đơn vị tính đã tồn tại');
+        // This specific Prisma error typically indicates a unique constraint violation.
+        // In this context, it's likely for a unique 'name' field if one exists without `deletedAt: null`.
+        // The more specific check for `existingUnit` handles the soft-delete aspect.
+        // Keeping this as a fallback or if there's another unique constraint.
+        throw new ConflictException('Unit already exists');
       }
 
       if (
@@ -58,7 +62,7 @@ export class UnitService {
         throw error;
       }
 
-      throw new Error('Tạo đơn vị tính thất bại');
+      throw new Error('Failed to create unit');
     }
   }
 
@@ -92,10 +96,10 @@ export class UnitService {
               },
             ]
           : []),
-        // Chỉ thêm customerId khi có giá trị
+        // Only add customerId when it has a value
         ...(customerId ? [{ customerId }] : []),
 
-        // Chỉ thêm status khi có giá trị
+        // Only add status when it has a value
         ...(status ? [{ status }] : []),
 
         { deletedAt: null },
@@ -128,7 +132,7 @@ export class UnitService {
     });
 
     if (!unit || unit.deletedAt) {
-      throw new NotFoundException('Không tìm thấy đơn vị tính');
+      throw new NotFoundException('Unit not found');
     }
 
     return plainToInstance(ResponseUnitDto, unit, {
@@ -152,7 +156,7 @@ export class UnitService {
 
         if (exists) {
           throw new ConflictException(
-            'Tên đơn vị tính đã tồn tại trong công ty này',
+            'Unit name already exists for this company',
           );
         }
       }
@@ -167,7 +171,7 @@ export class UnitService {
       });
     } catch (error) {
       if (error.code === 'P2003') {
-        throw new ConflictException('Công ty không tồn tại');
+        throw new ConflictException('Company not found');
       }
 
       if (
@@ -178,7 +182,7 @@ export class UnitService {
       }
 
       console.error('Update unit error:', error);
-      throw new Error('Cập nhật đơn vị tính thất bại');
+      throw new Error('Failed to update unit');
     }
   }
 
@@ -189,6 +193,6 @@ export class UnitService {
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

@@ -100,7 +100,7 @@ export class PurchaseVoucherItemService {
       });
 
     if (!purchaseVoucherItem || purchaseVoucherItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chi tiết chứng từ mua hàng');
+      throw new NotFoundException('Purchase voucher detail not found');
     }
 
     return plainToInstance(

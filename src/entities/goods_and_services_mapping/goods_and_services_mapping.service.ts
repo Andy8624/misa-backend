@@ -31,7 +31,7 @@ export class GoodsAndServicesMappingService {
       });
 
     if (existing) {
-      throw new ConflictException('Dữ liệu đã tồn tại');
+      throw new ConflictException('Data already exists');
     }
 
     const newItem =
@@ -107,7 +107,7 @@ export class GoodsAndServicesMappingService {
       });
 
     if (!item) {
-      throw new NotFoundException('Không tìm thấy');
+      throw new NotFoundException('Not found');
     }
 
     return plainToInstance(ResponseGoodsAndServicesMappingDto, item, {
@@ -128,7 +128,7 @@ export class GoodsAndServicesMappingService {
       });
 
     if (duplicate) {
-      throw new ConflictException('Đã tồn tại');
+      throw new ConflictException('Already exists');
     }
 
     const updated =
@@ -149,6 +149,6 @@ export class GoodsAndServicesMappingService {
       where: { id },
     });
 
-    return { message: 'Xóa thành công' };
+    return { message: 'Successfully deleted' };
   }
 }

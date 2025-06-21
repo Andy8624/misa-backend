@@ -63,7 +63,7 @@ export class DepositReceipItemService {
       });
 
     if (!depositReceipItem || depositReceipItem.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chi tiết phiếu gửi tiền');
+      throw new NotFoundException('Deposit voucher detail not found');
     }
 
     return plainToInstance(ResponseDepositReceipItemDto, depositReceipItem, {

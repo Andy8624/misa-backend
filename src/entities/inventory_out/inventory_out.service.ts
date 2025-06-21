@@ -19,7 +19,7 @@ export class InventoryOutService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createInventoryOutDto: CreateInventoryOutDto) {
-    // Kiểm tra voucherNumber không trùng trong cùng customerId
+    // Check for duplicate voucherNumber within the same customerId
     const existingVoucher = await this.prismaService.inventoryOut.findFirst({
       where: {
         voucherNumber: createInventoryOutDto.voucherNumber,
@@ -29,10 +29,12 @@ export class InventoryOutService {
     });
 
     if (existingVoucher) {
-      throw new ConflictException('Số chứng từ đã tồn tại trong hệ thống');
+      throw new ConflictException(
+        'Voucher number already exists in the system',
+      );
     }
 
-    // Tạo mới phiếu xuất kho
+    // Create new inventory out receipt
     const inventoryOut = await this.prismaService.inventoryOut.create({
       data: createInventoryOutDto,
       include: {
@@ -145,7 +147,7 @@ export class InventoryOutService {
     });
 
     if (!inventoryOut || inventoryOut.deletedAt) {
-      throw new NotFoundException('Không tìm thấy phiếu xuất kho');
+      throw new NotFoundException('Inventory out receipt not found');
     }
 
     return plainToInstance(ResponseInventoryOutDto, inventoryOut, {
@@ -154,10 +156,10 @@ export class InventoryOutService {
   }
 
   async update(id: string, updateInventoryOutDto: UpdateInventoryOutDto) {
-    // Kiểm tra phiếu xuất kho tồn tại
+    // Check if inventory out receipt exists
     const existingInventoryOut = await this.findOne(id);
 
-    // Kiểm tra voucherNumber không trùng trong cùng customerId nếu có thay đổi
+    // Check for duplicate voucherNumber within the same customerId if changed
     if (
       updateInventoryOutDto.voucherNumber &&
       updateInventoryOutDto.voucherNumber !== existingInventoryOut.voucherNumber
@@ -166,13 +168,15 @@ export class InventoryOutService {
         where: {
           voucherNumber: updateInventoryOutDto.voucherNumber,
           customerId: existingInventoryOut.customerId,
-          id: { not: id }, // Loại trừ chính bản ghi hiện tại
+          id: { not: id }, // Exclude the current record itself
           deletedAt: null,
         },
       });
 
       if (existingVoucher) {
-        throw new ConflictException('Số chứng từ đã tồn tại trong hệ thống');
+        throw new ConflictException(
+          'Voucher number already exists in the system',
+        );
       }
     }
 
@@ -202,15 +206,15 @@ export class InventoryOutService {
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    // Kiểm tra phiếu xuất kho tồn tại
+    // Check if inventory out receipt exists
     await this.findOne(id);
 
-    // Xóa mềm phiếu xuất kho
+    // Soft delete inventory out receipt
     await this.prismaService.inventoryOut.update({
       where: { id },
       data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa phiếu xuất kho thành công' };
+    return { message: 'Inventory out receipt deleted successfully' };
   }
 }

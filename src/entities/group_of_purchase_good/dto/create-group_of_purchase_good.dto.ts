@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateGroupOfPurchaseGoodDto {
   @Expose()
@@ -13,4 +13,8 @@ export class CreateGroupOfPurchaseGoodDto {
   @Expose()
   @IsOptional()
   description?: string;
+
+  @Expose()
+  @IsNotEmpty()
+  companyId: string;
 }

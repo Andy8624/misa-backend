@@ -53,7 +53,7 @@ export class InvoiceService {
     });
 
     if (!invoice || invoice.deletedAt) {
-      throw new NotFoundException('Không tìm thấy hóa đơn');
+      throw new NotFoundException('Invoice not found');
     }
 
     return plainToInstance(ResponseInvoiceDto, invoice, {
@@ -93,5 +93,9 @@ export class InvoiceService {
     });
 
     return { message: 'Xóa hóa đơn thành công' };
+  }
+
+  async getXMLFile(id: string) {
+    return 'Get file' + id;
   }
 }

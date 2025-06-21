@@ -28,7 +28,6 @@ export class BankAccountService {
     const bankAccounts = await this.prismaService.bankAccount.findMany({
       where: {
         deletedAt: null,
-        customerId: 
       },
       orderBy: {
         createdAt: 'desc',
@@ -54,7 +53,7 @@ export class BankAccountService {
     });
 
     if (!bankAccount || bankAccount.deletedAt) {
-      throw new NotFoundException('Không tìm thấy tài khoản ngân hàng');
+      throw new NotFoundException('Bank account not found');
     }
 
     return plainToInstance(ResponseBankAccountDto, bankAccount, {

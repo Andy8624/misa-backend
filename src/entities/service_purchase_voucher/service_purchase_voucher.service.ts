@@ -75,7 +75,7 @@ export class ServicePurchaseVoucherService {
       });
 
     if (!servicePurchaseVoucher || servicePurchaseVoucher.deletedAt) {
-      throw new NotFoundException('Không tìm thấy chứng từ mua dịch vụ');
+      throw new NotFoundException('Service purchase voucher not found');
     }
 
     return plainToInstance(

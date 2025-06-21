@@ -84,9 +84,7 @@ export class ProvisionServiceVoucherItemService {
       });
 
     if (!provisionServiceVoucherItem || provisionServiceVoucherItem.deletedAt) {
-      throw new NotFoundException(
-        'Không tìm thấy chi tiết chứng từ cung cấp dịch vụ',
-      );
+      throw new NotFoundException('Service receipt detail not found');
     }
 
     return plainToInstance(

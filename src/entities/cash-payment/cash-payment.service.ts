@@ -62,7 +62,7 @@ export class CashPaymentService {
     });
 
     if (!cashPayment || cashPayment.deletedAt) {
-      throw new NotFoundException('Không tìm thấy phiếu chi tiền mặt');
+      throw new NotFoundException('Cash payment voucher not found');
     }
 
     return plainToInstance(ResponseCashPaymentDto, cashPayment, {

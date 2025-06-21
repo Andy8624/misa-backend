@@ -41,7 +41,7 @@ export class BankService {
     });
 
     if (!bank || bank.deletedAt) {
-      throw new NotFoundException('Không tìm thấy ngân hàng');
+      throw new NotFoundException('Bank not found');
     }
 
     return plainToInstance(ResponseBankDto, bank, {
@@ -76,6 +76,6 @@ export class BankService {
       },
     });
 
-    return { message: 'Xóa ngân hàng thành công' };
+    return { message: 'Bank deleted successfully' };
   }
 }
