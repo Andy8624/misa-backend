@@ -292,17 +292,17 @@ model Employee {
   InventoryIns InventoryIn[] // Một nhân viên có thể tạo nhiều phiếu nhập kho
   InventoryOut InventoryOut[] // Một nhân viên có thể tạo nhiều phiếu xuất kho
 
-  CashReceipEmployeeByType CashReceip[] @relation("CashReceipEmployeeByType")
-  CashReceipEmployee       CashReceip[] @relation("CashReceipEmployee")
+  // CashReceipEmployeeByType CashReceip[] @relation("CashReceipEmployeeByType")
+  CashReceipEmployee CashReceip[] @relation("CashReceipEmployee")
 
-  CashPaymentEmployee       CashPayment[] @relation("CashPaymentEmployee")
-  CashPaymentEmployeeByType CashPayment[] @relation("CashPaymentEmployeeByType")
+  CashPaymentEmployee CashPayment[] @relation("CashPaymentEmployee")
+  // CashPaymentEmployeeByType CashPayment[] @relation("CashPaymentEmployeeByType")
 
   DebtCollectorEmployee DepositReceip[] @relation("DebtCollectorEmployee")
   DepositReceipEmployee DepositReceip[] @relation("DepositReceipEmployee")
 
   DepositPaymentEmployee DepositPayment[] @relation("DepositPaymentEmployee")
-  DepositPayment         DepositPayment[] @relation("DepositPaymentEmployeeByType")
+  // DepositPayment         DepositPayment[] @relation("DepositPaymentEmployeeByType")
 
   Invoice_ExecutinPerson Invoice[] @relation("Invoice_ExecutinPerson")
 
@@ -653,12 +653,47 @@ model InventoryIn {
   objectId String?  @map("object_id")
 
   // Quan hệ với bảng công ty
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @map("customer_id")
+  company   Customer @relation(fields: [companyId], references: [id])
+  companyId String   @map("customer_id")
 
   InventoryInItem InventoryInItem[]
 
   @@map("inventory_ins")
+}
+
+model InventoryInItem {
+  id        String  @id @default(uuid())
+  itemName  String? @map("item_name")
+  quantity  Int?
+  unitPrice Int?    @map("unit_price")
+
+  // ✅ Thêm relations với ChartOfAccount
+  creditAccount   ChartOfAccount? @relation("InventoryInItemCredit", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  debitAccount   ChartOfAccount? @relation("InventoryInItemDebit", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  // ✅ Thêm các relations khác
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id])
+  warehouseId String?    @map("warehouse_id")
+
+  item   GoodsAndServices? @relation(fields: [itemId], references: [id])
+  itemId String?           @map("item_id")
+
+  // ✅ Relation với InventoryIn (không phải InventoryOut)
+  inventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
+  inventoryInId String?      @map("inventory_in_id")
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? @map("unit_id")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("inventory_in_items")
 }
 
 model InventoryOut {
@@ -693,8 +728,8 @@ model InventoryOut {
   objectId String?  @map("object_id")
 
   // Quan hệ với bảng công ty
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @map("customer_id")
+  company   Customer @relation(fields: [companyId], references: [id])
+  companyId String   @map("company_id")
 
   InventoryOutItem InventoryOutItem[]
 
@@ -739,41 +774,6 @@ model InventoryOutItem {
   deletedAt DateTime? @map("deleted_at")
 
   @@map("inventory_out_items")
-}
-
-model InventoryInItem {
-  id        String  @id @default(uuid())
-  itemName  String? @map("item_name")
-  quantity  Int?
-  unitPrice Int?    @map("unit_price")
-
-  // ✅ Thêm relations với ChartOfAccount
-  creditAccount   ChartOfAccount? @relation("InventoryInItemCredit", fields: [creditAccountId], references: [id])
-  creditAccountId String?         @map("credit_account_id")
-
-  debitAccount   ChartOfAccount? @relation("InventoryInItemDebit", fields: [debitAccountId], references: [id])
-  debitAccountId String?         @map("debit_account_id")
-
-  // ✅ Thêm các relations khác
-  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id])
-  warehouseId String?    @map("warehouse_id")
-
-  item   GoodsAndServices? @relation(fields: [itemId], references: [id])
-  itemId String?           @map("item_id")
-
-  // ✅ Relation với InventoryIn (không phải InventoryOut)
-  inventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
-  inventoryInId String?      @map("inventory_in_id")
-
-  unit   Unit?   @relation(fields: [unitId], references: [id])
-  unitId String? @map("unit_id")
-
-  // Auditing
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("inventory_in_items")
 }
 
 model productionOrders {
@@ -837,12 +837,12 @@ model CashReceip {
   withOriginalVoucher    String?   @map("with_original_voucher")
 
   // Quan hệ với bảng công ty
-  customerCampany Customer? @relation(fields: [customerId], references: [id])
-  customerId      String?   @map("customer_id")
+  company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 
   // employeeByType  -- employee -- nhân viên
-  EmployeeByType Employee? @relation("CashReceipEmployeeByType", fields: [employeeByType], references: [id])
-  employeeByType String?   @map("employee_by_type")
+  // EmployeeByType Employee? @relation("CashReceipEmployeeByType", fields: [employeeByType], references: [id])
+  // employeeByType String?   @map("employee_by_type")
 
   // employee -- nhân viên
   Employee Employee? @relation("CashReceipEmployee", fields: [employee], references: [id])
@@ -905,12 +905,12 @@ model CashPayment {
   voucherNumber          String?   @map("voucher_number") // Số chứng từ
 
   // Quan hệ với bảng công ty
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @map("customer_id")
+  company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 
   // employeeByType  -- employee -- nhân viên
-  EmployeeByType Employee? @relation("CashPaymentEmployeeByType", fields: [employeeByType], references: [id])
-  employeeByType String?   @map("employee_by_type")
+  // EmployeeByType Employee? @relation("CashPaymentEmployeeByType", fields: [employeeByType], references: [id])
+  // employeeByType String?   @map("employee_by_type")
 
   // employee -- nhân viên
   Employee Employee? @relation("CashPaymentEmployee", fields: [employee], references: [id])
@@ -1038,14 +1038,14 @@ model DepositPayment {
   voucherDate        DateTime? @map("voucher_date")
 
   // Quan hệ với bảng công ty
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @map("customer_id")
+  company   Customer @relation(fields: [companyId], references: [id])
+  companyId String   @map("company_id")
 
   Employee Employee? @relation("DepositPaymentEmployee", fields: [employee], references: [id])
   employee String?
 
-  EmployeeByType Employee? @relation("DepositPaymentEmployeeByType", fields: [employeeByType], references: [id])
-  employeeByType String?   @map("employee_by_type")
+  // EmployeeByType Employee? @relation("DepositPaymentEmployeeByType", fields: [employeeByType], references: [id])
+  // employeeByType String?   @map("employee_by_type")
 
   Bank BankAccount? @relation("DepositPaymentBank", fields: [bank], references: [id])
   bank String?
@@ -1230,8 +1230,8 @@ model ServicePurchaseVoucher {
   purchase_without_invoiceInfo_address       String?
 
   // Quan hệ với bảng công ty
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @map("customer_id")
+  company   Customer @relation(fields: [companyId], references: [id])
+  companyId String   @map("customer_id")
 
   RecipientAccount Bank?   @relation("ServicePurchaseVoucher_RecipientAccount", fields: [recipientAccount], references: [id])
   recipientAccount String?

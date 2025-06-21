@@ -23,7 +23,7 @@ export class InventoryInService {
     const existingVoucher = await this.prismaService.inventoryIn.findFirst({
       where: {
         voucherNumber: createInventoryInDto.voucherNumber,
-        customerId: createInventoryInDto.customerId,
+        companyId: createInventoryInDto.companyId,
         deletedAt: null,
       },
     });
@@ -55,7 +55,7 @@ export class InventoryInService {
     const pageSize = Number(filters.pageSize) || 20;
     const page = Number(filters.page) || 1;
     const search = filters.search || '';
-    const customerId = filters.customerId || '';
+    const companyId = filters.companyId || '';
 
     const skip = page > 1 ? (page - 1) * pageSize : 0;
 
@@ -88,7 +88,7 @@ export class InventoryInService {
             ]
           : []),
 
-        ...(customerId ? [{ customerId }] : []),
+        ...(companyId ? [{ companyId }] : []),
 
         { deletedAt: null },
       ],
@@ -171,7 +171,7 @@ export class InventoryInService {
       const existingVoucher = await this.prismaService.inventoryIn.findFirst({
         where: {
           voucherNumber: updateInventoryInDto.voucherNumber,
-          customerId: existingInventoryIn.customerId,
+          companyId: existingInventoryIn.companyId,
           id: { not: id }, // Exclude the current record itself
           deletedAt: null,
         },

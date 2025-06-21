@@ -18,7 +18,7 @@ export class InventoryInFilterType {
 
   @ApiPropertyOptional({ description: 'Company ID' })
   @IsOptional()
-  customerId?: string;
+  companyId?: string;
 
   @ApiPropertyOptional({ description: 'Current page', example: 1 })
   @IsOptional()

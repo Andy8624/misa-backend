@@ -57,7 +57,7 @@ export class ResponseInventoryInDto {
   object?: ResponsePartnerDto[];
 
   @Expose()
-  customerId: string;
+  companyId: string;
 
   @Expose()
   @Transform(({ value }) => value.toISOString())

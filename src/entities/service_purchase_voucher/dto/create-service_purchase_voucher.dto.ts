@@ -133,5 +133,5 @@ export class CreateServicePurchaseVoucherDto {
 
   @Expose()
   @IsNotEmpty()
-  customerId: string;
+  companyId: string;
 }

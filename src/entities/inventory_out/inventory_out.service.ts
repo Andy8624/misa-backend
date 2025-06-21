@@ -19,11 +19,11 @@ export class InventoryOutService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createInventoryOutDto: CreateInventoryOutDto) {
-    // Check for duplicate voucherNumber within the same customerId
+    // Check for duplicate voucherNumber within the same companyId
     const existingVoucher = await this.prismaService.inventoryOut.findFirst({
       where: {
         voucherNumber: createInventoryOutDto.voucherNumber,
-        customerId: createInventoryOutDto.customerId,
+        companyId: createInventoryOutDto.companyId,
         deletedAt: null,
       },
     });
@@ -159,7 +159,7 @@ export class InventoryOutService {
     // Check if inventory out receipt exists
     const existingInventoryOut = await this.findOne(id);
 
-    // Check for duplicate voucherNumber within the same customerId if changed
+    // Check for duplicate voucherNumber within the same companyId if changed
     if (
       updateInventoryOutDto.voucherNumber &&
       updateInventoryOutDto.voucherNumber !== existingInventoryOut.voucherNumber
@@ -167,7 +167,7 @@ export class InventoryOutService {
       const existingVoucher = await this.prismaService.inventoryOut.findFirst({
         where: {
           voucherNumber: updateInventoryOutDto.voucherNumber,
-          customerId: existingInventoryOut.customerId,
+          companyId: existingInventoryOut.companyId,
           id: { not: id }, // Exclude the current record itself
           deletedAt: null,
         },

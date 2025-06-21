@@ -54,5 +54,5 @@ export class CreateInventoryOutDto {
 
   @Expose()
   @IsNotEmpty({ message: 'ID công ty không được để trống' })
-  customerId: string;
+  companyId: string;
 }

@@ -54,21 +54,5 @@ export class CreateInventoryInDto {
 
   @Expose()
   @IsNotEmpty({ message: 'ID Công ty không được để trống' })
-  customerId: string;
+  companyId: string;
 }
-
-// {
-//   "inventoryInVoucherType": "Loại phiếu nhập",
-//   "address": "Địa chỉ",
-//   "courier": "KD",
-//   "description": "Mô trả",
-//   "withOriginalVoucher": "12",
-//   "postedDate": "2025-06-19T07:27:38.867Z",
-//   "voucherDate": "2025-06-19T07:27:38.867Z",
-//   "voucherNumber": "string",
-//   "costOfInventoryReturned": "string",
-//   "storePersonId": null,
-//   "clientId": null,
-//   "objectId": null,
-//   "customerId": "0f3767ae-8f5d-4ece-8f95-011d12429d5f"
-// }

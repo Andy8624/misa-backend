@@ -74,5 +74,5 @@ export class CreateDepositPaymentDto {
 
   @Expose()
   @IsNotEmpty()
-  customerId: string;
+  companyId: string;
 }

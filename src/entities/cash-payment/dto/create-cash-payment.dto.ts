@@ -58,5 +58,5 @@ export class CreateCashPaymentDto {
 
   @Expose()
   @IsNotEmpty()
-  customerId: string;
+  companyId: string;
 }

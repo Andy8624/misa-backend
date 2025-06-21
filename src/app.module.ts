@@ -43,6 +43,7 @@ import { SaleVoucherItemModule } from './entities/sale_voucher_item/sale_voucher
 import { PurchaseVoucherModule } from './entities/purchase_voucher/purchase_voucher.module';
 import { PurchaseVoucherItemModule } from './entities/purchase_voucher_item/purchase_voucher_item.module';
 import { GroupOfPurchaseGoodModule } from './entities/group_of_purchase_good/group_of_purchase_good.module';
+import { UtilitiesModule } from './utilities/utilities.module';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { GroupOfPurchaseGoodModule } from './entities/group_of_purchase_good/gro
     PurchaseVoucherModule,
     PurchaseVoucherItemModule,
     GroupOfPurchaseGoodModule,
+    UtilitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
