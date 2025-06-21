@@ -4,19 +4,19 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreateGoodsAndServicesGroupDto {
   @Expose()
   @IsNotEmpty({
-    message: 'Mã nhóm dịch vụ hàng hóa không được để trống',
+    message: 'Goods and services group code cannot be empty',
   })
   code: string;
 
   @Expose()
   @IsNotEmpty({
-    message: 'Tên nhóm dịch vụ hàng hóa không được để trống',
+    message: 'Goods and services group name cannot be empty',
   })
   name: string;
 
   @Expose()
   @IsNotEmpty({
-    message: 'Trạng thái nhóm dịch vụ hàng hóa không được để trống',
+    message: 'Goods and services group status cannot be empty',
   })
   status: string;
 
@@ -25,6 +25,6 @@ export class CreateGoodsAndServicesGroupDto {
   parentGroupId: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID công ty không được để trống' })
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   customerId: string;
 }

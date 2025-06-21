@@ -12,7 +12,7 @@ export class CreateInventoryInDto {
 
   @Expose()
   @IsOptional()
-  courier?: string; // Người giao hàng
+  courier?: string; // Shipper
 
   @Expose()
   @IsOptional()
@@ -33,7 +33,7 @@ export class CreateInventoryInDto {
   voucherDate?: Date;
 
   @Expose()
-  @IsNotEmpty({ message: 'Số chứng từ không được để trống' })
+  @IsNotEmpty({ message: 'Voucher number cannot be empty' })
   voucherNumber: string;
 
   @Expose()
@@ -53,6 +53,6 @@ export class CreateInventoryInDto {
   objectId?: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID Công ty không được để trống' })
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   companyId: string;
 }

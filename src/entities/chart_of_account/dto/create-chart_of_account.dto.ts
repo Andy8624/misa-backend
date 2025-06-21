@@ -3,27 +3,27 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateChartOfAccountDto {
   @Expose()
-  @IsNotEmpty({ message: 'Soos tài khoản không được để trống' })
+  @IsNotEmpty({ message: 'Account number cannot be empty' })
   accountNumber: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Tên tài khoản không được để trống' })
+  @IsNotEmpty({ message: 'Account name cannot be empty' })
   accountName: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Tên tiếng anh tài khoản không được để trống' })
+  @IsNotEmpty({ message: 'Account English name cannot be empty' })
   englishName: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Chi tiết tài khoản không được để trống' })
+  @IsNotEmpty({ message: 'Account particular cannot be empty' })
   particular: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Đặc trưng tài khoản không được để trống' })
+  @IsNotEmpty({ message: 'Account characteristics cannot be empty' })
   characteristics: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID công ty không được để trống' })
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   customerId: string;
 
   @Expose()

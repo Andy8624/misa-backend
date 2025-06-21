@@ -4,53 +4,53 @@ import { LegalType, PartnerType } from 'src/interfaces/partner.interface';
 
 export class CreatePartnerDto {
   @Expose()
-  @IsNotEmpty({ message: 'Mã đối tác không được để trống' })
+  @IsNotEmpty({ message: 'Partner code cannot be empty' })
   partnerCode: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Loại đối tác không được để trống' })
+  @IsNotEmpty({ message: 'Partner type cannot be empty' })
   @IsEnum(PartnerType, {
-    message: 'Loại đối tác phải là client hoặc supplier',
+    message: 'Partner type must be client or supplier',
   })
-  partnerType: PartnerType; // Loại đối tác 'client' | 'supplier' (KH - NCC)
+  partnerType: PartnerType; // Partner type 'client' | 'supplier'
 
   @Expose()
-  @IsNotEmpty({ message: 'Loại hình doanh nghiệp không được để trống' })
+  @IsNotEmpty({ message: 'Legal type cannot be empty' })
   @IsEnum(LegalType, {
-    message: 'Loại hình doanh nghiệp phải là organization hoặc individual',
+    message: 'Legal type must be organization or individual',
   })
-  legalType: LegalType; // Loại hình doanh nghiệp (Cá nhân - tổ chức) ('organization' | 'individual')
+  legalType: LegalType; // Legal type ('organization' | 'individual')
 
   @Expose()
-  @IsNotEmpty({ message: 'Mã số thuế không được để trống' })
-  taxCode: string; // Mã số thuế
+  @IsNotEmpty({ message: 'Tax code cannot be empty' })
+  taxCode: string; // Tax code
 
   @Expose()
   @IsNotEmpty({
-    message: 'Mã số đơn vị có quan hệ với Ngân sách không được để trống',
+    message: 'Government unit code cannot be empty',
   })
-  govUnitCode: string; // Mã số đơn vị có quan hệ với Ngân sách
+  govUnitCode: string; // Government unit code
 
   @Expose()
-  @IsNotEmpty({ message: 'Họ tên không được để trống' })
-  fullName: string; // Tên
+  @IsNotEmpty({ message: 'Full name cannot be empty' })
+  fullName: string; // Name
 
   @Expose()
-  @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
-  address: string; // Địa chỉ
+  @IsNotEmpty({ message: 'Address cannot be empty' })
+  address: string; // Address
 
   @Expose()
   @Matches(/^(0)(9|3|7|8|5)[0-9]{8}$/, {
-    message: 'Số điện thoại không hợp lệ',
+    message: 'Invalid phone number',
   })
-  @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
-  phoneNumber: string; // Số điện thoại
+  @IsNotEmpty({ message: 'Phone number cannot be empty' })
+  phoneNumber: string; // Phone number
 
   @Expose()
   @IsOptional()
-  websiteUrl: string; // Đường dẫn đến website của đối tác (Partners)
+  websiteUrl: string; // Website URL of the partner
 
   @Expose()
-  @IsNotEmpty({ message: 'Id Công Ty (CustomerId) không được để trống' })
+  @IsNotEmpty({ message: 'Company ID (CustomerId) cannot be empty' })
   customerId: string;
 }

@@ -3,26 +3,26 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateWarehouseDto {
   @Expose()
-  @IsNotEmpty({ message: 'Mã không được để trống' })
+  @IsNotEmpty({ message: 'Code cannot be empty' })
   code: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Tên không được để trống' })
+  @IsNotEmpty({ message: 'Name cannot be empty' })
   name: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Trạng thái không được để trống' })
+  @IsNotEmpty({ message: 'Status cannot be empty' })
   status: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
+  @IsNotEmpty({ message: 'Address cannot be empty' })
   address: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID tài khoản không được để trống' })
+  @IsNotEmpty({ message: 'Account ID cannot be empty' })
   chartOfAccountId: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID công ty không được để trống' })
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   customerId: string;
 }

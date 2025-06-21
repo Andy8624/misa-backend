@@ -3,10 +3,10 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateGoodsAndServicesMappingDto {
   @Expose()
-  @IsNotEmpty({ message: 'ID hàng hóa dịch vụ không được để trống' })
+  @IsNotEmpty({ message: 'Goods and services ID cannot be empty' })
   goodsAndServicesId: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID nhóm hàng hóa dịch vụ không được để trống' })
+  @IsNotEmpty({ message: 'Goods and services group ID cannot be empty' })
   goodsAndServicesGroupId: string;
 }

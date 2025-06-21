@@ -3,14 +3,14 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateVatTaxDto {
   @Expose()
-  @IsNotEmpty({ message: 'Họ tên không được để trống' })
+  @IsNotEmpty({ message: 'Name cannot be empty' })
   name: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Họ tên không được để trống' })
+  @IsNotEmpty({ message: 'Percent cannot be empty' })
   percent: number;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID công ty không được để trống' })
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   customerId: string;
 }

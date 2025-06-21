@@ -3,54 +3,54 @@ import { IsEmail, IsIn, IsNotEmpty, Matches, MinLength } from 'class-validator';
 
 export class RegisterDTO {
   @IsNotEmpty({
-    message: 'Tên người dùng không được để trống',
+    message: 'Full name cannot be empty',
   })
   fullName: string;
 
-  // Regex cho số điện thoại Việt Nam:
-  // - Bắt đầu bằng số 0
-  // - Tiếp theo là 9 hoặc 3 hoặc 7 hoặc 8 hoặc 5
-  // - Theo sau bởi 8 số
-  // Ví dụ hợp lệ: 0912345678, 0323456789, 0791234567
+  // Regex for Vietnamese phone numbers:
+  // - Starts with 0
+  // - Followed by 9 or 3 or 7 or 8 or 5
+  // - Followed by 8 digits
+  // Valid examples: 0912345678, 0323456789, 0791234567
   @Matches(/^(0)(9|3|7|8|5)[0-9]{8}$/, {
     message:
-      'Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam 10 số',
+      'Invalid phone number. Please enter a 10-digit Vietnamese phone number',
   })
   @IsNotEmpty({
-    message: 'Số điện thoại không được để trống',
+    message: 'Phone number cannot be empty',
   })
   phoneNumber: string;
 
   @IsEmail(
     {},
     {
-      message: 'Email không hợp lệ',
+      message: 'Invalid email',
     },
   )
   @IsNotEmpty({
-    message: 'Email không được để trống',
+    message: 'Email cannot be empty',
   })
   email: string;
 
   @IsNotEmpty({
-    message: 'Ngày sinh không được để trống',
+    message: 'Birth date cannot be empty',
   })
   @Transform(({ value }) => new Date(value))
   birthDate: Date;
 
   @IsNotEmpty({
-    message: 'Giới tính không được để trống',
+    message: 'Gender cannot be empty',
   })
   @IsIn(['male', 'female', 'other'], {
-    message: 'Giới tính phải là một trong các giá trị: male, female, other',
+    message: 'Gender must be one of the following values: male, female, other',
   })
   gender: string;
 
   @IsNotEmpty({
-    message: 'Mật khẩu không được để trống',
+    message: 'Password cannot be empty',
   })
   @MinLength(6, {
-    message: 'Mật khẩu phải có ít nhất 6 ký tự',
+    message: 'Password must be at least 6 characters long',
   })
   password: string;
 }
@@ -59,16 +59,16 @@ export class LoginDTO {
   @IsEmail(
     {},
     {
-      message: 'Email không hợp lệ',
+      message: 'Invalid email',
     },
   )
   @IsNotEmpty({
-    message: 'Email không được để trống',
+    message: 'Email cannot be empty',
   })
   email: string;
 
   @IsNotEmpty({
-    message: 'Mật khẩu không được để trống',
+    message: 'Password cannot be empty',
   })
   password: string;
 }
@@ -78,7 +78,7 @@ export class AuthResponseDto {
   access_token: string;
 
   @Exclude()
-  // Cái này mốt có xài thì gửi qua cookies
+  // This will be sent via cookies later
   refresh_token: string;
 }
 
@@ -106,13 +106,13 @@ export class RegisterResponseDto {
 }
 
 export class ChangePasswordDto {
-  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsNotEmpty({ message: 'Email cannot be empty' })
   email: string;
 
-  @IsNotEmpty({ message: 'Mật khẩu cũ không được để trống' })
+  @IsNotEmpty({ message: 'Old password cannot be empty' })
   oldPassword: string;
 
-  @IsNotEmpty({ message: 'Mật khẩu mới không được để trống' })
-  @MinLength(6, { message: 'Mật khẩu mới phải có ít nhất 6 ký tự' })
+  @IsNotEmpty({ message: 'New password cannot be empty' })
+  @MinLength(6, { message: 'New password must be at least 6 characters long' })
   newPassword: string;
 }

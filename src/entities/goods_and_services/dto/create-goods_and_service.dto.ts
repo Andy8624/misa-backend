@@ -3,19 +3,19 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateGoodsAndServiceDto {
   @Expose()
-  @IsNotEmpty({ message: 'Tên không được để trống' })
+  @IsNotEmpty({ message: 'Name cannot be empty' })
   name: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Mã không được để trống' })
+  @IsNotEmpty({ message: 'Code cannot be empty' })
   code: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Giảm VAT không được để trống' })
+  @IsNotEmpty({ message: 'VAT decrease cannot be empty' })
   vatDecrease: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Tồn kho tối thiểu không được để trống' })
+  @IsNotEmpty({ message: 'Minimum stock quantity cannot be empty' })
   minimumStockQuantity: number;
 
   @Expose()
@@ -27,19 +27,19 @@ export class CreateGoodsAndServiceDto {
   source?: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Mô tả không được để trống' })
+  @IsNotEmpty({ message: 'Description cannot be empty' })
   description: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Mô tả mua hàng không được để trống' })
+  @IsNotEmpty({ message: 'Purchase description cannot be empty' })
   purchaseDescription: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Mô tả bán hàng không được để trống' })
+  @IsNotEmpty({ message: 'Sale description cannot be empty' })
   saleDescription: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Giá mua gần nhất không được để trống' })
+  @IsNotEmpty({ message: 'Latest purchase price cannot be empty' })
   latestPurchasePrice: number;
 
   @Expose()
@@ -79,6 +79,6 @@ export class CreateGoodsAndServiceDto {
   discountAccountId?: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Khách hàng không được để trống' })
+  @IsNotEmpty({ message: 'Customer cannot be empty' })
   customerId: string;
 }

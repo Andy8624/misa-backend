@@ -3,10 +3,10 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateWarrantyPeriodDto {
   @Expose()
-  @IsNotEmpty({ message: 'Mô tả không được để trống' })
+  @IsNotEmpty({ message: 'Description cannot be empty' })
   description: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'ID công ty không được để trống' })
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   customerId: string;
 }

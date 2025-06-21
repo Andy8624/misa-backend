@@ -3,11 +3,11 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUnitDto {
   @Expose()
-  @IsNotEmpty({ message: 'Tên đơn vị không được để trống' })
+  @IsNotEmpty({ message: 'Unit name cannot be empty' })
   name: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Trạng thái đơn vị không được để trống' })
+  @IsNotEmpty({ message: 'Unit status cannot be empty' })
   status: string;
 
   @Expose()
@@ -15,6 +15,6 @@ export class CreateUnitDto {
   description: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Id khách hàng (Công ty) không được để trống' })
+  @IsNotEmpty({ message: 'Customer ID (Company) cannot be empty' })
   customerId: string;
 }

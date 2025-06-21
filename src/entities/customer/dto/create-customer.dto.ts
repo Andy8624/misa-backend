@@ -13,18 +13,18 @@ export class CreateCustomerDto {
   logoUrl: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Loại hình doanh nghiệp không được để trống' })
+  @IsNotEmpty({ message: 'Business type cannot be empty' })
   @IsIn(['Doanh nghiệp', 'Hộ kinh doanh'], {
-    message: 'Loại hình doanh nghiệp không hợp lệ',
+    message: 'Invalid business type',
   })
   businessType: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Mã số thuế không được để trống' })
+  @IsNotEmpty({ message: 'Tax code cannot be empty' })
   taxCode: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Tên khách hàng không được để trống' })
+  @IsNotEmpty({ message: 'Customer name cannot be empty' })
   customerName: string;
 
   @Expose()
@@ -32,7 +32,7 @@ export class CreateCustomerDto {
   customerGroup: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Ngày thành lập không được để trống' })
+  @IsNotEmpty({ message: 'Founded date cannot be empty' })
   @Transform(({ value }) => {
     if (value) {
       const date = new Date(value);
@@ -43,22 +43,22 @@ export class CreateCustomerDto {
   foundedDate: Date;
 
   @Expose()
-  @IsNotEmpty({ message: 'Loại kê khai thuế GTGT không được để trống' })
+  @IsNotEmpty({ message: 'VAT tax declaration type cannot be empty' })
   @IsIn(['month', 'quarter'], {
-    message: 'Loại kê khai thuế GTGT không hợp lệ',
+    message: 'Invalid VAT tax declaration type',
   })
   vatTaxType: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Trạng thái khách hàng không được để trống' })
+  @IsNotEmpty({ message: 'Customer status cannot be empty' })
   customerStatus: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Tỉnh/Thành phố không được để trống' })
+  @IsNotEmpty({ message: 'Province/City cannot be empty' })
   province: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Quận/Huyện không được để trống' })
+  @IsNotEmpty({ message: 'District/County cannot be empty' })
   district: string;
 
   @Expose()
@@ -66,31 +66,31 @@ export class CreateCustomerDto {
   ward: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
+  @IsNotEmpty({ message: 'Street address cannot be empty' })
   streetAddress: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Địa chỉ đầy đủ không được để trống' })
+  @IsNotEmpty({ message: 'Full address cannot be empty' })
   fullAddress: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Họ tên không được để trống' })
+  @IsNotEmpty({ message: 'Contact name cannot be empty' })
   contactName: string;
 
   @Expose()
   @Matches(/^(0)(9|3|7|8|5)[0-9]{8}$/, {
-    message: 'Số điện thoại không hợp lệ',
+    message: 'Invalid phone number',
   })
   contactPhoneNumber: string;
 
   @Expose()
-  @IsEmail({}, { message: 'Email không hợp lệ' })
+  @IsEmail({}, { message: 'Invalid email' })
   contactEmail: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Chức danh không được để trống' })
+  @IsNotEmpty({ message: 'Contact position cannot be empty' })
   contactPosition: string;
 
-  // @IsNotEmpty({ message: 'Id kế toán không được để trống' })
+  // @IsNotEmpty({ message: 'Accountant ID cannot be empty' })
   accountantId: string;
 }

@@ -3,15 +3,15 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateEmployeeDto {
   @Expose()
-  @IsNotEmpty({ message: 'Mã nhân viên không được để trống' })
-  employeeCode: string; // Mã nhân viên (NV0001)
+  @IsNotEmpty({ message: 'Employee code cannot be empty' })
+  employeeCode: string; // Employee Code (NV0001)
 
   @Expose()
-  @IsNotEmpty({ message: 'Họ tên không được để trống' })
+  @IsNotEmpty({ message: 'Full name cannot be empty' })
   fullName: string;
 
   @Expose()
-  @IsNotEmpty({ message: 'Ngày sinh không được để trống' })
+  @IsNotEmpty({ message: 'Date of birth cannot be empty' })
   @Transform(({ value }) => {
     if (value) {
       const date = new Date(value);
@@ -19,41 +19,41 @@ export class CreateEmployeeDto {
     }
     return value;
   })
-  dob: Date; // Ngày sinh
+  dob: Date; // Date of birth
 
   @Expose()
-  @IsNotEmpty({ message: 'Giới tính không được để trống' })
-  sex: string; // Giới tính Male - Female - Other
+  @IsNotEmpty({ message: 'Gender cannot be empty' })
+  sex: string; // Gender Male - Female - Other
 
   @Expose()
-  @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
-  address: string; // Địa chỉ
+  @IsNotEmpty({ message: 'Address cannot be empty' })
+  address: string; // Address
 
   @Expose()
-  @IsNotEmpty({ message: 'Chức danh không được để trống' })
-  position: string; // Chức danh
+  @IsNotEmpty({ message: 'Position cannot be empty' })
+  position: string; // Position
 
   @Expose()
   @IsOptional()
-  passportNumber: string; // Số hộ chiếu
+  passportNumber: string; // Passport Number
 
   @Expose()
-  @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
-  phoneNumber: string; // Số điện thoại
+  @IsNotEmpty({ message: 'Phone number cannot be empty' })
+  phoneNumber: string; // Phone number
 
   @Expose()
-  @IsNotEmpty({ message: 'Số CCCD không được để trống' })
-  idCardNumber: string; // Số CCCD
+  @IsNotEmpty({ message: 'ID card number cannot be empty' })
+  idCardNumber: string; // ID Card Number
 
   @Expose()
-  @IsNotEmpty({ message: 'Ngày cấp CCCD không được để trống' })
-  idCardIssuedDate: string; // Ngày cấp CCCD
+  @IsNotEmpty({ message: 'ID card issued date cannot be empty' })
+  idCardIssuedDate: string; // ID Card Issued Date
 
   @Expose()
-  @IsNotEmpty({ message: 'Nơi cấp CCCD không được để trống' })
-  idCardPlaceOfIssue: string; // Nơi cấp CCCD
+  @IsNotEmpty({ message: 'ID card place of issue cannot be empty' })
+  idCardPlaceOfIssue: string; // ID Card Place of Issue
 
   @Expose()
-  @IsNotEmpty({ message: 'Customer ID không được để trống' })
+  @IsNotEmpty({ message: 'Customer ID cannot be empty' })
   customerId: string;
 }
