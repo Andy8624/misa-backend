@@ -11,20 +11,20 @@ export interface GoodAndServicePaginationResponseType {
 
 export class GoodAndServiceFilterType {
   @ApiPropertyOptional({
-    description: 'Tìm kiếm theo tên hoặc mã hàng hóa dịch vụ',
+    description: 'Search by goods and services name or code',
   })
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'ID công ty' })
+  @ApiPropertyOptional({ description: 'Company ID' })
   @IsOptional()
   customerId?: string;
 
-  @ApiPropertyOptional({ description: 'Trang hiện tại', example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', example: 1 })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Số lượng mỗi trang', example: 20 })
+  @ApiPropertyOptional({ description: 'Items per page', example: 20 })
   @IsOptional()
   pageSize?: number;
 }

@@ -10,19 +10,19 @@ export interface WarehousePaginationResponseType {
 }
 
 export class WarehouseFilterType {
-  @ApiPropertyOptional({ example: 20, description: 'Số lượng mỗi trang' })
+  @ApiPropertyOptional({ example: 20, description: 'Number of items per page' })
   @IsOptional()
   pageSize?: number;
 
-  @ApiPropertyOptional({ example: 1, description: 'Trang hiện tại' })
+  @ApiPropertyOptional({ example: 1, description: 'Current page' })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Từ khóa tìm kiếm' })
+  @ApiPropertyOptional({ description: 'Search keyword' })
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'ID khách hàng (Công ty)' })
+  @ApiPropertyOptional({ description: 'Customer ID (Company)' })
   @IsOptional()
   customerId?: string;
 }

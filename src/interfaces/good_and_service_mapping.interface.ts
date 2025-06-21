@@ -12,16 +12,16 @@ export interface GoodAndServiceMappingPaginationResponseType {
 export class GoodAndServiceMappingFilterType {
   @ApiPropertyOptional({
     description:
-      'Tìm kiếm theo ID dịch vụ hàng hóa hoặc ID nhóm dịch vụ hàng hóa',
+      'Search by goods and services ID or goods and services group ID',
   })
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'Trang hiện tại', example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', example: 1 })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Số lượng mỗi trang', example: 20 })
+  @ApiPropertyOptional({ description: 'Items per page', example: 20 })
   @IsOptional()
   pageSize?: number;
 }

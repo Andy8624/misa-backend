@@ -11,16 +11,16 @@ export interface InventoryOutPaginationResponseType {
 
 export class InventoryOutFilterType {
   @ApiPropertyOptional({
-    description: 'Tìm kiếm',
+    description: 'Search',
   })
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'Trang hiện tại', example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', example: 1 })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Số lượng mỗi trang', example: 20 })
+  @ApiPropertyOptional({ description: 'Items per page', example: 20 })
   @IsOptional()
   pageSize?: number;
 }

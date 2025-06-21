@@ -11,20 +11,20 @@ export interface InventoryInPaginationResponseType {
 
 export class InventoryInFilterType {
   @ApiPropertyOptional({
-    description: 'Tìm kiếm theo loại phiếu nhập',
+    description: 'Search by inventory receipt type',
   })
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'ID công ty' })
+  @ApiPropertyOptional({ description: 'Company ID' })
   @IsOptional()
   customerId?: string;
 
-  @ApiPropertyOptional({ description: 'Trang hiện tại', example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', example: 1 })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Số lượng mỗi trang', example: 20 })
+  @ApiPropertyOptional({ description: 'Items per page', example: 20 })
   @IsOptional()
   pageSize?: number;
 }

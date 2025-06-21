@@ -2,14 +2,6 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { ResponseUnitDto } from 'src/entities/unit/dto/response-unit.dto';
 
-// export interface UnitFilterType {
-//   pageSize?: number;
-//   page?: number;
-//   search?: string;
-//   customerId?: string;
-//   status?: string;
-// }
-
 export interface UnitPaginationResponseType {
   data: ResponseUnitDto[];
   total: number;
@@ -18,23 +10,23 @@ export interface UnitPaginationResponseType {
 }
 
 export class UnitFilterType {
-  @ApiPropertyOptional({ description: 'Tìm kiếm theo tên hoặc mã nhóm' })
+  @ApiPropertyOptional({ description: 'Search by name or group code' })
   @IsOptional()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'ID công ty' })
+  @ApiPropertyOptional({ description: 'Company ID' })
   @IsOptional()
   customerId?: string;
 
-  @ApiPropertyOptional({ description: 'Trang hiện tại', example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', example: 1 })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ description: 'Số lượng mỗi trang', example: 20 })
+  @ApiPropertyOptional({ description: 'Items per page', example: 20 })
   @IsOptional()
   pageSize?: number;
 
-  @ApiPropertyOptional({ description: 'Trạng thái của đơn vị' })
+  @ApiPropertyOptional({ description: 'Unit status' })
   @IsOptional()
   status: string;
 }
