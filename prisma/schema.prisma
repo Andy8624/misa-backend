@@ -478,6 +478,7 @@ model Unit {
   ProvisionServiceVoucherItem_Unit ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Unit")
   SaleVoucherItem                  SaleVoucherItem[]             @relation("SaleVoucherItem_Unit")
   PurchaseVoucherItem_Unit         PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_Unit")
+  AssetWriteOffAsset               AssetWriteOffAsset[]
 
   @@map("units")
 }
@@ -553,11 +554,13 @@ model ChartOfAccount {
 
   creditCashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_CreditAccount")
   debitCashPaymentVoucherItem  CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_DebitAccount")
-  DepositReceipItemCredit      DepositReceipItem[]      @relation("DepositReceipItemCredit")
-  DepositReceipItemDebit       DepositReceipItem[]      @relation("DepositReceipItemDebit")
 
-  DepositPaymentItemCredit  DepositPaymentItem[]  @relation("DepositPaymentItemCredit")
-  DepositPaymentItemDebit   DepositPaymentItem[]  @relation("DepositPaymentItemDebit")
+  DepositReceipItemCredit DepositReceipItem[] @relation("DepositReceipItemCredit")
+  DepositReceipItemDebit  DepositReceipItem[] @relation("DepositReceipItemDebit")
+
+  DepositPaymentItemCredit DepositPaymentItem[] @relation("DepositPaymentItemCredit")
+  DepositPaymentItemDebit  DepositPaymentItem[] @relation("DepositPaymentItemDebit")
+
   VoucherAccountEntryCredit VoucherAccountEntry[] @relation("VoucherAccountEntryCredit")
   VoucherAccountEntryDebit  VoucherAccountEntry[] @relation("VoucherAccountEntryDebit")
 
@@ -567,27 +570,36 @@ model ChartOfAccount {
   ServicePurchaseVoucherItemCredit ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemCredit")
   ServicePurchaseVoucherItemDebit  ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemDebit")
 
-  ProvisionServiceVoucherItemCredit                ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
-  ProvisionServiceVoucherItemDebit                 ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
-  ProvisionServiceVoucherItemDiscount              ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
-  ProvisionServiceVoucherItemVat                   ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
-  SaleVoucherItem_ExpenseAccount                   SaleVoucherItem[]             @relation("SaleVoucherItem_ExpenseAccount")
-  SaleVoucherItem_InventoryAccount                 SaleVoucherItem[]             @relation("SaleVoucherItem_InventoryAccount")
-  SaleVoucherItemDebit                             SaleVoucherItem[]             @relation("SaleVoucherItemDebit")
-  SaleVoucherItemCredit                            SaleVoucherItem[]             @relation("SaleVoucherItemCredit")
-  SaleVoucherItemCash                              SaleVoucherItem[]             @relation("SaleVoucherItemCash")
-  SaleVoucherItemLiability                         SaleVoucherItem[]             @relation("SaleVoucherItemLiability")
-  SaleVoucherItem_liabilityAccountOrExpense        SaleVoucherItem[]             @relation("SaleVoucherItem_liabilityAccountOrExpense")
-  SaleVoucherItem_SaleAccount                      SaleVoucherItem[]             @relation("SaleVoucherItem_SaleAccount")
-  SaleVoucherItem_ExportTaxAccount                 SaleVoucherItem[]             @relation("SaleVoucherItem_ExportTaxAccount")
-  PurchaseVoucherItem_CostAccount                  PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_CostAccount")
-  PurchaseVoucherItem_AccountPayable               PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_AccountPayable")
-  PurchaseVoucherItem_CashAccount                  PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_CashAccount")
-  PurchaseVoucherItem_InventoryAccount             PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_InventoryAccount")
-  PurchaseVoucherItem_VatAccount                   PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_VatAccount")
-  PurchaseVoucherItem_ImportTaxAccount             PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_ImportTaxAccount")
-  PurchaseVoucherItem_SpecialConsumptionTaxAccount PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_SpecialConsumptionTaxAccount")
-  PurchaseVoucherItem_VatCorrespondingAccount      PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_VatCorrespondingAccount")
+  ProvisionServiceVoucherItemCredit   ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
+  ProvisionServiceVoucherItemDebit    ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
+  ProvisionServiceVoucherItemDiscount ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
+  ProvisionServiceVoucherItemVat      ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
+
+  SaleVoucherItem_ExpenseAccount            SaleVoucherItem[] @relation("SaleVoucherItem_ExpenseAccount")
+  SaleVoucherItem_InventoryAccount          SaleVoucherItem[] @relation("SaleVoucherItem_InventoryAccount")
+  SaleVoucherItemDebit                      SaleVoucherItem[] @relation("SaleVoucherItemDebit")
+  SaleVoucherItemCredit                     SaleVoucherItem[] @relation("SaleVoucherItemCredit")
+  SaleVoucherItemCash                       SaleVoucherItem[] @relation("SaleVoucherItemCash")
+  SaleVoucherItemLiability                  SaleVoucherItem[] @relation("SaleVoucherItemLiability")
+  SaleVoucherItem_liabilityAccountOrExpense SaleVoucherItem[] @relation("SaleVoucherItem_liabilityAccountOrExpense")
+  SaleVoucherItem_SaleAccount               SaleVoucherItem[] @relation("SaleVoucherItem_SaleAccount")
+  SaleVoucherItem_ExportTaxAccount          SaleVoucherItem[] @relation("SaleVoucherItem_ExportTaxAccount")
+
+  PurchaseVoucherItem_CostAccount                  PurchaseVoucherItem[] @relation("PurchaseVoucherItem_CostAccount")
+  PurchaseVoucherItem_AccountPayable               PurchaseVoucherItem[] @relation("PurchaseVoucherItem_AccountPayable")
+  PurchaseVoucherItem_CashAccount                  PurchaseVoucherItem[] @relation("PurchaseVoucherItem_CashAccount")
+  PurchaseVoucherItem_InventoryAccount             PurchaseVoucherItem[] @relation("PurchaseVoucherItem_InventoryAccount")
+  PurchaseVoucherItem_VatAccount                   PurchaseVoucherItem[] @relation("PurchaseVoucherItem_VatAccount")
+  PurchaseVoucherItem_ImportTaxAccount             PurchaseVoucherItem[] @relation("PurchaseVoucherItem_ImportTaxAccount")
+  PurchaseVoucherItem_SpecialConsumptionTaxAccount PurchaseVoucherItem[] @relation("PurchaseVoucherItem_SpecialConsumptionTaxAccount")
+  PurchaseVoucherItem_VatCorrespondingAccount      PurchaseVoucherItem[] @relation("PurchaseVoucherItem_VatCorrespondingAccount")
+
+  AssetWriteOffAsset_OriginalCostAccount   AssetWriteOffAsset[] @relation("AssetWriteOffAsset_OriginalCostAccount")
+  AssetWriteOffAsset_DepreciationAccount   AssetWriteOffAsset[] @relation("AssetWriteOffAsset_DepreciationAccount")
+  AssetWriteOffAsset_RemainingValueAccount AssetWriteOffAsset[] @relation("AssetWriteOffAsset_RemainingValueAccount")
+
+  AssetWriteOffAccounting_DebitAccount  AssetWriteOffAccounting[] @relation("AssetWriteOffAccounting_DebitAccount")
+  AssetWriteOffAccounting_CreditAccount AssetWriteOffAccounting[] @relation("AssetWriteOffAccounting_CreditAccount")
 
   @@map("chart_of_accounts")
 }
@@ -1843,4 +1855,70 @@ model GroupOfPurchasedGood {
   updatedAt           DateTime?             @updatedAt @map("updated_at")
   deletedAt           DateTime?             @map("deleted_at")
   PurchaseVoucherItem PurchaseVoucherItem[] @relation("PurchaseVoucherItem_GroupOfPurchaseGood")
+}
+
+// Ghi giảm
+model AssetWriteOff {
+  id            String    @id @default(uuid())
+  reason        String? // Lý do ghi giảm
+  postedDate    DateTime? // Ngày hạch toán
+  voucherDate   DateTime? // Ngày chứng từ
+  voucherNumber String? // Số chứng từ
+
+  // Quan hệ
+  assets      AssetWriteOffAsset[]
+  accountings AssetWriteOffAccounting[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model AssetWriteOffAsset {
+  id                      String  @id @default(uuid())
+  assetCode               String? // Mã tài sản
+  assetName               String? // Tên tài sản
+  originalCost            Float? // Nguyên giá
+  accumulatedDepreciation Float? // Hao mòn lũy kế
+  depreciationValue       Float? // Giá trị khấu hao (có thể là hao mòn kỳ này)
+  remainingValue          Float? // Giá trị còn lại
+
+  assetWriteOff   AssetWriteOff? @relation(fields: [assetWriteOffId], references: [id])
+  assetWriteOffId String?
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? // Đơn vị sử dụng (FK tới Unit)
+
+  accountOriginalCost   ChartOfAccount? @relation("AssetWriteOffAsset_OriginalCostAccount", fields: [accountOriginalCostId], references: [id])
+  accountOriginalCostId String? // Tài khoản nguyên giá (FK ChartOfAccount)
+
+  accountDepreciation   ChartOfAccount? @relation("AssetWriteOffAsset_DepreciationAccount", fields: [accountDepreciationId], references: [id])
+  accountDepreciationId String? // Tài khoản hao mòn (FK ChartOfAccount)
+
+  accountRemainingValue   ChartOfAccount? @relation("AssetWriteOffAsset_RemainingValueAccount", fields: [accountRemainingValueId], references: [id])
+  accountRemainingValueId String? // Tài khoản xử lý giá trị còn lại (FK ChartOfAccount)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model AssetWriteOffAccounting {
+  id          String  @id @default(uuid())
+  description String? // Diễn giải
+  amount      Float? // Số tiền
+  costItem    String? // Khoản mục chi phí 
+
+  assetWriteOff   AssetWriteOff? @relation(fields: [assetWriteOffId], references: [id])
+  assetWriteOffId String?
+
+  debitAccount   ChartOfAccount? @relation("AssetWriteOffAccounting_DebitAccount", fields: [debitAccountId], references: [id])
+  debitAccountId String? // Tài khoản nợ (FK ChartOfAccount)
+
+  creditAccount   ChartOfAccount? @relation("AssetWriteOffAccounting_CreditAccount", fields: [creditAccountId], references: [id])
+  creditAccountId String? // Tài khoản có (FK ChartOfAccount)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
