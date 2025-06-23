@@ -2096,10 +2096,14 @@ model Asset {
   assetType   AssetType? @relation("Asset_AssetType", fields: [assetTypeId], references: [id])
   assetTypeId String?
 
-  Department          Department?           @relation("Asset_Department", fields: [departmentId], references: [id])
-  departmentId        String?
-  AssetTransferDetail AssetTransferDetail[]
-  AssetTransferDetail AssetTransferDetail[]
+  Department   Department? @relation("Asset_Department", fields: [departmentId], references: [id])
+  departmentId String?
+
+  AssetTransferDetail AssetTransferDetail[] @relation("AssetTransferDetail_Asset")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
 
 // Loại tài sản
@@ -2181,5 +2185,4 @@ model AssetTransferDetail {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-  Asset     Asset     @relation(fields: [assetId], references: [id])
 }
