@@ -544,73 +544,58 @@ model ChartOfAccount {
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String   @map("customer_id")
 
-  creditInventoryOutItems InventoryOutItem[] @relation("InventoryOutItemCredit")
-  debitInventoryOutItems  InventoryOutItem[] @relation("InventoryOutItemDebit")
-
-  creditInventoryInItems InventoryInItem[] @relation("InventoryInItemCredit")
-  debitInventoryInItems  InventoryInItem[] @relation("InventoryInItemDebit")
-
-  creditCashReceipVoucherItem CashReceipVoucherItem[] @relation("CashReceipVoucherItem_CreditAccount")
-  debitCashReceipVoucherItem  CashReceipVoucherItem[] @relation("CashReceipVoucherItem_DebitAccount")
-
-  creditCashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_CreditAccount")
-  debitCashPaymentVoucherItem  CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_DebitAccount")
-
-  DepositReceipItemCredit DepositReceipItem[] @relation("DepositReceipItemCredit")
-  DepositReceipItemDebit  DepositReceipItem[] @relation("DepositReceipItemDebit")
-
-  DepositPaymentItemCredit DepositPaymentItem[] @relation("DepositPaymentItemCredit")
-  DepositPaymentItemDebit  DepositPaymentItem[] @relation("DepositPaymentItemDebit")
-
-  VoucherAccountEntryCredit VoucherAccountEntry[] @relation("VoucherAccountEntryCredit")
-  VoucherAccountEntryDebit  VoucherAccountEntry[] @relation("VoucherAccountEntryDebit")
-
-  VoucherAccountEntry                   VoucherAccountEntry[]        @relation("VoucherAccountEntryVatAccount")
-  ServicePurchaseVoucherItem_VatAccount ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItem_VatAccount")
-
-  ServicePurchaseVoucherItemCredit ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemCredit")
-  ServicePurchaseVoucherItemDebit  ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItemDebit")
-
-  ProvisionServiceVoucherItemCredit   ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
-  ProvisionServiceVoucherItemDebit    ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
-  ProvisionServiceVoucherItemDiscount ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
-  ProvisionServiceVoucherItemVat      ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
-
-  SaleVoucherItem_ExpenseAccount            SaleVoucherItem[] @relation("SaleVoucherItem_ExpenseAccount")
-  SaleVoucherItem_InventoryAccount          SaleVoucherItem[] @relation("SaleVoucherItem_InventoryAccount")
-  SaleVoucherItemDebit                      SaleVoucherItem[] @relation("SaleVoucherItemDebit")
-  SaleVoucherItemCredit                     SaleVoucherItem[] @relation("SaleVoucherItemCredit")
-  SaleVoucherItemCash                       SaleVoucherItem[] @relation("SaleVoucherItemCash")
-  SaleVoucherItemLiability                  SaleVoucherItem[] @relation("SaleVoucherItemLiability")
-  SaleVoucherItem_LiabilityAccountOrExpense SaleVoucherItem[] @relation("SaleVoucherItem_LiabilityAccountOrExpense")
-  SaleVoucherItem_SaleAccount               SaleVoucherItem[] @relation("SaleVoucherItem_SaleAccount")
-  SaleVoucherItem_ExportTaxAccount          SaleVoucherItem[] @relation("SaleVoucherItem_ExportTaxAccount")
-
-  PurchaseVoucherItem_CostAccount                  PurchaseVoucherItem[] @relation("PurchaseVoucherItem_CostAccount")
-  PurchaseVoucherItem_AccountPayable               PurchaseVoucherItem[] @relation("PurchaseVoucherItem_AccountPayable")
-  PurchaseVoucherItem_CashAccount                  PurchaseVoucherItem[] @relation("PurchaseVoucherItem_CashAccount")
-  PurchaseVoucherItem_InventoryAccount             PurchaseVoucherItem[] @relation("PurchaseVoucherItem_InventoryAccount")
-  PurchaseVoucherItem_VatAccount                   PurchaseVoucherItem[] @relation("PurchaseVoucherItem_VatAccount")
-  PurchaseVoucherItem_ImportTaxAccount             PurchaseVoucherItem[] @relation("PurchaseVoucherItem_ImportTaxAccount")
-  PurchaseVoucherItem_SpecialConsumptionTaxAccount PurchaseVoucherItem[] @relation("PurchaseVoucherItem_SpecialConsumptionTaxAccount")
-  PurchaseVoucherItem_VatCorrespondingAccount      PurchaseVoucherItem[] @relation("PurchaseVoucherItem_VatCorrespondingAccount")
-
-  AssetWriteOffAsset_OriginalCostAccount   AssetWriteOffAsset[] @relation("AssetWriteOffAsset_OriginalCostAccount")
-  AssetWriteOffAsset_DepreciationAccount   AssetWriteOffAsset[] @relation("AssetWriteOffAsset_DepreciationAccount")
-  AssetWriteOffAsset_RemainingValueAccount AssetWriteOffAsset[] @relation("AssetWriteOffAsset_RemainingValueAccount")
-
-  AssetWriteOffAccounting_DebitAccount  AssetWriteOffAccounting[] @relation("AssetWriteOffAccounting_DebitAccount")
-  AssetWriteOffAccounting_CreditAccount AssetWriteOffAccounting[] @relation("AssetWriteOffAccounting_CreditAccount")
-
-  AssetDepreciationInfo_OriginalCostAccount AssetDepreciationInfo[] @relation("AssetDepreciationInfo_OriginalCostAccount")
-  AssetDepreciationInfo_depreciationAccount AssetDepreciationInfo[] @relation("AssetDepreciationInfo_DepreciationAccount")
-
-  AssetAllocation_ExpenseAccount AssetAllocation[] @relation("AssetAllocation_ExpenseAccount")
-
-  AssetFormationOrigin_DebitAccount  AssetFormationOrigin[] @relation("AssetFormationOrigin_DebitAccount")
-  AssetFormationOrigin_CreditAccount AssetFormationOrigin[] @relation("AssetFormationOrigin_CreditAccount")
-
-  AssetTransferDetail_ExpenseAccount AssetTransferDetail[] @relation("AssetTransferDetail_ExpenseAccount")
+  creditInventoryOutItems                          InventoryOutItem[]            @relation("InventoryOutItemCredit")
+  debitInventoryOutItems                           InventoryOutItem[]            @relation("InventoryOutItemDebit")
+  creditInventoryInItems                           InventoryInItem[]             @relation("InventoryInItemCredit")
+  debitInventoryInItems                            InventoryInItem[]             @relation("InventoryInItemDebit")
+  creditCashReceipVoucherItem                      CashReceipVoucherItem[]       @relation("CashReceipVoucherItem_CreditAccount")
+  debitCashReceipVoucherItem                       CashReceipVoucherItem[]       @relation("CashReceipVoucherItem_DebitAccount")
+  creditCashPaymentVoucherItem                     CashPaymentVoucherItem[]      @relation("CashPaymentVoucherItem_CreditAccount")
+  debitCashPaymentVoucherItem                      CashPaymentVoucherItem[]      @relation("CashPaymentVoucherItem_DebitAccount")
+  DepositReceipItemCredit                          DepositReceipItem[]           @relation("DepositReceipItemCredit")
+  DepositReceipItemDebit                           DepositReceipItem[]           @relation("DepositReceipItemDebit")
+  DepositPaymentItemCredit                         DepositPaymentItem[]          @relation("DepositPaymentItemCredit")
+  DepositPaymentItemDebit                          DepositPaymentItem[]          @relation("DepositPaymentItemDebit")
+  VoucherAccountEntryCredit                        VoucherAccountEntry[]         @relation("VoucherAccountEntryCredit")
+  VoucherAccountEntryDebit                         VoucherAccountEntry[]         @relation("VoucherAccountEntryDebit")
+  VoucherAccountEntry                              VoucherAccountEntry[]         @relation("VoucherAccountEntryVatAccount")
+  ServicePurchaseVoucherItem_VatAccount            ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItem_VatAccount")
+  ServicePurchaseVoucherItemCredit                 ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItemCredit")
+  ServicePurchaseVoucherItemDebit                  ServicePurchaseVoucherItem[]  @relation("ServicePurchaseVoucherItemDebit")
+  ProvisionServiceVoucherItemCredit                ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemCredit")
+  ProvisionServiceVoucherItemDebit                 ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDebit")
+  ProvisionServiceVoucherItemDiscount              ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemDiscount")
+  ProvisionServiceVoucherItemVat                   ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItemVat")
+  SaleVoucherItem_ExpenseAccount                   SaleVoucherItem[]             @relation("SaleVoucherItem_ExpenseAccount")
+  SaleVoucherItem_InventoryAccount                 SaleVoucherItem[]             @relation("SaleVoucherItem_InventoryAccount")
+  SaleVoucherItemDebit                             SaleVoucherItem[]             @relation("SaleVoucherItemDebit")
+  SaleVoucherItemCredit                            SaleVoucherItem[]             @relation("SaleVoucherItemCredit")
+  SaleVoucherItemCash                              SaleVoucherItem[]             @relation("SaleVoucherItemCash")
+  SaleVoucherItemLiability                         SaleVoucherItem[]             @relation("SaleVoucherItemLiability")
+  SaleVoucherItem_LiabilityAccountOrExpense        SaleVoucherItem[]             @relation("SaleVoucherItem_LiabilityAccountOrExpense")
+  SaleVoucherItem_SaleAccount                      SaleVoucherItem[]             @relation("SaleVoucherItem_SaleAccount")
+  SaleVoucherItem_ExportTaxAccount                 SaleVoucherItem[]             @relation("SaleVoucherItem_ExportTaxAccount")
+  PurchaseVoucherItem_CostAccount                  PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_CostAccount")
+  PurchaseVoucherItem_AccountPayable               PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_AccountPayable")
+  PurchaseVoucherItem_CashAccount                  PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_CashAccount")
+  PurchaseVoucherItem_InventoryAccount             PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_InventoryAccount")
+  PurchaseVoucherItem_VatAccount                   PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_VatAccount")
+  PurchaseVoucherItem_ImportTaxAccount             PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_ImportTaxAccount")
+  PurchaseVoucherItem_SpecialConsumptionTaxAccount PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_SpecialConsumptionTaxAccount")
+  PurchaseVoucherItem_VatCorrespondingAccount      PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_VatCorrespondingAccount")
+  AssetWriteOffAsset_OriginalCostAccount           AssetWriteOffAsset[]          @relation("AssetWriteOffAsset_OriginalCostAccount")
+  AssetWriteOffAsset_DepreciationAccount           AssetWriteOffAsset[]          @relation("AssetWriteOffAsset_DepreciationAccount")
+  AssetWriteOffAsset_RemainingValueAccount         AssetWriteOffAsset[]          @relation("AssetWriteOffAsset_RemainingValueAccount")
+  AssetWriteOffAccounting_DebitAccount             AssetWriteOffAccounting[]     @relation("AssetWriteOffAccounting_DebitAccount")
+  AssetWriteOffAccounting_CreditAccount            AssetWriteOffAccounting[]     @relation("AssetWriteOffAccounting_CreditAccount")
+  AssetDepreciationInfo_OriginalCostAccount        AssetDepreciationInfo[]       @relation("AssetDepreciationInfo_OriginalCostAccount")
+  AssetDepreciationInfo_depreciationAccount        AssetDepreciationInfo[]       @relation("AssetDepreciationInfo_DepreciationAccount")
+  AssetAllocation_ExpenseAccount                   AssetAllocation[]             @relation("AssetAllocation_ExpenseAccount")
+  AssetFormationOrigin_DebitAccount                AssetFormationOrigin[]        @relation("AssetFormationOrigin_DebitAccount")
+  AssetFormationOrigin_CreditAccount               AssetFormationOrigin[]        @relation("AssetFormationOrigin_CreditAccount")
+  AssetTransferDetail_ExpenseAccount               AssetTransferDetail[]         @relation("AssetTransferDetail_ExpenseAccount")
+  AssetRevaluationPosting_DebitAccount             AssetRevaluationPosting[]     @relation("AssetRevaluationPosting_DebitAccount")
+  AssetRevaluationPosting_CreditAccount            AssetRevaluationPosting[]     @relation("AssetRevaluationPosting_CreditAccount")
 
   @@map("chart_of_accounts")
 }
@@ -2073,7 +2058,8 @@ model Object {
   objectName String? // Tên đối tượng
   objectType String? // Loại đối tượng
 
-  AssetAllocation_object AssetAllocation[] @relation("AssetAllocation_object")
+  AssetAllocation_object         AssetAllocation[]         @relation("AssetAllocation_object")
+  AssetRevaluationPosting_Object AssetRevaluationPosting[] @relation("AssetRevaluationPosting_Object")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -2099,7 +2085,8 @@ model Asset {
   Department   Department? @relation("Asset_Department", fields: [departmentId], references: [id])
   departmentId String?
 
-  AssetTransferDetail AssetTransferDetail[] @relation("AssetTransferDetail_Asset")
+  AssetTransferDetail          AssetTransferDetail[]    @relation("AssetTransferDetail_Asset")
+  AssetRevaluationDetail_Asset AssetRevaluationDetail[] @relation("AssetRevaluationDetail_Asset")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -2133,11 +2120,14 @@ model Department {
   AssetTransferDetail_FromDepartment AssetTransferDetail[] @relation("AssetTransferDetail_FromDepartment")
   AssetTransferDetail_ToDepartment   AssetTransferDetail[] @relation("AssetTransferDetail_ToDepartment")
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  createdAt                          DateTime                  @default(now()) @map("created_at")
+  updatedAt                          DateTime?                 @updatedAt @map("updated_at")
+  deletedAt                          DateTime?                 @map("deleted_at")
+  AssetRevaluationDetail_Department  AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_Department")
+  AssetRevaluationPosting_Department AssetRevaluationPosting[] @relation("AssetRevaluationPosting_Department")
 }
 
+// Điều chuyển tài sản
 model AssetTransfer {
   id             String   @id @default(uuid())
   transferNumber String // Biên bản giao nhận số
@@ -2157,6 +2147,7 @@ model AssetTransfer {
   deletedAt DateTime? @map("deleted_at")
 }
 
+// Chi tiết điều chuyển tài sản
 model AssetTransferDetail {
   id String @id @default(uuid())
 
@@ -2181,6 +2172,84 @@ model AssetTransferDetail {
 
   AssetTransfer   AssetTransfer @relation("AssetTransferDetail_AssetTransfer", fields: [assetTransferId], references: [id])
   assetTransferId String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Đánh giá lại
+model AssetRevaluation {
+  id              String   @id @default(uuid())
+  revaluationCode String // Biên bản số
+  revaluationDate DateTime // Ngày
+  reason          String // Lý do
+  postedDate      DateTime // Ngày hạch toán
+  voucherDate     DateTime // Ngày chứng từ
+  voucherNumber   String // Số chứng từ
+
+  // Quan hệ đến bảng con
+  details  AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_AssetRevaluation")
+  postings AssetRevaluationPosting[] @relation("AssetRevaluationPosting_AssetRevaluation")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Đánh giá lại - Chi tiết điều chỉnh
+model AssetRevaluationDetail {
+  id String @id @default(uuid())
+
+  remainingValueBefore     Float? // Giá trị còn lại trước điều chỉnh
+  remainingValueAfter      Float? // Giá trị còn lại sau điều chỉnh
+  remainingValueDifference Float? // Chênh lệch
+
+  remainingUseTimeBefore     Float? // Thời gian sử dụng còn lại trước
+  remainingUseTimeAfter      Float? // Thời gian sử dụng còn lại sau
+  remainingUseTimeDifference Float? // Chênh lệch
+
+  accumulatedDepreciationBefore     Float? // Hao mòn trước
+  accumulatedDepreciationAfter      Float? // Hao mòn sau
+  accumulatedDepreciationDifference Float? // Hao mòn chênh lệch
+
+  Asset   Asset?  @relation("AssetRevaluationDetail_Asset", fields: [assetId], references: [id])
+  assetId String?
+
+  Department   Department? @relation("AssetRevaluationDetail_Department", fields: [departmentId], references: [id])
+  departmentId String?
+
+  AssetRevaluation   AssetRevaluation? @relation("AssetRevaluationDetail_AssetRevaluation", fields: [assetRevaluationId], references: [id])
+  assetRevaluationId String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Đánh giá lại - Hạch toán     
+model AssetRevaluationPosting {
+  id          String  @id @default(uuid())
+  description String? // Diễn giải
+  amount      Float? // Số tiền
+  costItem    String? // Khoản mục CP
+  project     String? // Công trình
+  thcpObject  String? // Đối tượng THCP
+
+  Department   Department? @relation("AssetRevaluationPosting_Department", fields: [departmentId], references: [id])
+  departmentId String?
+
+  Object   Object? @relation("AssetRevaluationPosting_Object", fields: [objectId], references: [id])
+  objectId String?
+
+  DebitAccount   ChartOfAccount? @relation("AssetRevaluationPosting_DebitAccount", fields: [debitAccountId], references: [id])
+  debitAccountId String?
+
+  CreditAccount   ChartOfAccount? @relation("AssetRevaluationPosting_CreditAccount", fields: [creditAccountId], references: [id])
+  creditAccountId String?
+
+  AssetRevaluation   AssetRevaluation? @relation("AssetRevaluationPosting_AssetRevaluation", fields: [assetRevaluationId], references: [id])
+  assetRevaluationId String?
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
