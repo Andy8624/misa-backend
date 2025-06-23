@@ -14,7 +14,6 @@ export class CashReceipService {
     const cashReceip = await this.prismaService.cashReceip.create({
       data: createCashReceipDto,
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Customer: true,
@@ -35,7 +34,6 @@ export class CashReceipService {
         createdAt: 'desc',
       },
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Customer: true,
@@ -52,7 +50,6 @@ export class CashReceipService {
     const cashReceip = await this.prismaService.cashReceip.findUnique({
       where: { id },
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Customer: true,
@@ -77,7 +74,6 @@ export class CashReceipService {
       where: { id },
       data: updateCashReceipDto,
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Customer: true,

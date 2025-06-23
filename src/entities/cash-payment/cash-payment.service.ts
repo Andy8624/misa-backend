@@ -14,7 +14,6 @@ export class CashPaymentService {
     const cashPayment = await this.prismaService.cashPayment.create({
       data: createCashPaymentDto,
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Supplier: true,
@@ -36,7 +35,6 @@ export class CashPaymentService {
         createdAt: 'desc',
       },
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Supplier: true,
@@ -53,7 +51,6 @@ export class CashPaymentService {
     const cashPayment = await this.prismaService.cashPayment.findUnique({
       where: { id },
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Supplier: true,
@@ -79,7 +76,6 @@ export class CashPaymentService {
       where: { id },
       data: updateCashPaymentDto,
       include: {
-        EmployeeByType: true,
         Employee: true,
         Subject: true,
         Supplier: true,

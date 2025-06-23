@@ -633,9 +633,6 @@ model InventoryIn {
   voucherNumber           String?   @map("voucher_number")
   costOfInventoryReturned String?   @map("cost_of_inventory_returned")
 
-  // Chứa danh sách bảng khác
-  attached File[] // Một phiếu nhập kho có nhiều file
-
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -707,9 +704,6 @@ model InventoryOut {
   postedDate              DateTime? @map("posted_date")
   voucherDate             DateTime? @map("voucher_date")
   voucherNumber           String?   @map("voucher_number")
-
-  // Chứa danh sách bảng khác
-  attached File[] // Một phiếu xuất kho có nhiều file
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -795,33 +789,34 @@ model File {
   fileName String @map("file_name")
   fileSize Int    @map("file_size")
   mimeType String @map("mime_type")
-  path     String // Đường dẫn lưu trữ
+  path     String
 
-  // Quan hệ với bảng công ty
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @map("customer_id")
+  // Add these fields for Directus integration
+  originalName String? @map("original_name")
+  fileUrl      String? @map("file_url")
+  directusId   String? @map("directus_id")
+
+  // Relations
+  company   Customer @relation(fields: [companyId], references: [id])
+  companyId String   @map("company_id")
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  // Quan hệ với phiếu nhập kho
-  InventoryIn   InventoryIn? @relation(fields: [inventoryInId], references: [id])
-  inventoryInId String?      @map("inventory_in_id")
-
-  InventoryOut   InventoryOut? @relation(fields: [inventoryOutId], references: [id])
-  inventoryOutId String?       @map("inventory_out_id")
-
-  DepositPaymentFile DepositPayment[] @relation("DepositPaymentFile")
-
-  InvoiceFile Invoice[] @relation("InvoiceFile")
-
-  ProvisionServiceVoucher  ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_Attached")
-  SaleVoucher_Attached     SaleVoucher[]             @relation("SaleVoucher_Attached")
-  PurchaseVoucher_Attached PurchaseVoucher[]         @relation("PurchaseVoucher_Attached")
+  attachments FileAttachment[]
 
   @@map("files")
+}
+
+model FileAttachment {
+  id          String @id @default(uuid())
+  relatedType String // 'inventory_in', 'invoice', 'deposit_payment',...
+  relatedId   String // UUID của phiếu
+
+  file   File   @relation(fields: [fileId], references: [id])
+  fileId String
 }
 
 // Phiếu thu tiền mặt
@@ -1056,9 +1051,6 @@ model DepositPayment {
   Subject Partner? @relation("DepositPaymentSubject", fields: [subject], references: [id])
   subject String?
 
-  Attached File?   @relation("DepositPaymentFile", fields: [attached], references: [id])
-  attached String?
-
   DepositPaymentItem_DepositPayment DepositPaymentItem[] @relation("DepositPaymentItem_DepositPayment")
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -1116,9 +1108,6 @@ model Invoice {
 
   ExecutinPerson Employee? @relation("Invoice_ExecutinPerson", fields: [executinPerson], references: [id])
   executinPerson String?
-
-  File File?   @relation("InvoiceFile", fields: [file], references: [id])
-  file String?
 
   // Quan hệ với bảng công ty
   customer   Customer @relation(fields: [customerId], references: [id])
@@ -1316,9 +1305,6 @@ model ProvisionServiceVoucher {
   Company   Customer @relation(fields: [companyId], references: [id])
   companyId String   @map("company_id")
 
-  Attached File?   @relation("ProvisionServiceVoucher_Attached", fields: [attached], references: [id])
-  attached String?
-
   postDate    DateTime?
   voucherDate DateTime?
 
@@ -1467,9 +1453,6 @@ model SaleVoucher {
   // Quan hệ với bảng công ty
   Company   Customer @relation(fields: [companyId], references: [id])
   companyId String   @map("company_id")
-
-  Attached File?   @relation("SaleVoucher_Attached", fields: [attached], references: [id])
-  attached String?
 
   posted_date  DateTime?
   voucher_date DateTime?
@@ -1738,10 +1721,6 @@ model PurchaseVoucher {
   payment_account_bank_name String?
   e_invoice_search_id       String?
   e_invoice_search_url      String?
-
-  // attached 
-  Attached File?   @relation("PurchaseVoucher_Attached", fields: [attached], references: [id])
-  attached String?
 
   inventory_in_voucher_particular String?
   cash_payment_voucher_particular String?

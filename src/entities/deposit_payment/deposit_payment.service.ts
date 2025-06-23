@@ -15,7 +15,6 @@ export class DepositPaymentService {
       data: createDepositPaymentDto,
       include: {
         Employee: true,
-        EmployeeByType: true,
         Bank: true,
         Supplier: true,
         Subject: true,
@@ -38,7 +37,6 @@ export class DepositPaymentService {
       },
       include: {
         Employee: true,
-        EmployeeByType: true,
         Bank: true,
         Supplier: true,
         Subject: true,
@@ -57,7 +55,6 @@ export class DepositPaymentService {
       where: { id },
       include: {
         Employee: true,
-        EmployeeByType: true,
         Bank: true,
         Supplier: true,
         Subject: true,
@@ -85,7 +82,6 @@ export class DepositPaymentService {
         data: updateDepositPaymentDto,
         include: {
           Employee: true,
-          EmployeeByType: true,
           Bank: true,
           Supplier: true,
           Subject: true,
