@@ -596,6 +596,8 @@ model ChartOfAccount {
   AssetTransferDetail_ExpenseAccount               AssetTransferDetail[]         @relation("AssetTransferDetail_ExpenseAccount")
   AssetRevaluationPosting_DebitAccount             AssetRevaluationPosting[]     @relation("AssetRevaluationPosting_DebitAccount")
   AssetRevaluationPosting_CreditAccount            AssetRevaluationPosting[]     @relation("AssetRevaluationPosting_CreditAccount")
+  AssetRevaluationDetail_DepreciationAccount       AssetRevaluationDetail[]      @relation("AssetRevaluationDetail_DepreciationAccount")
+  AssetRevaluationDetail_DepreciationBaseAccount   AssetRevaluationDetail[]      @relation("AssetRevaluationDetail_DepreciationBaseAccount")
 
   @@map("chart_of_accounts")
 }
@@ -2201,18 +2203,39 @@ model AssetRevaluation {
 model AssetRevaluationDetail {
   id String @id @default(uuid())
 
+  // Giá trị còn lại
   remainingValueBefore     Float? // Giá trị còn lại trước điều chỉnh
   remainingValueAfter      Float? // Giá trị còn lại sau điều chỉnh
-  remainingValueDifference Float? // Chênh lệch
+  remainingValueDifference Float? // Giá trị còn lại chênh lệch
 
-  remainingUseTimeBefore     Float? // Thời gian sử dụng còn lại trước
-  remainingUseTimeAfter      Float? // Thời gian sử dụng còn lại sau
+  // Thời gian sử dụng còn lại
+  remainingUseTimeBefore     Float? // Trước
+  remainingUseTimeAfter      Float? // Sau
   remainingUseTimeDifference Float? // Chênh lệch
 
-  accumulatedDepreciationBefore     Float? // Hao mòn trước
-  accumulatedDepreciationAfter      Float? // Hao mòn sau
-  accumulatedDepreciationDifference Float? // Hao mòn chênh lệch
+  // Hao mòn lũy kế
+  accumulatedDepreciationBefore     Float? // Trước
+  accumulatedDepreciationAfter      Float? // Sau
+  accumulatedDepreciationDifference Float? // Chênh lệch
 
+  // Tài khoản - Chi phí hao mòn lũy kế
+  DepreciationAccount   ChartOfAccount? @relation("AssetRevaluationDetail_DepreciationAccount", fields: [depreciationAccountId], references: [id])
+  depreciationAccountId String? // Tài khoản chi phí hao mòn lũy kế
+
+  // Giá trị tính khấu hao
+  depreciationBaseBefore     Float? // GTKH trước điều chỉnh
+  depreciationBaseAfter      Float? // GTKH sau điều chỉnh
+  depreciationBaseDifference Float? // GTKH chênh lệch
+
+  // Tài khoản đánh giá lại cho GTKH
+  DepreciationBaseAccount   ChartOfAccount? @relation("AssetRevaluationDetail_DepreciationBaseAccount", fields: [depreciationBaseAccountId], references: [id])
+  depreciationBaseAccountId String? // Tài khoản đánh giá lại của GTKH
+
+  // GTKH tháng
+  depreciationMonthValueAfter      Float? // GTKH tháng sau điều chỉnh
+  depreciationMonthValueLegalAfter Float? // GTKH tháng theo luật sau điều chỉnh
+
+  // Quan hệ
   Asset   Asset?  @relation("AssetRevaluationDetail_Asset", fields: [assetId], references: [id])
   assetId String?
 
