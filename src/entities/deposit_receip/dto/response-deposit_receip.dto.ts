@@ -2,6 +2,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseBankAccountDto } from 'src/entities/bank_account/dto/response-bank_account.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseDepositReceipDto {
   @Expose()
@@ -22,13 +23,7 @@ export class ResponseDepositReceipDto {
   voucherNumber: string;
 
   @Expose()
-  address: string;
-
-  @Expose()
   reason: string;
-
-  @Expose()
-  bankName: string;
 
   @Expose()
   debtCollector: string;
@@ -69,4 +64,8 @@ export class ResponseDepositReceipDto {
   @Expose()
   @Type(() => ResponseBankAccountDto)
   Bank?: ResponseBankAccountDto;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

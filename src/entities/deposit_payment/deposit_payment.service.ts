@@ -1,106 +1,203 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateDepositPaymentDto } from './dto/create-deposit_payment.dto';
-import { UpdateDepositPaymentDto } from './dto/update-deposit_payment.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
+import { VoucherService } from '../voucher/voucher.service';
+import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
+import { CreateDepositPaymentDto } from './dto/create-deposit_payment.dto';
+import { UpdateDepositPaymentDto } from './dto/update-deposit_payment.dto';
 import { ResponseDepositPaymentDto } from './dto/response-deposit_payment.dto';
 
 @Injectable()
 export class DepositPaymentService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly voucherService: VoucherService,
+  ) {}
 
-  async create(createDepositPaymentDto: CreateDepositPaymentDto) {
-    // Create a new deposit payment
-    const depositPayment = await this.prismaService.depositPayment.create({
-      data: createDepositPaymentDto,
-      include: {
-        Employee: true,
-        Bank: true,
-        Supplier: true,
-        Subject: true,
-      },
-    });
+  async create(createDto: CreateDepositPaymentDto) {
+    const {
+      depositPaymentType,
+      paymentMethod,
+      paymentBankName,
+      receipBankName,
+      description,
+      idCardNo,
+      issuedBy,
+      issuedDate,
+      voucherNumber,
+      voucherDate,
+      employee,
+      bank,
+      supplier,
+      subject,
+      companyId,
+    } = createDto;
 
-    return plainToInstance(ResponseDepositPaymentDto, depositPayment, {
-      excludeExtraneousValues: true,
-    });
-  }
+    const createVoucherDto: CreateVoucherDto = {
+      voucherType: 'DEPOSIT_PAYMENT',
+      voucherDate,
+      postedDate: voucherDate,
+      voucherNumber,
+      companyId,
+    };
 
-  async findAll() {
-    const depositPayments = await this.prismaService.depositPayment.findMany({
-      where: {
-        deletedAt: null,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        Employee: true,
-        Bank: true,
-        Supplier: true,
-        Subject: true,
+    const result = await this.prismaService.$transaction(async (tx) => {
+      const newVoucher = await this.voucherService.createWithTransaction(
+        createVoucherDto,
+        tx,
+      );
 
-        DepositPaymentItem_DepositPayment: true,
-      },
-    });
-
-    return plainToInstance(ResponseDepositPaymentDto, depositPayments, {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  async findOne(id: string) {
-    const depositPayment = await this.prismaService.depositPayment.findUnique({
-      where: { id },
-      include: {
-        Employee: true,
-        Bank: true,
-        Supplier: true,
-        Subject: true,
-      },
-    });
-
-    if (!depositPayment || depositPayment.deletedAt) {
-      throw new NotFoundException('Bank transfer payment voucher not found');
-    }
-
-    return plainToInstance(ResponseDepositPaymentDto, depositPayment, {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  async update(id: string, updateDepositPaymentDto: UpdateDepositPaymentDto) {
-    // Check if the deposit payment exists
-    await this.findOne(id);
-
-    // Update the deposit payment
-    const updatedDepositPayment =
-      await this.prismaService.depositPayment.update({
-        where: { id },
-        data: updateDepositPaymentDto,
+      const created = await tx.depositPayment.create({
+        data: {
+          depositPaymentType,
+          paymentMethod,
+          paymentBankName,
+          receipBankName,
+          description,
+          idCardNo,
+          issuedBy,
+          issuedDate,
+          Employee: employee ? { connect: { id: employee } } : undefined,
+          Bank: bank ? { connect: { id: bank } } : undefined,
+          Supplier: supplier ? { connect: { id: supplier } } : undefined,
+          Subject: subject ? { connect: { id: subject } } : undefined,
+          company: { connect: { id: companyId } },
+          voucher: { connect: { id: newVoucher.id } },
+        },
         include: {
           Employee: true,
           Bank: true,
           Supplier: true,
           Subject: true,
+          company: true,
+          voucher: true,
         },
       });
 
-    return plainToInstance(ResponseDepositPaymentDto, updatedDepositPayment, {
+      return created;
+    });
+
+    return plainToInstance(ResponseDepositPaymentDto, result, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async findAll() {
+    const list = await this.prismaService.depositPayment.findMany({
+      where: { deletedAt: null },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        Employee: true,
+        Bank: true,
+        Supplier: true,
+        Subject: true,
+        company: true,
+        voucher: true,
+        DepositPaymentItem_DepositPayment: true,
+      },
+    });
+
+    return plainToInstance(ResponseDepositPaymentDto, list, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async findOne(id: string) {
+    const found = await this.prismaService.depositPayment.findUnique({
+      where: { id },
+      include: {
+        Employee: true,
+        Bank: true,
+        Supplier: true,
+        Subject: true,
+        company: true,
+        voucher: true,
+      },
+    });
+
+    if (!found || found.deletedAt) {
+      throw new NotFoundException('Bank transfer payment voucher not found');
+    }
+
+    return plainToInstance(ResponseDepositPaymentDto, found, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async update(id: string, updateDto: UpdateDepositPaymentDto) {
+    const existing = await this.prismaService.depositPayment.findUnique({
+      where: { id },
+      include: { voucher: true },
+    });
+
+    if (!existing || existing.deletedAt) {
+      throw new NotFoundException('Bank transfer payment voucher not found');
+    }
+
+    const {
+      depositPaymentType,
+      paymentMethod,
+      paymentBankName,
+      receipBankName,
+      description,
+      idCardNo,
+      issuedBy,
+      issuedDate,
+      voucherNumber,
+      voucherDate,
+      employee,
+      bank,
+      supplier,
+      subject,
+    } = updateDto;
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      await this.voucherService.updateWithTransaction(
+        existing.voucher?.id,
+        { voucherDate, postedDate: voucherDate, voucherNumber },
+        tx,
+      );
+
+      const updated = await tx.depositPayment.update({
+        where: { id },
+        data: {
+          depositPaymentType,
+          paymentMethod,
+          paymentBankName,
+          receipBankName,
+          description,
+          idCardNo,
+          issuedBy,
+          issuedDate,
+          Employee: employee ? { connect: { id: employee } } : undefined,
+          Bank: bank ? { connect: { id: bank } } : undefined,
+          Supplier: supplier ? { connect: { id: supplier } } : undefined,
+          Subject: subject ? { connect: { id: subject } } : undefined,
+        },
+        include: {
+          Employee: true,
+          Bank: true,
+          Supplier: true,
+          Subject: true,
+          company: true,
+          voucher: true,
+        },
+      });
+
+      return updated;
+    });
+
+    return plainToInstance(ResponseDepositPaymentDto, result, {
       excludeExtraneousValues: true,
     });
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    // Check if the deposit payment exists
     await this.findOne(id);
 
-    // Soft delete the deposit payment
     await this.prismaService.depositPayment.update({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
+      data: { deletedAt: new Date() },
     });
 
     return { message: 'Xóa phiếu chi tiền gửi thành công' };

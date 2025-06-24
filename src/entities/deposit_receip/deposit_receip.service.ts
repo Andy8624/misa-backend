@@ -1,109 +1,196 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateDepositReceipDto } from './dto/create-deposit_receip.dto';
-import { UpdateDepositReceipDto } from './dto/update-deposit_receip.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
+import { VoucherService } from '../voucher/voucher.service';
+import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
+import { CreateDepositReceipDto } from './dto/create-deposit_receip.dto';
 import { ResponseDepositReceipDto } from './dto/response-deposit_receip.dto';
+import { UpdateDepositReceipDto } from './dto/update-deposit_receip.dto';
 
 @Injectable()
 export class DepositReceipService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly voucherService: VoucherService,
+  ) {}
 
   async create(createDepositReceipDto: CreateDepositReceipDto) {
-    // Create a new deposit receipt
-    const depositReceip = await this.prismaService.depositReceip.create({
-      data: createDepositReceipDto,
-      include: {
-        DebtCollector: true,
-        Employee: true,
-        Subject: true,
-        Customer: true,
-        Bank: true,
-      },
+    const {
+      depositReceipType,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      reason,
+      debtCollector,
+      employee,
+      subject,
+      customer,
+      bank,
+      companyId,
+    } = createDepositReceipDto;
+
+    const createVoucherDto: CreateVoucherDto = {
+      voucherType: 'DEPOSIT_RECEIPT',
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+    };
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      const newVoucher = await this.voucherService.createWithTransaction(
+        createVoucherDto,
+        tx,
+      );
+
+      const createdDepositReceip = await tx.depositReceip.create({
+        data: {
+          depositReceipType,
+          reason,
+          DebtCollector: debtCollector
+            ? { connect: { id: debtCollector } }
+            : undefined,
+          Employee: employee ? { connect: { id: employee } } : undefined,
+          Subject: subject ? { connect: { id: subject } } : undefined,
+          Customer: customer ? { connect: { id: customer } } : undefined,
+          Bank: bank ? { connect: { id: bank } } : undefined,
+          Company: { connect: { id: companyId } },
+          voucher: { connect: { id: newVoucher.id } },
+        },
+        include: {
+          Company: true,
+          Employee: true,
+          DebtCollector: true,
+          Subject: true,
+          Customer: true,
+          Bank: true,
+          voucher: true,
+          DepositReceipItem: true,
+        },
+      });
+
+      return createdDepositReceip;
     });
 
-    return plainToInstance(ResponseDepositReceipDto, depositReceip, {
+    return plainToInstance(ResponseDepositReceipDto, result, {
       excludeExtraneousValues: true,
     });
   }
 
   async findAll() {
-    const depositReceips = await this.prismaService.depositReceip.findMany({
-      where: {
-        deletedAt: null,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    const receips = await this.prismaService.depositReceip.findMany({
+      where: { deletedAt: null },
+      orderBy: { createdAt: 'desc' },
       include: {
-        DebtCollector: true,
+        Company: true,
         Employee: true,
+        DebtCollector: true,
         Subject: true,
         Customer: true,
         Bank: true,
+        DepositReceipItem: true,
+        voucher: true,
       },
     });
 
-    return plainToInstance(ResponseDepositReceipDto, depositReceips, {
+    return plainToInstance(ResponseDepositReceipDto, receips, {
       excludeExtraneousValues: true,
     });
   }
 
   async findOne(id: string) {
-    const depositReceip = await this.prismaService.depositReceip.findUnique({
+    const receip = await this.prismaService.depositReceip.findUnique({
       where: { id },
       include: {
-        DebtCollector: true,
+        Company: true,
         Employee: true,
+        DebtCollector: true,
         Subject: true,
         Customer: true,
         Bank: true,
+        DepositReceipItem: true,
+        voucher: true,
       },
     });
 
-    if (!depositReceip || depositReceip.deletedAt) {
-      throw new NotFoundException('Deposit voucher not found');
+    if (!receip || receip.deletedAt) {
+      throw new NotFoundException('Deposit receipt not found');
     }
 
-    return plainToInstance(ResponseDepositReceipDto, depositReceip, {
+    return plainToInstance(ResponseDepositReceipDto, receip, {
       excludeExtraneousValues: true,
     });
   }
 
   async update(id: string, updateDepositReceipDto: UpdateDepositReceipDto) {
-    // Check if the deposit receipt exists
-    await this.findOne(id);
-
-    // Update the deposit receipt
-    const updatedDepositReceip = await this.prismaService.depositReceip.update({
+    const existing = await this.prismaService.depositReceip.findUnique({
       where: { id },
-      data: updateDepositReceipDto,
-      include: {
-        DebtCollector: true,
-        Employee: true,
-        Subject: true,
-        Customer: true,
-        Bank: true,
-      },
+      include: { voucher: true },
     });
 
-    return plainToInstance(ResponseDepositReceipDto, updatedDepositReceip, {
+    if (!existing || existing.deletedAt) {
+      throw new NotFoundException('Deposit receipt not found');
+    }
+
+    const {
+      depositReceipType,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      reason,
+      debtCollector,
+      employee,
+      subject,
+      customer,
+      bank,
+    } = updateDepositReceipDto;
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      await this.voucherService.updateWithTransaction(
+        existing.voucher?.id,
+        { voucherDate, postedDate, voucherNumber },
+        tx,
+      );
+
+      const updatedDepositReceip = await tx.depositReceip.update({
+        where: { id },
+        data: {
+          depositReceipType,
+          reason,
+          debtCollector: debtCollector ?? undefined,
+          employee: employee ?? undefined,
+          subject: subject ?? undefined,
+          customer: customer ?? undefined,
+          bank: bank ?? undefined,
+        },
+        include: {
+          Company: true,
+          Employee: true,
+          DebtCollector: true,
+          Subject: true,
+          Customer: true,
+          Bank: true,
+          DepositReceipItem: true,
+          voucher: true,
+        },
+      });
+
+      return updatedDepositReceip;
+    });
+
+    return plainToInstance(ResponseDepositReceipDto, result, {
       excludeExtraneousValues: true,
     });
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    // Check if the deposit receipt exists
     await this.findOne(id);
 
-    // Soft delete the deposit receipt
     await this.prismaService.depositReceip.update({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
+      data: { deletedAt: new Date() },
     });
 
-    return { message: 'Xóa phiếu gửi tiền thành công' };
+    return { message: 'Xóa phiếu thu tiền gửi thành công' };
   }
 }

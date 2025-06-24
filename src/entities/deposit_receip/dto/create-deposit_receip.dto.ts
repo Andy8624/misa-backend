@@ -22,15 +22,7 @@ export class CreateDepositReceipDto {
 
   @Expose()
   @IsOptional()
-  address?: string;
-
-  @Expose()
-  @IsOptional()
   reason?: string;
-
-  @Expose()
-  @IsOptional()
-  bankName?: string;
 
   @Expose()
   @IsOptional()

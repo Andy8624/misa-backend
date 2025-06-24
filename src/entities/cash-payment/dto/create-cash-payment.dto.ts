@@ -12,10 +12,6 @@ export class CreateCashPaymentDto {
 
   @Expose()
   @IsOptional()
-  address?: string;
-
-  @Expose()
-  @IsOptional()
   recipient?: string;
 
   @Expose()
@@ -39,10 +35,6 @@ export class CreateCashPaymentDto {
   @Expose()
   @IsOptional()
   voucherNumber?: string;
-
-  @Expose()
-  @IsOptional()
-  employeeByType?: string;
 
   @Expose()
   @IsOptional()

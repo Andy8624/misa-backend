@@ -1,10 +1,10 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseBankAccountDto } from 'src/entities/bank_account/dto/response-bank_account.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
-import { ResponseFileDto } from 'src/entities/file/dto/response-file.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
 import { ResponsePaymentTermDto } from 'src/entities/payment_term/dto/response-payment_term.dto';
 import { ResponsePurchaseVoucherItemDto } from 'src/entities/purchase_voucher_item/dto/response-purchase_voucher_item.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponsePurchaseVoucherDto {
   @Expose()
@@ -156,11 +156,11 @@ export class ResponsePurchaseVoucherDto {
   @Type(() => ResponseBankAccountDto)
   PaymentAccount?: ResponseBankAccountDto;
 
-  // @Expose()
-  // @Type(() => ResponseFileDto)
-  // Attached?: ResponseFileDto;
-
   @Expose()
   @Type(() => ResponsePurchaseVoucherItemDto)
   PurchaseVoucherItem_PurchaseVoucher?: ResponsePurchaseVoucherItemDto[];
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

@@ -35,10 +35,6 @@ export class CreateProvisionServiceVoucherDto {
   e_invoice_search_url?: string;
 
   @Expose()
-  @IsOptional()
-  attached?: string;
-
-  @Expose()
   @Transform(({ value }) => value?.toISOString())
   @IsOptional()
   postDate?: Date;
