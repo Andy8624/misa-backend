@@ -237,9 +237,9 @@ export class ResponseSaleVoucherDto {
   createdAt: Date;
 
   // Relations
-  @Expose()
-  @Type(() => ResponseFileDto)
-  Attached?: ResponseFileDto;
+  // @Expose()
+  // @Type(() => ResponseFileDto)
+  // Attached?: ResponseFileDto;
 
   @Expose()
   @Type(() => ResponsePaymentTermDto)

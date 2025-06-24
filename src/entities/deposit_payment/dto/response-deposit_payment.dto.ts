@@ -2,7 +2,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseBankAccountDto } from 'src/entities/bank_account/dto/response-bank_account.dto';
 import { ResponseDepositPaymentItemDto } from 'src/entities/deposit_payment_item/dto/response-deposit_payment_item.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
-import { ResponseFileDto } from 'src/entities/file/dto/response-file.dto';
+// import { ResponseFileDto } from 'src/entities/file/dto/response-file.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
 
 export class ResponseDepositPaymentDto {
@@ -87,9 +87,9 @@ export class ResponseDepositPaymentDto {
   @Type(() => ResponsePartnerDto)
   Subject?: ResponsePartnerDto;
 
-  @Expose()
-  @Type(() => ResponseFileDto)
-  Attached?: ResponseFileDto;
+  // @Expose()
+  // @Type(() => ResponseFileDto)
+  // Attached?: ResponseFileDto;
 
   @Expose()
   @Type(() => ResponseDepositPaymentItemDto)

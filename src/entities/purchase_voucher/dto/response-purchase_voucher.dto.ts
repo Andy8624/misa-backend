@@ -156,9 +156,9 @@ export class ResponsePurchaseVoucherDto {
   @Type(() => ResponseBankAccountDto)
   PaymentAccount?: ResponseBankAccountDto;
 
-  @Expose()
-  @Type(() => ResponseFileDto)
-  Attached?: ResponseFileDto;
+  // @Expose()
+  // @Type(() => ResponseFileDto)
+  // Attached?: ResponseFileDto;
 
   @Expose()
   @Type(() => ResponsePurchaseVoucherItemDto)

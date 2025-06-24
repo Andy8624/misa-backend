@@ -8,11 +8,35 @@ import { UpdateChartOfAccountDto } from './dto/update-chart_of_account.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseChartOfAccountDto } from './dto/response-chart_of_account.dto';
-import {
-  ChartOfAccountFilterType,
-  ChartOfAccountPaginationResponseType,
-} from 'src/interfaces/account_main_systerm.interface';
+
 import { Prisma } from 'generated/prisma';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
+
+export interface ChartOfAccountPaginationResponseType {
+  data: ResponseChartOfAccountDto[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export class ChartOfAccountFilterType {
+  @ApiPropertyOptional({ example: 20, description: 'Number of items per page' })
+  @IsOptional()
+  pageSize?: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'Current page' })
+  @IsOptional()
+  page?: number;
+
+  @ApiPropertyOptional({ description: 'Search keyword' })
+  @IsOptional()
+  search?: string;
+
+  @ApiPropertyOptional({ description: 'Customer ID (Company)' })
+  @IsOptional()
+  customerId?: string;
+}
 
 @Injectable()
 export class ChartOfAccountService {

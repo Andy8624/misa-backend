@@ -19,7 +19,7 @@ export class PurchaseVoucherService {
         PurchasingStaff: true,
         RecipientAccount: true,
         PaymentAccount: true,
-        Attached: true,
+
         PurchaseVoucherItem_PurchaseVoucher: true,
       },
     });
@@ -43,7 +43,7 @@ export class PurchaseVoucherService {
         PurchasingStaff: true,
         RecipientAccount: true,
         PaymentAccount: true,
-        Attached: true,
+
         PurchaseVoucherItem_PurchaseVoucher: true,
       },
     });
@@ -63,7 +63,7 @@ export class PurchaseVoucherService {
           PurchasingStaff: true,
           RecipientAccount: true,
           PaymentAccount: true,
-          Attached: true,
+
           PurchaseVoucherItem_PurchaseVoucher: true,
         },
       },
@@ -93,7 +93,7 @@ export class PurchaseVoucherService {
           PurchasingStaff: true,
           RecipientAccount: true,
           PaymentAccount: true,
-          Attached: true,
+
           PurchaseVoucherItem_PurchaseVoucher: true,
         },
       });

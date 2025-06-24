@@ -107,6 +107,7 @@ async function bootstrap() {
     )
     .addTag('VoucherAccountEntry', 'VoucherAccountEntry management')
     .addTag('CodeGenerator', 'CodeGenerator management')
+    
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

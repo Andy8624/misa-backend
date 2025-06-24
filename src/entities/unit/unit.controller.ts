@@ -27,25 +27,25 @@ export class UnitController {
   }
 
   @Get()
-  @ApiProtectedEndpoint('Find All Partner')
+  @ApiProtectedEndpoint('Find All Unit')
   findAll(@Query() param: UnitFilterType) {
     return this.unitService.findAll(param);
   }
 
   @Get(':id')
-  @ApiProtectedEndpoint('Find Partner by ID')
+  @ApiProtectedEndpoint('Find Unit by ID')
   findOne(@Param('id') id: string) {
     return this.unitService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiProtectedEndpoint('Update Partner')
+  @ApiProtectedEndpoint('Update Unit')
   update(@Param('id') id: string, @Body() updateUnitDto: UpdateUnitDto) {
     return this.unitService.update(id, updateUnitDto);
   }
 
   @Delete(':id')
-  @ApiProtectedEndpoint('Delete Partner')
+  @ApiProtectedEndpoint('Delete Unit')
   remove(@Param('id') id: string) {
     return this.unitService.remove(id);
   }

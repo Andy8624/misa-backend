@@ -14,7 +14,6 @@ export class SaleVoucherService {
     const saleVoucher = await this.prismaService.saleVoucher.create({
       data: createSaleVoucherDto,
       include: {
-        Attached: true,
         PaymentTAndC: true,
         InvoiceCustomer: true,
         InvoiceBankAccount: true,
@@ -50,7 +49,6 @@ export class SaleVoucherService {
         createdAt: 'desc',
       },
       include: {
-        Attached: true,
         PaymentTAndC: true,
         InvoiceCustomer: true,
         InvoiceBankAccount: true,
@@ -81,7 +79,6 @@ export class SaleVoucherService {
     const saleVoucher = await this.prismaService.saleVoucher.findUnique({
       where: { id },
       include: {
-        Attached: true,
         PaymentTAndC: true,
         InvoiceCustomer: true,
         InvoiceBankAccount: true,
@@ -121,7 +118,6 @@ export class SaleVoucherService {
       where: { id },
       data: updateSaleVoucherDto,
       include: {
-        Attached: true,
         PaymentTAndC: true,
         InvoiceCustomer: true,
         InvoiceBankAccount: true,

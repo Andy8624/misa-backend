@@ -18,7 +18,6 @@ export class DepositPaymentService {
         Bank: true,
         Supplier: true,
         Subject: true,
-        Attached: true,
       },
     });
 
@@ -40,7 +39,7 @@ export class DepositPaymentService {
         Bank: true,
         Supplier: true,
         Subject: true,
-        Attached: true,
+
         DepositPaymentItem_DepositPayment: true,
       },
     });
@@ -58,7 +57,6 @@ export class DepositPaymentService {
         Bank: true,
         Supplier: true,
         Subject: true,
-        Attached: true,
       },
     });
 
@@ -85,7 +83,6 @@ export class DepositPaymentService {
           Bank: true,
           Supplier: true,
           Subject: true,
-          Attached: true,
         },
       });
 

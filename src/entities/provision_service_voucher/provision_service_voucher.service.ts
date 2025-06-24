@@ -17,7 +17,6 @@ export class ProvisionServiceVoucherService {
       await this.prismaService.provisionServiceVoucher.create({
         data: createProvisionServiceVoucherDto,
         include: {
-          Attached: true,
           PaymentTAndC: true,
           CashReceiptCustomer: true,
           CashReceiptBankAccount: true,
@@ -50,7 +49,6 @@ export class ProvisionServiceVoucherService {
           createdAt: 'desc',
         },
         include: {
-          Attached: true,
           PaymentTAndC: true,
           CashReceiptCustomer: true,
           CashReceiptBankAccount: true,
@@ -78,7 +76,6 @@ export class ProvisionServiceVoucherService {
       await this.prismaService.provisionServiceVoucher.findUnique({
         where: { id },
         include: {
-          Attached: true,
           PaymentTAndC: true,
           CashReceiptCustomer: true,
           CashReceiptBankAccount: true,
@@ -118,7 +115,6 @@ export class ProvisionServiceVoucherService {
         where: { id },
         data: updateProvisionServiceVoucherDto,
         include: {
-          Attached: true,
           PaymentTAndC: true,
           CashReceiptCustomer: true,
           CashReceiptBankAccount: true,
