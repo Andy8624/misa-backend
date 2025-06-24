@@ -104,7 +104,7 @@ export class InventoryInService {
           storePerson: true,
           client: true,
           object: true,
-          attached: true,
+
           InventoryInItem: {
             include: {
               item: true,
@@ -137,7 +137,7 @@ export class InventoryInService {
         storePerson: true,
         client: true,
         object: true,
-        attached: true,
+
         InventoryInItem: {
           include: {
             item: true,
@@ -191,7 +191,7 @@ export class InventoryInService {
         storePerson: true,
         client: true,
         object: true,
-        attached: true,
+
         InventoryInItem: {
           include: {
             item: true,

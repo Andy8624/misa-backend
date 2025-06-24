@@ -44,6 +44,24 @@ import { PurchaseVoucherModule } from './entities/purchase_voucher/purchase_vouc
 import { PurchaseVoucherItemModule } from './entities/purchase_voucher_item/purchase_voucher_item.module';
 import { GroupOfPurchaseGoodModule } from './entities/group_of_purchase_good/group_of_purchase_good.module';
 import { UtilitiesModule } from './utilities/utilities.module';
+import { AssetWriteOffModule } from './entities/asset_write_off/asset_write_off.module';
+import { AssetWriteOffAssetModule } from './entities/asset_write_off_asset/asset_write_off_asset.module';
+import { AssetWriteOffAccountingModule } from './entities/asset_write_off_accounting/asset_write_off_accounting.module';
+import { AssetIncrementModule } from './entities/asset_increment/asset_increment.module';
+import { AssetDepreciationInfoModule } from './entities/asset_depreciation_info/asset_depreciation_info.module';
+import { AssetAllocationModule } from './entities/asset_allocation/asset_allocation.module';
+import { AssetFormationOriginModule } from './entities/asset_formation_origin/asset_formation_origin.module';
+import { AssetComponentModule } from './entities/asset_component/asset_component.module';
+import { AssetAccessoryModule } from './entities/asset_accessory/asset_accessory.module';
+import { ObjectModule } from './entities/object/object.module';
+import { AssetModule } from './entities/asset/asset.module';
+import { AssetTypeModule } from './entities/asset_type/asset_type.module';
+import { DepartmentModule } from './entities/department/department.module';
+import { AssetTransferModule } from './entities/asset_transfer/asset_transfer.module';
+import { AssetTransferDetailModule } from './entities/asset_transfer_detail/asset_transfer_detail.module';
+import { AssetRevaluationModule } from './entities/asset_revaluation/asset_revaluation.module';
+import { AssetRevaluationDetailModule } from './entities/asset_revaluation_detail/asset_revaluation_detail.module';
+import { AssetRevaluationPostingModule } from './entities/asset_revaluation_posting/asset_revaluation_posting.module';
 
 @Module({
   imports: [
@@ -89,6 +107,24 @@ import { UtilitiesModule } from './utilities/utilities.module';
     PurchaseVoucherItemModule,
     GroupOfPurchaseGoodModule,
     UtilitiesModule,
+    AssetWriteOffModule,
+    AssetWriteOffAssetModule,
+    AssetWriteOffAccountingModule,
+    AssetIncrementModule,
+    AssetDepreciationInfoModule,
+    AssetAllocationModule,
+    AssetFormationOriginModule,
+    AssetComponentModule,
+    AssetAccessoryModule,
+    ObjectModule,
+    AssetModule,
+    AssetTypeModule,
+    DepartmentModule,
+    AssetTransferModule,
+    AssetTransferDetailModule,
+    AssetRevaluationModule,
+    AssetRevaluationDetailModule,
+    AssetRevaluationPostingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

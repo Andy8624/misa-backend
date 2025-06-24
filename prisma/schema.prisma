@@ -14,13 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator erd {
-  provider              = "prisma-erd-generator"
-  output                = "ERD.svg" // có đuôi .svg hoặc .png hoặc .pdf
-  disableRelationLines  = true
-  includeRelationFields = false
-}
-
 // Bảng lưu thông tin của Kế toán (Accountant)
 model Accountant {
   id          String   @id @default(uuid())
@@ -106,6 +99,24 @@ model Customer {
   CashReceip              CashReceip[]
   BankAccount             BankAccount[]
   File                    File[]
+  Asset                   Asset[]
+  AssetType               AssetType[]
+  Department              Department[]
+  AssetTransfer           AssetTransfer[]
+  AssetTransferDetail     AssetTransferDetail[]
+  AssetRevaluation        AssetRevaluation[]
+  AssetRevaluationDetail  AssetRevaluationDetail[]
+  AssetRevaluationPosting AssetRevaluationPosting[]
+  Object                  Object[]
+  AssetComponent          AssetComponent[]
+  AssetAccessory          AssetAccessory[]
+  AssetFormationOrigin    AssetFormationOrigin[]
+  AssetAllocation         AssetAllocation[]
+  AssetDepreciationInfo   AssetDepreciationInfo[]
+  AssetIncrement          AssetIncrement[]
+  AssetWriteOffAccounting AssetWriteOffAccounting[]
+  AssetWriteOffAsset      AssetWriteOffAsset[]
+  AssetWriteOff           AssetWriteOff[]
 
   @@map("customers")
 }
@@ -480,6 +491,8 @@ model Unit {
   ProvisionServiceVoucherItem_Unit ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Unit")
   SaleVoucherItem                  SaleVoucherItem[]             @relation("SaleVoucherItem_Unit")
   PurchaseVoucherItem_Unit         PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_Unit")
+  AssetComponent_Unit              AssetComponent[]              @relation("AssetComponent_Unit")
+  AssetAccessory_Unit              AssetAccessory[]              @relation("AssetAccessory_Unit")
 
   @@map("units")
 }
@@ -1870,6 +1883,10 @@ model AssetWriteOff {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi giảm - Tài sản
@@ -1900,6 +1917,10 @@ model AssetWriteOffAsset {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi giảm - Hoạch toán
@@ -1921,20 +1942,24 @@ model AssetWriteOffAccounting {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi tăng
 model AssetIncrement {
-  id            String   @id @default(uuid())
-  voucherNumber String // Số chứng từ ghi tăng
-  incrementDate DateTime // Ngày ghi tăng
-  assetType     String // Loại tài sản
-  assetCode     String // Mã tài sản
-  assetName     String // Tên tài sản
-  isDepreciable Boolean // Có tính khấu hao không
+  id            String    @id @default(uuid())
+  voucherNumber String? // Số chứng từ ghi tăng
+  incrementDate DateTime? // Ngày ghi tăng
+  assetType     String? // Loại tài sản
+  assetCode     String? // Mã tài sản
+  assetName     String? // Tên tài sản
+  isDepreciable Boolean? // Có tính khấu hao không
 
-  Department   Department @relation("AssetIncrement_Department", fields: [departmentId], references: [id])
-  departmentId String // Đơn vị sử dụng (FK tới Department)
+  Department   Department? @relation("AssetIncrement_Department", fields: [departmentId], references: [id])
+  departmentId String? // Đơn vị sử dụng (FK tới Department)
 
   // Quan hệ đến các bảng con
   AssetDepreciationInfo_AssetIncrement AssetDepreciationInfo[] @relation("AssetDepreciationInfo_AssetIncrement")
@@ -1948,6 +1973,10 @@ model AssetIncrement {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi tăng - Thông tin khấu hao
@@ -1975,6 +2004,10 @@ model AssetDepreciationInfo {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi tăng - Thiết lập phân bố
@@ -1996,38 +2029,48 @@ model AssetAllocation {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi tăng - Nguồn gốc hình thành
 model AssetFormationOrigin {
-  id            String   @id @default(uuid())
-  voucherDate   DateTime // Ngày chứng từ
-  voucherNumber String // Số chứng từ
-  description   String // Diễn giải
-  amount        Float // Số tiền
+  id            String    @id @default(uuid())
+  voucherDate   DateTime? // Ngày chứng từ
+  voucherNumber String? // Số chứng từ
+  description   String? // Diễn giải
+  amount        Float? // Số tiền
 
   // Quan hệ
   AssetIncrement   AssetIncrement? @relation("AssetFormationOrigin_AssetIncrement", fields: [assetIncrementId], references: [id])
   assetIncrementId String?
 
-  DebitAccount   ChartOfAccount @relation("AssetFormationOrigin_DebitAccount", fields: [debitAccountId], references: [id])
-  debitAccountId String // Tài khoản nợ (FK ChartOfAccount)
+  DebitAccount   ChartOfAccount? @relation("AssetFormationOrigin_DebitAccount", fields: [debitAccountId], references: [id])
+  debitAccountId String? // Tài khoản nợ (FK ChartOfAccount)
 
-  CreditAccount   ChartOfAccount @relation("AssetFormationOrigin_CreditAccount", fields: [creditAccountId], references: [id])
-  creditAccountId String // Tài khoản có (FK ChartOfAccount)
+  CreditAccount   ChartOfAccount? @relation("AssetFormationOrigin_CreditAccount", fields: [creditAccountId], references: [id])
+  creditAccountId String? // Tài khoản có (FK ChartOfAccount)
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi tăng - Bộ phận cấu thành
 model AssetComponent {
   id             String  @id @default(uuid())
-  name           String? // Bộ phận
-  unit           String? // Đơn vị tính
+  unitId         String? // Đơn vị tính
   quantity       Int? // Số lượng
   warrantyPeriod Int? // Thời hạn bảo hành
+
+  name String? // Bộ phận
+  Unit Unit?   @relation("AssetComponent_Unit", fields: [unitId], references: [id])
 
   AssetIncrement   AssetIncrement? @relation("AssetComponent_AssetIncrement", fields: [assetIncrementId], references: [id])
   assetIncrementId String?
@@ -2035,15 +2078,21 @@ model AssetComponent {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Ghi tăng - Dụng cụ phụ tùng kèm theo 
 model AssetAccessory {
   id       String  @id @default(uuid())
   name     String? // Tên / Quy cách dụng cụ / Phụ tùng
-  unit     String? // Đơn vị tính
   quantity Int? // Số lượng
   value    Float? // Giá trị
+
+  Unit   Unit?   @relation("AssetAccessory_Unit", fields: [unitId], references: [id])
+  unitId String? // Đơn vị tính
 
   AssetIncrement   AssetIncrement? @relation("AssetAccessory_AssetIncrement", fields: [assetIncrementId], references: [id])
   assetIncrementId String?
@@ -2051,6 +2100,10 @@ model AssetAccessory {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Đối tượng
@@ -2066,9 +2119,13 @@ model Object {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
-// Tài sản
+// Tài sản -- DONE
 model Asset {
   id                      String    @id @default(uuid())
   assetCode               String? // Mã tài sản
@@ -2093,9 +2150,13 @@ model Asset {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
-// Loại tài sản
+// Loại tài sản -- DONE
 model AssetType {
   id          String  @id @default(uuid())
   name        String? // Tên tài sản
@@ -2106,9 +2167,13 @@ model AssetType {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
-// Đơn vị hành chính
+// Đơn vị hành chính - DONE
 model Department {
   id          String  @id @default(uuid())
   name        String? // Tên đơn vị hành chính
@@ -2127,40 +2192,48 @@ model Department {
   deletedAt                          DateTime?                 @map("deleted_at")
   AssetRevaluationDetail_Department  AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_Department")
   AssetRevaluationPosting_Department AssetRevaluationPosting[] @relation("AssetRevaluationPosting_Department")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
-// Điều chuyển tài sản
+// Điều chuyển tài sản - DONE
 model AssetTransfer {
-  id             String   @id @default(uuid())
-  transferNumber String // Biên bản giao nhận số
-  transferDate   DateTime // Ngày
-  reason         String // Lý do điều chuyển
+  id             String    @id @default(uuid())
+  transferNumber String? // Biên bản giao nhận số
+  transferDate   DateTime? // Ngày
+  reason         String? // Lý do điều chuyển
 
-  DeliveredBy   Employee @relation("AssetTransfer_DeliveredBy", fields: [deliveredById], references: [id])
-  deliveredById String // Người bàn giao
+  DeliveredBy   Employee? @relation("AssetTransfer_DeliveredBy", fields: [deliveredById], references: [id])
+  deliveredById String? // Người bàn giao
 
-  ReceivedBy   Employee @relation("AssetTransfer_ReceivedBy", fields: [receivedById], references: [id])
-  receivedById String // Người tiếp nhận
+  ReceivedBy   Employee? @relation("AssetTransfer_ReceivedBy", fields: [receivedById], references: [id])
+  receivedById String? // Người tiếp nhận
 
   AssetTransferDetail_AssetTransfer AssetTransferDetail[] @relation("AssetTransferDetail_AssetTransfer")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Chi tiết điều chuyển tài sản
 model AssetTransferDetail {
   id String @id @default(uuid())
 
-  Asset   Asset  @relation("AssetTransferDetail_Asset", fields: [assetId], references: [id])
-  assetId String // FK đến tài sản
+  Asset   Asset?  @relation("AssetTransferDetail_Asset", fields: [assetId], references: [id])
+  assetId String? // FK đến tài sản
 
-  FromDepartment   Department @relation("AssetTransferDetail_FromDepartment", fields: [fromDepartmentId], references: [id])
-  fromDepartmentId String // Từ đơn vị
+  FromDepartment   Department? @relation("AssetTransferDetail_FromDepartment", fields: [fromDepartmentId], references: [id])
+  fromDepartmentId String? // Từ đơn vị
 
-  ToDepartment   Department @relation("AssetTransferDetail_ToDepartment", fields: [toDepartmentId], references: [id])
-  toDepartmentId String // Đến đơn vị
+  ToDepartment   Department? @relation("AssetTransferDetail_ToDepartment", fields: [toDepartmentId], references: [id])
+  toDepartmentId String? // Đến đơn vị
 
   saleContract  String? // Hợp đồng bán (để tạm chưa tạo bảng hợp đồng)
   purchaseOrder String? // Đơn đặt hàng (để tạm chưa tạo bảng đơn đặt hàng)
@@ -2169,34 +2242,41 @@ model AssetTransferDetail {
   costItem   String? // Khoản mục chi phí
   thcpObject String? // Đối tượng THCP
 
-  ExpenseAccount   ChartOfAccount @relation("AssetTransferDetail_ExpenseAccount", fields: [expenseAccountId], references: [id])
-  expenseAccountId String // Tài khoản chi phí
+  ExpenseAccount   ChartOfAccount? @relation("AssetTransferDetail_ExpenseAccount", fields: [expenseAccountId], references: [id])
+  expenseAccountId String? // Tài khoản chi phí
 
-  AssetTransfer   AssetTransfer @relation("AssetTransferDetail_AssetTransfer", fields: [assetTransferId], references: [id])
-  assetTransferId String
+  AssetTransfer   AssetTransfer? @relation("AssetTransferDetail_AssetTransfer", fields: [assetTransferId], references: [id])
+  assetTransferId String?
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Đánh giá lại
 model AssetRevaluation {
-  id              String   @id @default(uuid())
-  revaluationCode String // Biên bản số
-  revaluationDate DateTime // Ngày
-  reason          String // Lý do
-  postedDate      DateTime // Ngày hạch toán
-  voucherDate     DateTime // Ngày chứng từ
-  voucherNumber   String // Số chứng từ
+  id              String    @id @default(uuid())
+  revaluationCode String? // Biên bản số
+  revaluationDate DateTime? // Ngày
+  reason          String? // Lý do
+  postedDate      DateTime? // Ngày hạch toán
+  voucherDate     DateTime? // Ngày chứng từ
+  voucherNumber   String? // Số chứng từ
 
   // Quan hệ đến bảng con
-  details  AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_AssetRevaluation")
-  postings AssetRevaluationPosting[] @relation("AssetRevaluationPosting_AssetRevaluation")
+  details   AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_AssetRevaluation")
+  postings  AssetRevaluationPosting[] @relation("AssetRevaluationPosting_AssetRevaluation")
+  createdAt DateTime                  @default(now()) @map("created_at")
+  updatedAt DateTime?                 @updatedAt @map("updated_at")
+  deletedAt DateTime?                 @map("deleted_at")
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Đánh giá lại - Chi tiết điều chỉnh
@@ -2248,6 +2328,10 @@ model AssetRevaluationDetail {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
 
 // Đánh giá lại - Hạch toán     
@@ -2277,4 +2361,8 @@ model AssetRevaluationPosting {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với bảng công ty
+  Company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 }
