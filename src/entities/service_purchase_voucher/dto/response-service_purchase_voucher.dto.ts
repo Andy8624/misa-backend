@@ -3,6 +3,7 @@ import { ResponseBankDto } from 'src/entities/bank/dto/response-bank.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
 import { ResponsePaymentTermDto } from 'src/entities/payment_term/dto/response-payment_term.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseServicePurchaseVoucherDto {
   @Expose()
@@ -130,4 +131,8 @@ export class ResponseServicePurchaseVoucherDto {
   @Expose()
   @Type(() => ResponsePaymentTermDto)
   PaymentTerm?: ResponsePaymentTermDto;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

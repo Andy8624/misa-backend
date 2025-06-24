@@ -15,7 +15,6 @@ export class InvoiceService {
       data: createInvoiceDto,
       include: {
         ExecutinPerson: true,
-        File: true,
       },
     });
 
@@ -34,7 +33,6 @@ export class InvoiceService {
       },
       include: {
         ExecutinPerson: true,
-        File: true,
       },
     });
 
@@ -48,7 +46,6 @@ export class InvoiceService {
       where: { id },
       include: {
         ExecutinPerson: true,
-        File: true,
       },
     });
 
@@ -71,7 +68,6 @@ export class InvoiceService {
       data: updateInvoiceDto,
       include: {
         ExecutinPerson: true,
-        File: true,
       },
     });
 

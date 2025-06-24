@@ -11,10 +11,6 @@ export class CreateCashReceipDto {
   payer?: string;
 
   @Expose()
-  @IsOptional()
-  address?: string;
-
-  @Expose()
   @Transform(({ value }) => value?.toISOString())
   @IsOptional()
   postedDate?: Date;
@@ -35,10 +31,6 @@ export class CreateCashReceipDto {
   @Expose()
   @IsOptional()
   withOriginalVoucher?: string;
-
-  @Expose()
-  @IsOptional()
-  employeeByType?: string;
 
   @Expose()
   @IsOptional()

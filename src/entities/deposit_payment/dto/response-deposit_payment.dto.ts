@@ -4,6 +4,7 @@ import { ResponseDepositPaymentItemDto } from 'src/entities/deposit_payment_item
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
 // import { ResponseFileDto } from 'src/entities/file/dto/response-file.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseDepositPaymentDto {
   @Expose()
@@ -17,9 +18,6 @@ export class ResponseDepositPaymentDto {
 
   @Expose()
   paymentBankName: string;
-
-  @Expose()
-  address: string;
 
   @Expose()
   receipBankName: string;
@@ -60,9 +58,6 @@ export class ResponseDepositPaymentDto {
   subject: string;
 
   @Expose()
-  attached: string;
-
-  @Expose()
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
 
@@ -70,10 +65,6 @@ export class ResponseDepositPaymentDto {
   @Expose()
   @Type(() => ResponseEmployeeDto)
   Employee?: ResponseEmployeeDto;
-
-  @Expose()
-  @Type(() => ResponseEmployeeDto)
-  EmployeeByType?: ResponseEmployeeDto;
 
   @Expose()
   @Type(() => ResponseBankAccountDto)
@@ -87,11 +78,11 @@ export class ResponseDepositPaymentDto {
   @Type(() => ResponsePartnerDto)
   Subject?: ResponsePartnerDto;
 
-  // @Expose()
-  // @Type(() => ResponseFileDto)
-  // Attached?: ResponseFileDto;
-
   @Expose()
   @Type(() => ResponseDepositPaymentItemDto)
   DepositPaymentItem_DepositPayment?: ResponseDepositPaymentItemDto;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

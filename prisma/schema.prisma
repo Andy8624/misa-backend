@@ -117,6 +117,7 @@ model Customer {
   AssetWriteOffAccounting AssetWriteOffAccounting[]
   AssetWriteOffAsset      AssetWriteOffAsset[]
   AssetWriteOff           AssetWriteOff[]
+  Voucher                 Voucher[]                 @relation("Voucher_Company")
 
   @@map("customers")
 }
@@ -276,16 +277,17 @@ model Employee {
   employeeCode String @map("employee_code") // Mã nhân viên (NV0001)
 
   // Thông tin cá nhân
-  fullName           String   @map("full_name")
-  dob                DateTime // Ngày sinh
-  sex                String // Giới tính Male - Female - Other
-  address            String // Địa chỉ
-  position           String // Chức danh
-  passportNumber     String?  @map("passport_number") // Số hộ chiếu
-  phoneNumber        String   @map("phone_number") // Số điện thoại
-  idCardNumber       String   @map("id_card_number") // Số CCCD
-  idCardIssuedDate   String   @map("id_card_issued_date") // Ngày cấp CCCD
-  idCardPlaceOfIssue String   @map("id_card_place_of_issue") // Nơi cấp CCCD
+  fullName       String   @map("full_name")
+  dob            DateTime // Ngày sinh
+  sex            String // Giới tính Male - Female - Other
+  address        String // Địa chỉ
+  position       String // Chức danh
+  passportNumber String?  @map("passport_number") // Số hộ chiếu
+  phoneNumber    String   @map("phone_number") // Số điện thoại
+
+  idCardNumber       String @map("id_card_number") // Số CCCD
+  idCardIssuedDate   String @map("id_card_issued_date") // Ngày cấp CCCD
+  idCardPlaceOfIssue String @map("id_card_place_of_issue") // Nơi cấp CCCD
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -842,25 +844,49 @@ model FileAttachment {
   fileId String
 }
 
+// Model Voucher chung
+model Voucher {
+  id          String @id @default(uuid())
+  voucherType String @map("voucher_type") // Loại chứng từ (e.g., 'CASH_RECEIPT', 'CASH_PAYMENT', 'DEPOSIT_RECEIPT', 'DEPOSIT_PAYMENT')
+
+  postedDate    DateTime? @map("posted_date") // Ngày hạch toán
+  voucherDate   DateTime? @map("voucher_date") // Ngày chứng từ
+  voucherNumber String?   @map("voucher_number") // Số chứng từ  
+
+  // Quan hệ với bảng công ty (Customer trong trường hợp này có vẻ là Company)
+  Company   Customer? @relation("Voucher_Company", fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
+
+  // Các loại phiếu cụ thể sẽ có quan hệ 1-1 với bảng Voucher
+  CashReceipt             CashReceip?
+  CashPayment             CashPayment?
+  DepositReceip           DepositReceip?
+  DepositPayment          DepositPayment?
+  ServicePurchaseVoucher  ServicePurchaseVoucher?
+  ProvisionServiceVoucher ProvisionServiceVoucher?
+  SaleVoucher             SaleVoucher?
+  PurchaseVoucher         PurchaseVoucher?
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
 // Phiếu thu tiền mặt
 model CashReceip {
-  id                     String    @id @default(uuid())
-  cashReceiptVoucherType String?   @map("cash_receipt_voucher_type") // Loại phiếu thu
+  id                     String  @id @default(uuid())
+  cashReceiptVoucherType String? @map("cash_receipt_voucher_type") // Loại phiếu thu
   payer                  String? // Người nộp
-  address                String?
-  postedDate             DateTime? @map("posted_date") // Ngày hạch toán
-  voucherDate            DateTime? @map("voucher_date") // Ngày chứng từ
-  voucherNumber          String?   @map("voucher_number") // Số chứng từ
   reason                 String? // Lý do nộp
-  withOriginalVoucher    String?   @map("with_original_voucher")
+  withOriginalVoucher    String? @map("with_original_voucher") // Kèm theo bao nhiêu chứng từ gốc
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 
   // Quan hệ với bảng công ty
   company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
-
-  // employeeByType  -- employee -- nhân viên
-  // EmployeeByType Employee? @relation("CashReceipEmployeeByType", fields: [employeeByType], references: [id])
-  // employeeByType String?   @map("employee_by_type")
 
   // employee -- nhân viên
   Employee Employee? @relation("CashReceipEmployee", fields: [employee], references: [id])
@@ -911,24 +937,17 @@ model CashReceipVoucherItem {
 
 // Phiếu chi tiền mặt
 model CashPayment {
-  id                     String    @id @default(uuid())
-  cashPaymentVoucherType String?   @map("cash_receipt_voucher_type") // Loại phiếu thu
-  supplierName           String?   @map("supplier_name") // Tên nhà cung cấp
-  address                String?
+  id                     String  @id @default(uuid())
+  cashPaymentVoucherType String? @map("cash_receipt_voucher_type") // Loại phiếu chi
   recipient              String? // Người nhận
-  withOriginalVoucher    String?   @map("with_original_vouher")
-  reason                 String? // Lý do nộp
-  postedDate             DateTime? @map("posted_date") // Ngày hạch toán
-  voucherDate            DateTime? @map("voucher_date") // Ngày chứng từ
-  voucherNumber          String?   @map("voucher_number") // Số chứng từ
+  supplierName           String? @map("supplier_name") // Tên nhà cung cấp
+
+  reason              String? // Lý do nộp
+  withOriginalVoucher String? @map("with_original_voucher") // Kèm theo bao nhiêu chứng từ gốc
 
   // Quan hệ với bảng công ty
   company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
-
-  // employeeByType  -- employee -- nhân viên
-  // EmployeeByType Employee? @relation("CashPaymentEmployeeByType", fields: [employeeByType], references: [id])
-  // employeeByType String?   @map("employee_by_type")
 
   // employee -- nhân viên
   Employee Employee? @relation("CashPaymentEmployee", fields: [employee], references: [id])
@@ -948,6 +967,9 @@ model CashPayment {
   deletedAt DateTime? @map("deleted_at")
 
   CashPaymentVoucherItem CashPaymentVoucherItem[] @relation("CashPaymentVoucherItem_CashPayment")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Chi tiết phiếu chi tiền mặt
@@ -978,14 +1000,9 @@ model CashPaymentVoucherItem {
 
 // Tiền gửi - thu
 model DepositReceip {
-  id                String    @id @default(uuid())
-  depositReceipType String?   @map("deposit_receip_type")
-  postedDate        DateTime? @map("posted_date") // Ngày hạch toán
-  voucherDate       DateTime? @map("voucher_date") // Ngày chứng từ
-  voucherNumber     String?   @map("voucher_number") // Số chứng từ
-  address           String?
+  id                String  @id @default(uuid())
+  depositReceipType String? @map("deposit_receip_type")
   reason            String?
-  bankName          String?   @map("bank_name")
 
   // Quan hệ với bảng công ty
   Company   Customer @relation(fields: [companyId], references: [id])
@@ -1013,6 +1030,9 @@ model DepositReceip {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Chi tiết tiền gửi - thu
@@ -1042,18 +1062,18 @@ model DepositReceipItem {
 
 // Tiền gửi - chi
 model DepositPayment {
-  id                 String    @id @default(uuid())
-  depositPaymentType String?   @map("deposit_receip_type")
-  paymentMethod      String?   @map("payment_method")
-  paymentBankName    String?   @map("payment_bank_name") // Tên ngân hàng chi
-  address            String?
-  receipBankName     String?   @map("receip_bank_name") // Tên ngân hàng thu
-  description        String?
-  idCardNo           String?   @map("id_card_no")
-  issuedBy           String?   @map("issued_by")
-  issuedDate         DateTime? @map("issued_date")
-  voucherNumber      String?   @map("voucher_number")
-  voucherDate        DateTime? @map("voucher_date")
+  id                 String  @id @default(uuid())
+  depositPaymentType String? @map("deposit_receip_type")
+  paymentMethod      String? @map("payment_method")
+
+  paymentBankName String? @map("payment_bank_name") // Tên ngân hàng chi
+  receipBankName  String? @map("receip_bank_name") // Tên ngân hàng thu
+
+  description String?
+
+  idCardNo   String?   @map("id_card_no") // Số CCCD
+  issuedDate DateTime? @map("issued_date") // Ngày cấp CCCD
+  issuedBy   String?   @map("issued_by") // Nơi cấp CCCD
 
   // Quan hệ với bảng công ty
   company   Customer @relation(fields: [companyId], references: [id])
@@ -1061,9 +1081,6 @@ model DepositPayment {
 
   Employee Employee? @relation("DepositPaymentEmployee", fields: [employee], references: [id])
   employee String?
-
-  // EmployeeByType Employee? @relation("DepositPaymentEmployeeByType", fields: [employeeByType], references: [id])
-  // employeeByType String?   @map("employee_by_type")
 
   Bank BankAccount? @relation("DepositPaymentBank", fields: [bank], references: [id])
   bank String?
@@ -1079,6 +1096,9 @@ model DepositPayment {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Chi tiết tiền gửi - chi
@@ -1233,9 +1253,6 @@ model ServicePurchaseVoucher {
   dueDate                 DateTime?
   cashPaymentVoucherNo    String?
   cashPaymentVoucherDate  DateTime?
-  postedDate              DateTime?
-  voucherNumber           String?
-  voucherDate             DateTime?
 
   purchase_without_invoiceInfo_supplier_name String?
   purchase_without_invoiceInfo_id_card_no    String?
@@ -1265,6 +1282,9 @@ model ServicePurchaseVoucher {
   deletedAt DateTime? @map("deleted_at")
 
   ServicePurchaseVoucherItem_ServicePurchaseVoucher ServicePurchaseVoucherItem[] @relation("ServicePurchaseVoucherItem_ServicePurchaseVoucher")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 model ServicePurchaseVoucherItem {
@@ -1315,7 +1335,6 @@ model ServicePurchaseVoucherItem {
 
 model ProvisionServiceVoucher {
   id                   String  @id @default(uuid())
-  voucherNumber        String?
   paymentStatus        String?
   paymentMethod        String?
   withInvoice          String?
@@ -1327,9 +1346,6 @@ model ProvisionServiceVoucher {
   // Quan hệ với bảng công ty
   Company   Customer @relation(fields: [companyId], references: [id])
   companyId String   @map("company_id")
-
-  postDate    DateTime?
-  voucherDate DateTime?
 
   PaymentTAndC PaymentTerms? @relation("ProvisionServiceVoucher_PaymentTAndC", fields: [paymentTAndC], references: [id])
   paymentTAndC String?
@@ -1409,8 +1425,8 @@ model ProvisionServiceVoucher {
   discount_type                  String?
 
   // customer
-  Customer Partner? @relation("ProvisionServiceVoucher_Customer", fields: [company], references: [id])
-  company  String?
+  Customer Partner? @relation("ProvisionServiceVoucher_Customer", fields: [customer], references: [id])
+  customer String?
 
   customer_name     String?
   customer_tax_code String?
@@ -1421,6 +1437,9 @@ model ProvisionServiceVoucher {
   deletedAt DateTime? @map("deleted_at")
 
   ProvisionServiceVoucherItem_ProvisionServiceVoucher ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_ProvisionServiceVoucher")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 model ProvisionServiceVoucherItem {
@@ -1476,9 +1495,6 @@ model SaleVoucher {
   // Quan hệ với bảng công ty
   Company   Customer @relation(fields: [companyId], references: [id])
   companyId String   @map("company_id")
-
-  posted_date  DateTime?
-  voucher_date DateTime?
 
   // payment_t_and_c
   PaymentTAndC    PaymentTerms? @relation("SaleVoucher_PaymentTAndC", fields: [payment_t_and_c], references: [id])
@@ -1616,6 +1632,9 @@ model SaleVoucher {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 model SaleVoucherItem {
@@ -1692,13 +1711,10 @@ model SaleVoucherItem {
 }
 
 model PurchaseVoucher {
-  id             String    @id @default(uuid())
+  id             String  @id @default(uuid())
   purchase_type  String?
-  voucher_number String?
   payment_status String?
   payment_method String?
-  posted_date    DateTime?
-  voucher_date   DateTime?
 
   // Quan hệ với bảng công ty
   Company   Customer @relation(fields: [companyId], references: [id])
@@ -1767,6 +1783,9 @@ model PurchaseVoucher {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 model PurchaseVoucherItem {

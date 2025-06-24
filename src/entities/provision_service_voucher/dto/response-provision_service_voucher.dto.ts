@@ -1,9 +1,9 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseBankDto } from 'src/entities/bank/dto/response-bank.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
-import { ResponseFileDto } from 'src/entities/file/dto/response-file.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
 import { ResponsePaymentTermDto } from 'src/entities/payment_term/dto/response-payment_term.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseProvisionServiceVoucherDto {
   @Expose()
@@ -32,9 +32,6 @@ export class ResponseProvisionServiceVoucherDto {
 
   @Expose()
   e_invoice_search_url: string;
-
-  @Expose()
-  attached: string;
 
   @Expose()
   @Transform(({ value }) => value?.toISOString())
@@ -217,4 +214,8 @@ export class ResponseProvisionServiceVoucherDto {
   @Expose()
   @Type(() => ResponsePartnerDto)
   Customer?: ResponsePartnerDto;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

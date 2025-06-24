@@ -2,10 +2,10 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseBankAccountDto } from 'src/entities/bank_account/dto/response-bank_account.dto';
 import { ResponseBankDto } from 'src/entities/bank/dto/response-bank.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
-import { ResponseFileDto } from 'src/entities/file/dto/response-file.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
 import { ResponsePaymentTermDto } from 'src/entities/payment_term/dto/response-payment_term.dto';
 import { ResponseSaleVoucherItemDto } from 'src/entities/sale_voucher_item/dto/response-sale_voucher_item.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseSaleVoucherDto {
   @Expose()
@@ -312,4 +312,8 @@ export class ResponseSaleVoucherDto {
   @Expose()
   @Type(() => ResponseSaleVoucherItemDto)
   SaleVoucherItem_SaleVoucher?: ResponseSaleVoucherItemDto[];
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

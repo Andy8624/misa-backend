@@ -2,6 +2,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseCashPaymentVoucherItemDto } from 'src/entities/cash-payment-voucher-item/dto/response-cash-payment-voucher-item.dto';
 import { ResponseEmployeeDto } from 'src/entities/employee/dto/response-employee.dto';
 import { ResponsePartnerDto } from 'src/entities/partners/dto/response-partner-dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseCashPaymentDto {
   @Expose()
@@ -12,9 +13,6 @@ export class ResponseCashPaymentDto {
 
   @Expose()
   supplierName: string;
-
-  @Expose()
-  address: string;
 
   @Expose()
   recipient: string;
@@ -37,9 +35,6 @@ export class ResponseCashPaymentDto {
   voucherNumber: string;
 
   @Expose()
-  employeeByType: string;
-
-  @Expose()
   employee: string;
 
   @Expose()
@@ -51,11 +46,6 @@ export class ResponseCashPaymentDto {
   @Expose()
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
-
-  // Relations
-  @Expose()
-  @Type(() => ResponseEmployeeDto)
-  EmployeeByType?: ResponseEmployeeDto;
 
   @Expose()
   @Type(() => ResponseEmployeeDto)
@@ -72,4 +62,8 @@ export class ResponseCashPaymentDto {
   @Expose()
   @Type(() => ResponseCashPaymentVoucherItemDto)
   CashPaymentVoucherItem?: ResponseCashPaymentVoucherItemDto[];
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

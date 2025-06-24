@@ -4,23 +4,71 @@ import { UpdateCashReceipDto } from './dto/update-cash_receip.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseCashReceipDto } from './dto/response-cash_receip.dto';
+import { VoucherService } from '../voucher/voucher.service';
+import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 
 @Injectable()
 export class CashReceipService {
-  constructor(private readonly prismaService: PrismaService) {}
-
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly voucherService: VoucherService,
+  ) {}
   async create(createCashReceipDto: CreateCashReceipDto) {
-    // Create a new cash receipt
-    const cashReceip = await this.prismaService.cashReceip.create({
-      data: createCashReceipDto,
-      include: {
-        Employee: true,
-        Subject: true,
-        Customer: true,
-      },
+    const {
+      cashReceiptVoucherType,
+      payer,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      reason,
+      withOriginalVoucher,
+      employee,
+      subject,
+      customer,
+      companyId,
+    } = createCashReceipDto;
+
+    const createVoucherDto: CreateVoucherDto = {
+      voucherType: 'CASH_RECEIPT',
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+    };
+
+    // Dùng transaction để đảm bảo cả hai thao tác đều thành công hoặc rollback
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Tạo voucher
+      const newVoucher = await this.voucherService.createWithTransaction(
+        createVoucherDto,
+        tx,
+      );
+
+      // Tạo cash receip và gắn voucher
+      const createdCashReceip = await tx.cashReceip.create({
+        data: {
+          cashReceiptVoucherType,
+          payer,
+          reason,
+          withOriginalVoucher,
+          Employee: { connect: { id: employee } },
+          Subject: { connect: { id: subject } },
+          Customer: { connect: { id: customer } },
+          company: { connect: { id: companyId } },
+          voucher: { connect: { id: newVoucher.id } },
+        },
+        include: {
+          voucher: true,
+          Employee: true,
+          Subject: true,
+          Customer: true,
+        },
+      });
+
+      return createdCashReceip;
     });
 
-    return plainToInstance(ResponseCashReceipDto, cashReceip, {
+    return plainToInstance(ResponseCashReceipDto, result, {
       excludeExtraneousValues: true,
     });
   }
@@ -38,6 +86,7 @@ export class CashReceipService {
         Subject: true,
         Customer: true,
         CashReceipVoucherItem: true,
+        voucher: true,
       },
     });
 
@@ -53,6 +102,7 @@ export class CashReceipService {
         Employee: true,
         Subject: true,
         Customer: true,
+        voucher: true,
       },
     });
 
@@ -66,21 +116,65 @@ export class CashReceipService {
   }
 
   async update(id: string, updateCashReceipDto: UpdateCashReceipDto) {
-    // Check if the cash receipt exists
-    await this.findOne(id);
-
-    // Update the cash receipt
-    const updatedCashReceip = await this.prismaService.cashReceip.update({
+    // Kiểm tra tồn tại
+    const existing = await this.prismaService.cashReceip.findUnique({
       where: { id },
-      data: updateCashReceipDto,
-      include: {
-        Employee: true,
-        Subject: true,
-        Customer: true,
-      },
+      include: { voucher: true },
     });
 
-    return plainToInstance(ResponseCashReceipDto, updatedCashReceip, {
+    if (!existing || existing.deletedAt) {
+      throw new NotFoundException('Cash receipt voucher not found');
+    }
+
+    const {
+      voucherDate,
+      postedDate,
+      voucherNumber,
+      cashReceiptVoucherType,
+      payer,
+      reason,
+      withOriginalVoucher,
+      employee,
+      subject,
+      customer,
+    } = updateCashReceipDto;
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Update voucher trước
+      await this.voucherService.updateWithTransaction(
+        existing.voucher.id,
+        {
+          voucherDate,
+          postedDate,
+          voucherNumber,
+        },
+        tx,
+      );
+
+      // Update cash receip
+      const updatedCashReceip = await tx.cashReceip.update({
+        where: { id },
+        data: {
+          cashReceiptVoucherType,
+          payer,
+          reason,
+          withOriginalVoucher,
+          Employee: employee ? { connect: { id: employee } } : undefined,
+          Subject: subject ? { connect: { id: subject } } : undefined,
+          Customer: customer ? { connect: { id: customer } } : undefined,
+        },
+        include: {
+          Employee: true,
+          Subject: true,
+          Customer: true,
+          voucher: true,
+        },
+      });
+
+      return updatedCashReceip;
+    });
+
+    return plainToInstance(ResponseCashReceipDto, result, {
       excludeExtraneousValues: true,
     });
   }

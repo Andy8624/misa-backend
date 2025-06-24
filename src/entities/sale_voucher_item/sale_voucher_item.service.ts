@@ -25,7 +25,7 @@ export class SaleVoucherItemService {
         debitAccount: true,
         cashAccount: true,
         liabilityAccount: true,
-        liabilityAccountOrExpenseAccount: true,
+
         SaleAccount: true,
         ExportTaxAccount: true,
       },
@@ -56,7 +56,7 @@ export class SaleVoucherItemService {
         debitAccount: true,
         cashAccount: true,
         liabilityAccount: true,
-        liabilityAccountOrExpenseAccount: true,
+
         SaleAccount: true,
         ExportTaxAccount: true,
       },
@@ -83,7 +83,7 @@ export class SaleVoucherItemService {
           debitAccount: true,
           cashAccount: true,
           liabilityAccount: true,
-          liabilityAccountOrExpenseAccount: true,
+
           SaleAccount: true,
           ExportTaxAccount: true,
         },
@@ -120,7 +120,7 @@ export class SaleVoucherItemService {
           debitAccount: true,
           cashAccount: true,
           liabilityAccount: true,
-          liabilityAccountOrExpenseAccount: true,
+
           SaleAccount: true,
           ExportTaxAccount: true,
         },

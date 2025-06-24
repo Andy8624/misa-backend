@@ -16,10 +16,6 @@ export class CreateDepositPaymentDto {
 
   @Expose()
   @IsOptional()
-  address?: string;
-
-  @Expose()
-  @IsOptional()
   receipBankName?: string;
 
   @Expose()
@@ -54,10 +50,6 @@ export class CreateDepositPaymentDto {
 
   @Expose()
   @IsOptional()
-  employeeByType?: string;
-
-  @Expose()
-  @IsOptional()
   bank?: string;
 
   @Expose()
@@ -67,10 +59,6 @@ export class CreateDepositPaymentDto {
   @Expose()
   @IsOptional()
   subject?: string;
-
-  @Expose()
-  @IsOptional()
-  attached?: string;
 
   @Expose()
   @IsNotEmpty()

@@ -62,6 +62,7 @@ import { AssetTransferDetailModule } from './entities/asset_transfer_detail/asse
 import { AssetRevaluationModule } from './entities/asset_revaluation/asset_revaluation.module';
 import { AssetRevaluationDetailModule } from './entities/asset_revaluation_detail/asset_revaluation_detail.module';
 import { AssetRevaluationPostingModule } from './entities/asset_revaluation_posting/asset_revaluation_posting.module';
+import { VoucherModule } from './entities/voucher/voucher.module';
 
 @Module({
   imports: [
@@ -125,6 +126,7 @@ import { AssetRevaluationPostingModule } from './entities/asset_revaluation_post
     AssetRevaluationModule,
     AssetRevaluationDetailModule,
     AssetRevaluationPostingModule,
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [AppService],
