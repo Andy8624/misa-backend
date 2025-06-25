@@ -31,4 +31,8 @@ export class CreateAssetTransferDto {
   @Expose()
   @IsOptional()
   companyId?: string; // ID công ty
+
+  @Expose()
+  @IsOptional()
+  circularId?: string;
 }

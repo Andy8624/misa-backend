@@ -4,23 +4,70 @@ import { UpdateAssetTransferDto } from './dto/update-asset_transfer.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseAssetTransferDto } from './dto/response-asset_transfer.dto';
+import { VoucherService } from '../voucher/voucher.service';
+import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 
 @Injectable()
 export class AssetTransferService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly voucherService: VoucherService,
+  ) {}
 
   async create(createAssetTransferDto: CreateAssetTransferDto) {
-    const assetTransfer = await this.prismaService.assetTransfer.create({
-      data: createAssetTransferDto,
-      include: {
-        DeliveredBy: true,
-        ReceivedBy: true,
-        Company: true,
-        AssetTransferDetail_AssetTransfer: true, // Bao gồm bảng con
-      },
+    const {
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      reason,
+      deliveredById,
+      receivedById,
+      companyId,
+      circularId,
+    } = createAssetTransferDto;
+
+    const createVoucherDto: CreateVoucherDto = {
+      voucherType: 'ASSET_TRANSFER',
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+      circularId,
+    };
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Tạo voucher
+      const newVoucher = await this.voucherService.createWithTransaction(
+        createVoucherDto,
+        tx,
+      );
+
+      // Tạo asset transfer và gắn voucher
+      const createdAssetTransfer = await tx.assetTransfer.create({
+        data: {
+          reason,
+          DeliveredBy: deliveredById
+            ? { connect: { id: deliveredById } }
+            : undefined,
+          ReceivedBy: receivedById
+            ? { connect: { id: receivedById } }
+            : undefined,
+          Company: companyId ? { connect: { id: companyId } } : undefined,
+          voucher: { connect: { id: newVoucher.id } },
+        },
+        include: {
+          voucher: true,
+          DeliveredBy: true,
+          ReceivedBy: true,
+          Company: true,
+          AssetTransferDetail_AssetTransfer: true,
+        },
+      });
+
+      return createdAssetTransfer;
     });
 
-    return plainToInstance(ResponseAssetTransferDto, assetTransfer, {
+    return plainToInstance(ResponseAssetTransferDto, result, {
       excludeExtraneousValues: true,
     });
   }
@@ -38,6 +85,7 @@ export class AssetTransferService {
         ReceivedBy: true,
         Company: true,
         AssetTransferDetail_AssetTransfer: true,
+        voucher: true,
       },
     });
 
@@ -54,6 +102,7 @@ export class AssetTransferService {
         ReceivedBy: true,
         Company: true,
         AssetTransferDetail_AssetTransfer: true,
+        voucher: true,
       },
     });
 
@@ -67,20 +116,64 @@ export class AssetTransferService {
   }
 
   async update(id: string, updateAssetTransferDto: UpdateAssetTransferDto) {
-    await this.findOne(id);
-
-    const updatedAssetTransfer = await this.prismaService.assetTransfer.update({
+    // Kiểm tra tồn tại
+    const existing = await this.prismaService.assetTransfer.findUnique({
       where: { id },
-      data: updateAssetTransferDto,
-      include: {
-        DeliveredBy: true,
-        ReceivedBy: true,
-        Company: true,
-        AssetTransferDetail_AssetTransfer: true,
-      },
+      include: { voucher: true },
     });
 
-    return plainToInstance(ResponseAssetTransferDto, updatedAssetTransfer, {
+    if (!existing || existing.deletedAt) {
+      throw new NotFoundException('Asset transfer voucher not found');
+    }
+
+    const {
+      voucherDate,
+      postedDate,
+      voucherNumber,
+      reason,
+      deliveredById,
+      receivedById,
+      circularId,
+    } = updateAssetTransferDto;
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Update voucher trước
+      await this.voucherService.updateWithTransaction(
+        existing.voucher.id,
+        {
+          voucherDate,
+          postedDate,
+          voucherNumber,
+          circularId,
+        },
+        tx,
+      );
+
+      // Update asset transfer
+      const updatedAssetTransfer = await tx.assetTransfer.update({
+        where: { id },
+        data: {
+          reason,
+          DeliveredBy: deliveredById
+            ? { connect: { id: deliveredById } }
+            : undefined,
+          ReceivedBy: receivedById
+            ? { connect: { id: receivedById } }
+            : undefined,
+        },
+        include: {
+          DeliveredBy: true,
+          ReceivedBy: true,
+          Company: true,
+          AssetTransferDetail_AssetTransfer: true,
+          voucher: true,
+        },
+      });
+
+      return updatedAssetTransfer;
+    });
+
+    return plainToInstance(ResponseAssetTransferDto, result, {
       excludeExtraneousValues: true,
     });
   }

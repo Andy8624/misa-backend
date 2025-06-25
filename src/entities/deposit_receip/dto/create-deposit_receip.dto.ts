@@ -47,4 +47,8 @@ export class CreateDepositReceipDto {
   @Expose()
   @IsNotEmpty()
   companyId: string;
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

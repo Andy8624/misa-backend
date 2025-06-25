@@ -213,4 +213,8 @@ export class CreateProvisionServiceVoucherDto {
   @Expose()
   @IsNotEmpty()
   companyId: string;
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

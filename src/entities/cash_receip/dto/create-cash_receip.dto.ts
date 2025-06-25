@@ -47,4 +47,8 @@ export class CreateCashReceipDto {
   @Expose()
   @IsOptional()
   companyId: string;
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

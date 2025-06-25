@@ -1,6 +1,7 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseAssetWriteOffAssetDto } from 'src/entities/asset_write_off_asset/dto/response-asset_write_off_asset.dto';
 import { ResponseAssetWriteOffAccountingDto } from 'src/entities/asset_write_off_accounting/dto/response-asset_write_off_accounting.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseAssetWriteOffDto {
   @Expose()
@@ -38,4 +39,11 @@ export class ResponseAssetWriteOffDto {
   @Expose()
   @Transform(({ value }) => value?.toISOString())
   updatedAt?: Date;
+
+  @Expose()
+  circularId: string;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

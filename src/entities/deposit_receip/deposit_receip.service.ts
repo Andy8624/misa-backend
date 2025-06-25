@@ -27,6 +27,7 @@ export class DepositReceipService {
       customer,
       bank,
       companyId,
+      circularId,
     } = createDepositReceipDto;
 
     const createVoucherDto: CreateVoucherDto = {
@@ -35,6 +36,7 @@ export class DepositReceipService {
       voucherDate,
       voucherNumber,
       companyId,
+      circularId,
     };
 
     const result = await this.prismaService.$transaction(async (tx) => {
@@ -143,12 +145,13 @@ export class DepositReceipService {
       subject,
       customer,
       bank,
+      circularId,
     } = updateDepositReceipDto;
 
     const result = await this.prismaService.$transaction(async (tx) => {
       await this.voucherService.updateWithTransaction(
         existing.voucher?.id,
-        { voucherDate, postedDate, voucherNumber },
+        { voucherDate, postedDate, voucherNumber, circularId },
         tx,
       );
 

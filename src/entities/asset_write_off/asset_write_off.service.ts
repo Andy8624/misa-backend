@@ -4,22 +4,61 @@ import { UpdateAssetWriteOffDto } from './dto/update-asset_write_off.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseAssetWriteOffDto } from './dto/response-asset_write_off.dto';
+import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
+import { VoucherService } from '../voucher/voucher.service';
 
 @Injectable()
 export class AssetWriteOffService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly voucherService: VoucherService,
+  ) {}
 
   async create(createAssetWriteOffDto: CreateAssetWriteOffDto) {
-    const assetWriteOff = await this.prismaService.assetWriteOff.create({
-      data: createAssetWriteOffDto,
-      include: {
-        Company: true,
-        assets: true, // Bao gồm các bảng con
-        accountings: true, // Bao gồm các bảng con
-      },
+    const {
+      reason,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+      circularId,
+    } = createAssetWriteOffDto;
+
+    const createVoucherDto: CreateVoucherDto = {
+      voucherType: 'ASSET_WRITE_OFF',
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+      circularId,
+    };
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Tạo voucher trước
+      const newVoucher = await this.voucherService.createWithTransaction(
+        createVoucherDto,
+        tx,
+      );
+
+      // Tạo asset write-off và gắn voucher
+      const createdAssetWriteOff = await tx.assetWriteOff.create({
+        data: {
+          reason,
+          Company: companyId ? { connect: { id: companyId } } : undefined,
+          voucher: { connect: { id: newVoucher.id } },
+        },
+        include: {
+          Company: true,
+          assets: true,
+          accountings: true,
+          voucher: true,
+        },
+      });
+
+      return createdAssetWriteOff;
     });
 
-    return plainToInstance(ResponseAssetWriteOffDto, assetWriteOff, {
+    return plainToInstance(ResponseAssetWriteOffDto, result, {
       excludeExtraneousValues: true,
     });
   }
@@ -36,6 +75,7 @@ export class AssetWriteOffService {
         Company: true,
         assets: true,
         accountings: true,
+        voucher: true,
       },
     });
 
@@ -51,6 +91,7 @@ export class AssetWriteOffService {
         Company: true,
         assets: true,
         accountings: true,
+        voucher: true,
       },
     });
 
@@ -64,19 +105,57 @@ export class AssetWriteOffService {
   }
 
   async update(id: string, updateAssetWriteOffDto: UpdateAssetWriteOffDto) {
-    await this.findOne(id);
-
-    const updatedAssetWriteOff = await this.prismaService.assetWriteOff.update({
+    // Kiểm tra tồn tại
+    const existing = await this.prismaService.assetWriteOff.findUnique({
       where: { id },
-      data: updateAssetWriteOffDto,
-      include: {
-        Company: true,
-        assets: true,
-        accountings: true,
-      },
+      include: { voucher: true },
     });
 
-    return plainToInstance(ResponseAssetWriteOffDto, updatedAssetWriteOff, {
+    if (!existing || existing.deletedAt) {
+      throw new NotFoundException('Asset write-off voucher not found');
+    }
+
+    const {
+      reason,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      circularId,
+      companyId,
+    } = updateAssetWriteOffDto;
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Cập nhật voucher trước
+      await this.voucherService.updateWithTransaction(
+        existing.voucher.id,
+        {
+          postedDate,
+          voucherDate,
+          voucherNumber,
+          circularId,
+        },
+        tx,
+      );
+
+      // Cập nhật AssetWriteOff
+      const updatedAssetWriteOff = await tx.assetWriteOff.update({
+        where: { id },
+        data: {
+          reason,
+          Company: companyId ? { connect: { id: companyId } } : undefined,
+        },
+        include: {
+          Company: true,
+          assets: true,
+          accountings: true,
+          voucher: true,
+        },
+      });
+
+      return updatedAssetWriteOff;
+    });
+
+    return plainToInstance(ResponseAssetWriteOffDto, result, {
       excludeExtraneousValues: true,
     });
   }

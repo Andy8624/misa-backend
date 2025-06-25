@@ -51,4 +51,8 @@ export class CreateCashPaymentDto {
   @Expose()
   @IsNotEmpty()
   companyId: string;
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

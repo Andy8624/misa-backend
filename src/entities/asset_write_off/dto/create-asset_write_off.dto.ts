@@ -27,4 +27,8 @@ export class CreateAssetWriteOffDto {
   @Expose()
   @IsOptional()
   companyId?: string; // Quan hệ với bảng công ty
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

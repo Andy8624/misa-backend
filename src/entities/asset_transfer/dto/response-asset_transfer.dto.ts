@@ -1,5 +1,6 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { ResponseAssetTransferDetailDto } from 'src/entities/asset_transfer_detail/dto/response-asset_transfer_detail.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseAssetTransferDto {
   @Expose()
@@ -35,4 +36,11 @@ export class ResponseAssetTransferDto {
   @Expose()
   @Transform(({ value }) => value?.toISOString())
   updatedAt?: Date;
+
+  @Expose()
+  circularId?: string;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

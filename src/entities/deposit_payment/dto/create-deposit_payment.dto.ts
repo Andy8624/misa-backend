@@ -63,4 +63,8 @@ export class CreateDepositPaymentDto {
   @Expose()
   @IsNotEmpty()
   companyId: string;
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

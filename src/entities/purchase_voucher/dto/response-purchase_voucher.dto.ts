@@ -135,6 +135,9 @@ export class ResponsePurchaseVoucherDto {
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
 
+  @Expose()
+  circularId: string;
+
   // Relations
   @Expose()
   @Type(() => ResponsePaymentTermDto)

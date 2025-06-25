@@ -66,4 +66,7 @@ export class ResponseCashPaymentDto {
   @Expose()
   @Type(() => ResponseVoucherDto)
   voucher?: ResponseVoucherDto;
+
+  @Expose()
+  circularId: string;
 }

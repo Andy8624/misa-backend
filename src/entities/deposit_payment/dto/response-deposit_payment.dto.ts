@@ -61,6 +61,9 @@ export class ResponseDepositPaymentDto {
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
 
+  @Expose()
+  circularId: string;
+
   // Relations
   @Expose()
   @Type(() => ResponseEmployeeDto)

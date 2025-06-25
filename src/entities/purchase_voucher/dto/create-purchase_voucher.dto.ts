@@ -165,4 +165,8 @@ export class CreatePurchaseVoucherDto {
   @Expose()
   @IsNotEmpty()
   companyId: string;
+
+  @Expose()
+  @IsOptional()
+  circularId: string;
 }

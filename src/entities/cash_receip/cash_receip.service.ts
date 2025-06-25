@@ -26,6 +26,7 @@ export class CashReceipService {
       subject,
       customer,
       companyId,
+      circularId,
     } = createCashReceipDto;
 
     const createVoucherDto: CreateVoucherDto = {
@@ -34,6 +35,7 @@ export class CashReceipService {
       voucherDate,
       voucherNumber,
       companyId,
+      circularId,
     };
 
     // Dùng transaction để đảm bảo cả hai thao tác đều thành công hoặc rollback
@@ -137,6 +139,7 @@ export class CashReceipService {
       employee,
       subject,
       customer,
+      circularId,
     } = updateCashReceipDto;
 
     const result = await this.prismaService.$transaction(async (tx) => {
@@ -147,6 +150,7 @@ export class CashReceipService {
           voucherDate,
           postedDate,
           voucherNumber,
+          circularId,
         },
         tx,
       );

@@ -22,6 +22,9 @@ export class ResponseVoucherDto {
   companyId?: string;
 
   @Expose()
+  circularId?: string;
+
+  @Expose()
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
 

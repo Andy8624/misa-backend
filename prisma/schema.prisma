@@ -866,10 +866,11 @@ model Voucher {
   ProvisionServiceVoucher ProvisionServiceVoucher?
   SaleVoucher             SaleVoucher?
   PurchaseVoucher         PurchaseVoucher?
-  AssetTransfer           AssetTransfer?
-  AssetWriteOff           AssetWriteOff?
-  AssetIncrement          AssetIncrement?
-  AssetRevaluation        AssetRevaluation?
+
+  AssetTransfer    AssetTransfer?
+  AssetWriteOff    AssetWriteOff?
+  AssetIncrement   AssetIncrement?
+  AssetRevaluation AssetRevaluation?
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")

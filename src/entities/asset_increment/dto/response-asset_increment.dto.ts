@@ -4,6 +4,7 @@ import { ResponseAssetAllocationDto } from 'src/entities/asset_allocation/dto/re
 import { ResponseAssetFormationOriginDto } from 'src/entities/asset_formation_origin/dto/response-asset_formation_origin.dto';
 import { ResponseAssetAccessoryDto } from 'src/entities/asset_accessory/dto/response-asset_accessory.dto';
 import { ResponseAssetDepreciationInfoDto } from 'src/entities/asset_depreciation_info/dto/response-asset_depreciation_info.dto';
+import { ResponseVoucherDto } from 'src/entities/voucher/dto/response-voucher.dto';
 
 export class ResponseAssetIncrementDto {
   @Expose()
@@ -61,4 +62,11 @@ export class ResponseAssetIncrementDto {
   @Expose()
   @Transform(({ value }) => value?.toISOString())
   updatedAt?: Date;
+
+  @Expose()
+  circularId: string;
+
+  @Expose()
+  @Type(() => ResponseVoucherDto)
+  voucher?: ResponseVoucherDto;
 }

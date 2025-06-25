@@ -37,6 +37,7 @@ export class SaleVoucherService {
       cash_receipt_voucher_storeperson,
       cash_receipt_voucher_principal,
       customer,
+      circularId,
       ...rest
     } = createDto;
 
@@ -46,6 +47,7 @@ export class SaleVoucherService {
       voucherDate: voucher_date,
       voucherNumber: voucher_number,
       companyId,
+      circularId,
     };
 
     const result = await this.prismaService.$transaction(async (tx) => {
@@ -234,6 +236,7 @@ export class SaleVoucherService {
       cash_receipt_voucher_storeperson,
       cash_receipt_voucher_principal,
       customer,
+      circularId,
       ...rest
     } = updateDto;
 
@@ -253,6 +256,7 @@ export class SaleVoucherService {
           voucherDate: voucher_date,
           postedDate: posted_date,
           voucherNumber: voucher_number,
+          circularId,
         },
         tx,
       );

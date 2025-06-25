@@ -25,6 +25,7 @@ export class ServicePurchaseVoucherService {
       purchasingStaff,
       paymentAccount,
       paymentTerm,
+      circularId,
       ...rest
     } = createDto;
 
@@ -34,6 +35,7 @@ export class ServicePurchaseVoucherService {
       postedDate,
       voucherNumber,
       companyId,
+      circularId,
     };
 
     const result = await this.prismaService.$transaction(async (tx) => {
@@ -146,13 +148,14 @@ export class ServicePurchaseVoucherService {
       paymentAccount,
       paymentTerm,
       companyId,
+      circularId,
       ...rest
     } = updateDto;
 
     const result = await this.prismaService.$transaction(async (tx) => {
       await this.voucherService.updateWithTransaction(
         existing.voucher?.id,
-        { voucherDate, postedDate, voucherNumber },
+        { voucherDate, postedDate, voucherNumber, circularId },
         tx,
       );
 

@@ -236,10 +236,8 @@ export class ResponseSaleVoucherDto {
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
 
-  // Relations
-  // @Expose()
-  // @Type(() => ResponseFileDto)
-  // Attached?: ResponseFileDto;
+  @Expose()
+  circularId: string;
 
   @Expose()
   @Type(() => ResponsePaymentTermDto)

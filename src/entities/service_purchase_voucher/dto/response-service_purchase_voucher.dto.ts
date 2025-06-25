@@ -111,6 +111,9 @@ export class ResponseServicePurchaseVoucherDto {
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
 
+  @Expose()
+  circularId: string;
+
   // Relations
   @Expose()
   @Type(() => ResponseBankDto)

@@ -43,9 +43,6 @@ export class VoucherService {
       include: {
         Company: true,
       },
-      include: {
-        Circular: true,
-      },
     });
 
     return plainToInstance(ResponseVoucherDto, vouchers, {
@@ -58,9 +55,6 @@ export class VoucherService {
       where: { id },
       include: {
         Company: true,
-      },
-      include: {
-        Circular: true,
       },
     });
 

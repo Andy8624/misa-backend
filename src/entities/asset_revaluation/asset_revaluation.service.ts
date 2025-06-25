@@ -4,22 +4,68 @@ import { UpdateAssetRevaluationDto } from './dto/update-asset_revaluation.dto';
 import { PrismaService } from 'src/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseAssetRevaluationDto } from './dto/response-asset_revaluation.dto';
+import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
+import { VoucherService } from '../voucher/voucher.service';
 
 @Injectable()
 export class AssetRevaluationService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly voucherService: VoucherService,
+  ) {}
 
   async create(createAssetRevaluationDto: CreateAssetRevaluationDto) {
-    const assetRevaluation = await this.prismaService.assetRevaluation.create({
-      data: createAssetRevaluationDto,
-      include: {
-        Company: true,
-        details: true, // Bao gồm các bảng con
-        postings: true, // Bao gồm các bảng con
-      },
+    const {
+      revaluationCode,
+      revaluationDate,
+      reason,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+      circularId,
+    } = createAssetRevaluationDto;
+
+    const createVoucherDto: CreateVoucherDto = {
+      voucherType: 'ASSET_REVALUATION', // giả sử loại voucher này
+      voucherNumber,
+      voucherDate,
+      postedDate,
+      companyId,
+      circularId,
+    };
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Tạo voucher
+      const newVoucher = await this.voucherService.createWithTransaction(
+        createVoucherDto,
+        tx,
+      );
+
+      // Tạo assetRevaluation và liên kết voucher
+      const createdAssetRevaluation = await tx.assetRevaluation.create({
+        data: {
+          revaluationCode,
+          revaluationDate,
+          reason,
+          postedDate,
+          voucherDate,
+          voucherNumber,
+          Company: companyId ? { connect: { id: companyId } } : undefined,
+          voucher: { connect: { id: newVoucher.id } },
+        },
+        include: {
+          Company: true,
+          details: true,
+          postings: true,
+          voucher: true,
+        },
+      });
+
+      return createdAssetRevaluation;
     });
 
-    return plainToInstance(ResponseAssetRevaluationDto, assetRevaluation, {
+    return plainToInstance(ResponseAssetRevaluationDto, result, {
       excludeExtraneousValues: true,
     });
   }
@@ -37,6 +83,7 @@ export class AssetRevaluationService {
           Company: true,
           details: true,
           postings: true,
+          voucher: true,
         },
       });
 
@@ -53,6 +100,7 @@ export class AssetRevaluationService {
           Company: true,
           details: true,
           postings: true,
+          voucher: true,
         },
       });
 
@@ -69,26 +117,69 @@ export class AssetRevaluationService {
     id: string,
     updateAssetRevaluationDto: UpdateAssetRevaluationDto,
   ) {
-    await this.findOne(id);
+    // Kiểm tra bản ghi tồn tại và lấy voucherId
+    const existing = await this.prismaService.assetRevaluation.findUnique({
+      where: { id },
+      include: { voucher: true },
+    });
 
-    const updatedAssetRevaluation =
-      await this.prismaService.assetRevaluation.update({
+    if (!existing || existing.deletedAt) {
+      throw new NotFoundException('Asset revaluation not found');
+    }
+
+    const {
+      revaluationCode,
+      revaluationDate,
+      reason,
+      postedDate,
+      voucherDate,
+      voucherNumber,
+      companyId,
+      circularId,
+    } = updateAssetRevaluationDto;
+
+    const result = await this.prismaService.$transaction(async (tx) => {
+      // Update voucher trước
+      if (existing.voucher) {
+        await this.voucherService.updateWithTransaction(
+          existing.voucher.id,
+          {
+            voucherDate,
+            postedDate,
+            voucherNumber,
+            circularId,
+            companyId,
+          },
+          tx,
+        );
+      }
+
+      // Update assetRevaluation
+      const updatedAssetRevaluation = await tx.assetRevaluation.update({
         where: { id },
-        data: updateAssetRevaluationDto,
+        data: {
+          revaluationCode,
+          revaluationDate,
+          reason,
+          postedDate,
+          voucherDate,
+          voucherNumber,
+          companyId,
+        },
         include: {
           Company: true,
           details: true,
           postings: true,
+          voucher: true,
         },
       });
 
-    return plainToInstance(
-      ResponseAssetRevaluationDto,
-      updatedAssetRevaluation,
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+      return updatedAssetRevaluation;
+    });
+
+    return plainToInstance(ResponseAssetRevaluationDto, result, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async remove(id: string): Promise<{ message: string }> {

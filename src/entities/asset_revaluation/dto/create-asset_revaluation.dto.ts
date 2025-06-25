@@ -38,4 +38,8 @@ export class CreateAssetRevaluationDto {
   @Expose()
   @IsOptional()
   companyId?: string; // Quan hệ với bảng công ty
+
+  @Expose()
+  @IsOptional()
+  circularId?: string;
 }
