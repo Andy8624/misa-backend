@@ -1,5 +1,12 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { IsEmail, IsIn, IsNotEmpty, Matches, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDTO {
   @IsNotEmpty({
@@ -115,4 +122,10 @@ export class ChangePasswordDto {
   @IsNotEmpty({ message: 'New password cannot be empty' })
   @MinLength(6, { message: 'New password must be at least 6 characters long' })
   newPassword: string;
+}
+
+export class AccessTokenDto {
+  @Expose()
+  @IsOptional()
+  access_token: string;
 }

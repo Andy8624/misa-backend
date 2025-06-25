@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import {
+  AccessTokenDto,
   ChangePasswordDto,
   LoginDTO,
   RegisterDTO,
@@ -7,7 +8,12 @@ import {
 } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiPublicEndpoint } from 'src/config/custom-decorator/api-security.decorator';
+import {
+  ApiProtectedEndpoint,
+  ApiPublicEndpoint,
+} from 'src/config/custom-decorator/api-security.decorator';
+import { Request } from 'express';
+import { User } from 'src/config/custom-decorator/accountant.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -34,5 +40,11 @@ export class AuthController {
   @ApiPublicEndpoint('User login', 'Change password for accountant')
   async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     return this.authService.changePassword(changePasswordDto);
+  }
+
+  @Post('interact-token')
+  @ApiProtectedEndpoint('New token interact', 'Get new token for interact')
+  async getInteractCompanyToken(@User() user: any) {
+    return this.authService.getInteractCompanyToken(user);
   }
 }

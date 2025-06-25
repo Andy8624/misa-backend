@@ -73,6 +73,19 @@ export class AuthService {
     return plainToInstance(AuthResponseDto, tokens);
   }
 
+  async getInteractCompanyToken(payload: any) {
+    // Tạo token mới từ payload đã lấy được
+    const newToken = await this.jwtService.signAsync(
+      { id: payload.id, name: payload.name, email: payload.email },
+      {
+        secret: jwtConfig.accessToken.secret,
+        expiresIn: '5m',
+      },
+    );
+
+    return { interact_token: newToken };
+  }
+
   /**
    * Changes a user's password.
    * @param changePasswordDto The change password data.
