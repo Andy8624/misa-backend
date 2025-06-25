@@ -866,11 +866,19 @@ model Voucher {
   ProvisionServiceVoucher ProvisionServiceVoucher?
   SaleVoucher             SaleVoucher?
   PurchaseVoucher         PurchaseVoucher?
+  AssetTransfer           AssetTransfer?
+  AssetWriteOff           AssetWriteOff?
+  AssetIncrement          AssetIncrement?
+  AssetRevaluation        AssetRevaluation?
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  // Thêm khóa ngoại tới Circular
+  Circular   Circular? @relation(fields: [circularId], references: [id])
+  circularId String?   @map("circular_id")
 }
 
 // Phiếu thu tiền mặt
@@ -1906,6 +1914,9 @@ model AssetWriteOff {
   // Quan hệ với bảng công ty
   Company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Ghi giảm - Tài sản
@@ -1996,6 +2007,9 @@ model AssetIncrement {
   // Quan hệ với bảng công ty
   Company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Ghi tăng - Thông tin khấu hao
@@ -2219,10 +2233,8 @@ model Department {
 
 // Điều chuyển tài sản - DONE
 model AssetTransfer {
-  id             String    @id @default(uuid())
-  transferNumber String? // Biên bản giao nhận số
-  transferDate   DateTime? // Ngày
-  reason         String? // Lý do điều chuyển
+  id     String  @id @default(uuid())
+  reason String? // Lý do điều chuyển
 
   DeliveredBy   Employee? @relation("AssetTransfer_DeliveredBy", fields: [deliveredById], references: [id])
   deliveredById String? // Người bàn giao
@@ -2239,6 +2251,9 @@ model AssetTransfer {
   // Quan hệ với bảng công ty
   Company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Chi tiết điều chuyển tài sản
@@ -2296,6 +2311,9 @@ model AssetRevaluation {
   // Quan hệ với bảng công ty
   Company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
 }
 
 // Đánh giá lại - Chi tiết điều chỉnh
@@ -2384,4 +2402,23 @@ model AssetRevaluationPosting {
   // Quan hệ với bảng công ty
   Company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
+}
+
+model Circular {
+  id          String    @id @default(uuid())
+  code        String? // Mã thông tư (ví dụ: 133, 200, ...)
+  name        String? // Tên thông tư
+  description String? // Mô tả
+  effectiveAt DateTime? // Ngày hiệu lực
+  expiredAt   DateTime? // Ngày hết hiệu lực (nếu có)
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Quan hệ với Voucher
+  vouchers Voucher[]
+
+  @@map("circulars")
 }

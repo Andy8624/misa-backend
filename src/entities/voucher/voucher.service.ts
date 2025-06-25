@@ -41,7 +41,10 @@ export class VoucherService {
         createdAt: 'desc',
       },
       include: {
-        Company: true, // Bao gồm thông tin công ty
+        Company: true,
+      },
+      include: {
+        Circular: true,
       },
     });
 
@@ -54,7 +57,10 @@ export class VoucherService {
     const voucher = await this.prismaService.voucher.findUnique({
       where: { id },
       include: {
-        Company: true, // Bao gồm thông tin công ty
+        Company: true,
+      },
+      include: {
+        Circular: true,
       },
     });
 

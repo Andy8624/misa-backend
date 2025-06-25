@@ -3,13 +3,18 @@ import { IsOptional } from 'class-validator';
 
 export class CreateAssetTransferDto {
   @Expose()
+  @Transform(({ value }) => value?.toISOString())
   @IsOptional()
-  transferNumber?: string; // Biên bản giao nhận số
+  postedDate?: Date;
+
+  @Expose()
+  @Transform(({ value }) => value?.toISOString())
+  @IsOptional()
+  voucherDate?: Date;
 
   @Expose()
   @IsOptional()
-  @Transform(({ value }) => value?.toISOString())
-  transferDate?: Date; // Ngày
+  voucherNumber?: string;
 
   @Expose()
   @IsOptional()
