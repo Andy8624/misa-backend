@@ -12,12 +12,7 @@ export class FileService {
 
   constructor(private prisma: PrismaService) {}
 
-  async uploadFile(
-    file: Express.Multer.File,
-    companyId: string,
-    relatedType: string,
-    relatedId: string,
-  ) {
+  async uploadFile(file: Express.Multer.File, companyId: string) {
     try {
       if (!file) {
         throw new BadRequestException('No file uploaded');
@@ -63,13 +58,11 @@ export class FileService {
       });
 
       // 4. Create FileAttachment link
-      await this.prisma.fileAttachment.create({
-        data: {
-          fileId: fileRecord.id,
-          relatedType,
-          relatedId,
-        },
-      });
+      // await this.prisma.fileAttachment.create({
+      //   data: {
+      //     fileId: fileRecord.id,
+      //   },
+      // });
 
       // 5. Delete temp file
       fs.unlinkSync(file.path);

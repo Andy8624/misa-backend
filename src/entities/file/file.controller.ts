@@ -32,19 +32,19 @@ export class FileController {
           type: 'string',
           description: 'ID of the company uploading this file',
         },
-        relatedType: {
-          type: 'string',
-          description:
-            'Type of record this file is attached to (e.g. inventory_in, invoice)',
-          example: 'inventory_in',
-        },
-        relatedId: {
-          type: 'string',
-          description: 'ID of the related record (e.g. inventory record ID)',
-          example: 'inv_abc123',
-        },
+        // relatedType: {
+        //   type: 'string',
+        //   description:
+        //     'Type of record this file is attached to (e.g. inventory_in, invoice)',
+        //   example: 'inventory_in',
+        // },
+        // relatedId: {
+        //   type: 'string',
+        //   description: 'ID of the related record (e.g. inventory record ID)',
+        //   example: 'inv_abc123',
+        // },
       },
-      required: ['file', 'companyId', 'relatedType', 'relatedId'],
+      required: ['file', 'companyId'],
     },
   })
   @UseInterceptors(
@@ -62,9 +62,9 @@ export class FileController {
   uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Body('companyId') companyId: string,
-    @Body('relatedType') relatedType: string,
-    @Body('relatedId') relatedId: string,
+    // @Body('relatedType') relatedType: string,
+    // @Body('relatedId') relatedId: string,
   ) {
-    return this.fileService.uploadFile(file, companyId, relatedType, relatedId);
+    return this.fileService.uploadFile(file, companyId);
   }
 }

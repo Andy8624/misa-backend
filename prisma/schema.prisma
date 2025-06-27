@@ -118,6 +118,7 @@ model Customer {
   AssetWriteOffAsset      AssetWriteOffAsset[]
   AssetWriteOff           AssetWriteOff[]
   Voucher                 Voucher[]                 @relation("Voucher_Company")
+  Project_Company         Project[]                 @relation("Project_Company")
 
   @@map("customers")
 }
@@ -201,6 +202,12 @@ model Partner {
   SaleVoucher_CashReceiptVoucherPrincipal SaleVoucher[]             @relation("SaleVoucher_CashReceiptVoucherPrincipal")
   SaleVoucher_Customer                    SaleVoucher[]             @relation("SaleVoucher_Customer")
   PurchaseVoucher_Supplier                PurchaseVoucher[]         @relation("PurchaseVoucher_Supplier")
+  Quotation_Customer                      Quotation[]               @relation("Quotation_Customer")
+  PurchaseOrder_Customer                  PurchaseOrder[]           @relation("PurchaseOrder_Customer")
+  SaleDiscountVoucher_Customer            SaleDiscountVoucher[]     @relation("SaleDiscountVoucher_Customer")
+  Project_Customer                        Project[]                 @relation("Project_Customer")
+  SalesContract_Customer                  SalesContract[]           @relation("SalesContract_Customer")
+  SalesReturn_Customer                    SalesReturn[]             @relation("SalesReturn_Customer")
 
   @@map("partners")
 }
@@ -262,12 +269,13 @@ model BankAccount {
   DepositPaymentBank DepositPayment[] @relation("DepositPaymentBank")
 
   // Auditing
-  createdAt                        DateTime          @default(now()) @map("created_at")
-  updatedAt                        DateTime?         @updatedAt @map("updated_at")
-  deletedAt                        DateTime?         @map("deleted_at")
-  SaleVoucher_InvoiceBankAccount   SaleVoucher[]     @relation("SaleVoucher_InvoiceBankAccount")
-  PurchaseVoucher_RecipientAccount PurchaseVoucher[] @relation("PurchaseVoucher_RecipientAccount")
-  PurchaseVoucher_PaymentAccount   PurchaseVoucher[] @relation("PurchaseVoucher_PaymentAccount")
+  createdAt                        DateTime              @default(now()) @map("created_at")
+  updatedAt                        DateTime?             @updatedAt @map("updated_at")
+  deletedAt                        DateTime?             @map("deleted_at")
+  SaleVoucher_InvoiceBankAccount   SaleVoucher[]         @relation("SaleVoucher_InvoiceBankAccount")
+  PurchaseVoucher_RecipientAccount PurchaseVoucher[]     @relation("PurchaseVoucher_RecipientAccount")
+  PurchaseVoucher_PaymentAccount   PurchaseVoucher[]     @relation("PurchaseVoucher_PaymentAccount")
+  SaleDiscountVoucher_BankAccount  SaleDiscountVoucher[] @relation("SaleDiscountVoucher_BankAccount")
 
   @@map("bank_accounts")
 }
@@ -330,6 +338,12 @@ model Employee {
   PurchaseVoucher_PurchasingStaff                       PurchaseVoucher[]         @relation("PurchaseVoucher_PurchasingStaff")
   AssetTransfer_ReceivedBy                              AssetTransfer[]           @relation("AssetTransfer_ReceivedBy")
   AssetTransfer_DeliveredBy                             AssetTransfer[]           @relation("AssetTransfer_DeliveredBy")
+  Quotation_Employee                                    Quotation[]               @relation("Quotation_Employee")
+  Quotation_ContactEmloyee                              Quotation[]               @relation("Quotation_ContactEmloyee")
+  PurchaseOrder_Employee                                PurchaseOrder[]           @relation("PurchaseOrder_Employee")
+  SaleDiscountVoucher_Employee                          SaleDiscountVoucher[]     @relation("SaleDiscountVoucher_Employee")
+  SalesContract_ContactEmloyee                          SalesContract[]           @relation("SalesContract_ContactEmloyee")
+  SalesReturn_Employee                                  SalesReturn[]             @relation("SalesReturn_Employee")
 
   @@map("employees")
 }
@@ -416,6 +430,8 @@ model GoodsAndServices {
   ProvisionServiceVoucherItem_Item  ProvisionServiceVoucherItem[] @relation("ProvisionServiceVoucherItem_Item")
   SaleVoucherItem_Item              SaleVoucherItem[]             @relation("SaleVoucherItem_Item")
   PurchaseVoucherItem_Item          PurchaseVoucherItem[]         @relation("PurchaseVoucherItem_Item")
+  OrderItem_Goods                   OrderItem[]                   @relation("OrderItem_Goods")
+  SalesReturnCost_Goods             SalesReturnCost[]             @relation("SalesReturnCost_Goods")
 
   @@map("goods_and_services")
 }
@@ -613,6 +629,14 @@ model ChartOfAccount {
   AssetRevaluationPosting_CreditAccount            AssetRevaluationPosting[]     @relation("AssetRevaluationPosting_CreditAccount")
   AssetRevaluationDetail_DepreciationAccount       AssetRevaluationDetail[]      @relation("AssetRevaluationDetail_DepreciationAccount")
   AssetRevaluationDetail_DepreciationBaseAccount   AssetRevaluationDetail[]      @relation("AssetRevaluationDetail_DepreciationBaseAccount")
+  OrderItem_DiscountAccount                        OrderItem[]                   @relation("OrderItem_DiscountAccount")
+  OrderItem_ReceivableAccount                      OrderItem[]                   @relation("OrderItem_ReceivableAccount")
+  OrderItem_VatAccount                             OrderItem[]                   @relation("OrderItem_VatAccount")
+  OrderItem_CreditAccount                          OrderItem[]                   @relation("OrderItem_CreditAccount")
+  OrderItem_DebitAccount                           OrderItem[]                   @relation("OrderItem_DebitAccount")
+  OrderItem_ReturnAccount                          OrderItem[]                   @relation("OrderItem_ReturnAccount")
+  SalesReturnCost                                  SalesReturnCost[]             @relation("SalesReturnCost_WarehouseAccount")
+  SalesReturnCost_CogsAccount                      SalesReturnCost[]             @relation("SalesReturnCost_CogsAccount")
 
   @@map("chart_of_accounts")
 }
@@ -642,6 +666,7 @@ model Warehouse {
 
   SaleVoucherItem               SaleVoucherItem[]     @relation("SaleVoucherItem_Warehouse")
   PurchaseVoucherItem_Warehouse PurchaseVoucherItem[] @relation("PurchaseVoucherItem_Warehouse")
+  SalesReturnCost_Warehouse     SalesReturnCost[]     @relation("SalesReturnCost_Warehouse")
 
   @@map("warehouses")
 }
@@ -830,19 +855,19 @@ model File {
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  attachments FileAttachment[]
+  Voucher Voucher?
 
   @@map("files")
 }
 
-model FileAttachment {
-  id          String @id @default(uuid())
-  relatedType String // 'inventory_in', 'invoice', 'deposit_payment',...
-  relatedId   String // UUID của phiếu
+// model FileAttachment {
+//   id          String @id @default(uuid())
+//   relatedType String // 'inventory_in', 'invoice', 'deposit_payment',...
+//   relatedId   String // UUID của phiếu
 
-  file   File   @relation(fields: [fileId], references: [id])
-  fileId String
-}
+//   file   File   @relation(fields: [fileId], references: [id])
+//   fileId String
+// }
 
 // Model Voucher chung
 model Voucher {
@@ -871,6 +896,15 @@ model Voucher {
   AssetWriteOff    AssetWriteOff?
   AssetIncrement   AssetIncrement?
   AssetRevaluation AssetRevaluation?
+
+  Quotation           Quotation?
+  PurchaseOrder       PurchaseOrder?
+  SaleDiscountVoucher SaleDiscountVoucher?
+  SalesContract       SalesContract?
+  SalesReturn         SalesReturn?
+
+  File   File?   @relation(fields: [fileId], references: [id])
+  fileId String? @unique // Liên kết 1-1 với file
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -1188,6 +1222,7 @@ model PaymentTerms {
   ProvisionServiceVoucher_PaymentTAndC ProvisionServiceVoucher[] @relation("ProvisionServiceVoucher_PaymentTAndC")
   SaleVoucher_PaymentTAndC             SaleVoucher[]             @relation("SaleVoucher_PaymentTAndC")
   PurchaseVoucher_PaymentTAndC         PurchaseVoucher[]         @relation("PurchaseVoucher_PaymentTAndC")
+  PurchaseOrder_PaymentTerm            PurchaseOrder[]           @relation("PurchaseOrder_PaymentTerm")
 }
 
 model VoucherAccountEntry {
@@ -1999,8 +2034,6 @@ model AssetIncrement {
   AssetAccessory_AssetIncrement        AssetAccessory[]        @relation("AssetAccessory_AssetIncrement")
   AssetFormationOrigin_AssetIncrement  AssetFormationOrigin[]  @relation("AssetFormationOrigin_AssetIncrement")
 
-  // attachments        FileAttachment[] @relation("AssetIncrementAttachment")
-
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -2214,22 +2247,23 @@ model Department {
   code        String? // Mã đơn vị hành chính
   description String? // Mô tả
 
-  AssetWriteOffAsset_Department AssetWriteOffAsset[] @relation("AssetWriteOffAsset_Department")
-  AssetIncrement_Department     AssetIncrement[]     @relation("AssetIncrement_Department")
-  Asset_Department              Asset[]              @relation("Asset_Department")
-
-  AssetTransferDetail_FromDepartment AssetTransferDetail[] @relation("AssetTransferDetail_FromDepartment")
-  AssetTransferDetail_ToDepartment   AssetTransferDetail[] @relation("AssetTransferDetail_ToDepartment")
-
-  createdAt                          DateTime                  @default(now()) @map("created_at")
-  updatedAt                          DateTime?                 @updatedAt @map("updated_at")
-  deletedAt                          DateTime?                 @map("deleted_at")
-  AssetRevaluationDetail_Department  AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_Department")
-  AssetRevaluationPosting_Department AssetRevaluationPosting[] @relation("AssetRevaluationPosting_Department")
-
   // Quan hệ với bảng công ty
   Company   Customer? @relation(fields: [companyId], references: [id])
   companyId String?   @map("company_id")
+
+  AssetWriteOffAsset_Department      AssetWriteOffAsset[]      @relation("AssetWriteOffAsset_Department")
+  AssetIncrement_Department          AssetIncrement[]          @relation("AssetIncrement_Department")
+  Asset_Department                   Asset[]                   @relation("Asset_Department")
+  AssetTransferDetail_FromDepartment AssetTransferDetail[]     @relation("AssetTransferDetail_FromDepartment")
+  AssetTransferDetail_ToDepartment   AssetTransferDetail[]     @relation("AssetTransferDetail_ToDepartment")
+  AssetRevaluationDetail_Department  AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_Department")
+  AssetRevaluationPosting_Department AssetRevaluationPosting[] @relation("AssetRevaluationPosting_Department")
+  SaleDiscountVoucher_Department     SaleDiscountVoucher[]     @relation("SaleDiscountVoucher_Department")
+  SalesReturn_Department             SalesReturn[]             @relation("SalesReturn_Department")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }
 
 // Điều chuyển tài sản - DONE
@@ -2298,9 +2332,9 @@ model AssetRevaluation {
   revaluationCode String? // Biên bản số
   revaluationDate DateTime? // Ngày
   reason          String? // Lý do
-  postedDate      DateTime? // Ngày hạch toán
-  voucherDate     DateTime? // Ngày chứng từ
-  voucherNumber   String? // Số chứng từ
+  // postedDate      DateTime? // Ngày hạch toán
+  // voucherDate     DateTime? // Ngày chứng từ
+  // voucherNumber   String? // Số chứng từ
 
   // Quan hệ đến bảng con
   details   AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_AssetRevaluation")
@@ -2422,4 +2456,326 @@ model Circular {
   vouchers Voucher[]
 
   @@map("circulars")
+}
+
+// Báo giá
+model Quotation {
+  id String @id @default(uuid())
+
+  Customer   Partner? @relation("Quotation_Customer", fields: [customerId], references: [id])
+  customerId String?
+
+  Employee   Employee? @relation("Quotation_Employee", fields: [employeeId], references: [id])
+  employeeId String?
+
+  ContactEmloyee    Employee? @relation("Quotation_ContactEmloyee", fields: [contactEmployeeId], references: [id])
+  contactEmployeeId String?
+
+  expiredAt   DateTime? // Ngày hết hiệu lực (nếu có)
+  taxCode     String?
+  description String?
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
+  OrderItem_Quotation OrderItem[] @relation("OrderItem_Quotation")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Báo giá - chi tiết
+model OrderItem {
+  id String @id @default(uuid())
+
+  Goods  GoodsAndServices? @relation("OrderItem_Goods", fields: [goodId], references: [id])
+  goodId String?
+
+  quantity          Int?
+  deliveredQuantity Int?
+  unitPrice         Int? @map("unit_price")
+
+  // Chiết khấu
+  discount String?
+
+  discountRate Float?
+  vatRate      Float?
+
+  salesVoucherNumber Int?
+
+  //  Tài khoản giảm giá
+  DiscountAccount   ChartOfAccount? @relation("OrderItem_DiscountAccount", fields: [discountAccountId], references: [id])
+  discountAccountId String?
+
+  // Tài khoản công nợ
+  ReceivableAccount   ChartOfAccount? @relation("OrderItem_ReceivableAccount", fields: [receivableAccountId], references: [id])
+  receivableAccountId String?
+
+  // Tài khoản thuế GTGT
+  VatAccount   ChartOfAccount? @relation("OrderItem_VatAccount", fields: [vatAccountId], references: [id])
+  vatAccountId String?
+
+  // Tài khoản nợ
+  CreditAccount   ChartOfAccount? @relation("OrderItem_CreditAccount", fields: [creditAccountId], references: [id])
+  creditAccountId String?         @map("credit_account_id")
+
+  // Tài khoản có 
+  DebitAccount   ChartOfAccount? @relation("OrderItem_DebitAccount", fields: [debitAccountId], references: [id])
+  debitAccountId String?         @map("debit_account_id")
+
+  ReturnAccount   ChartOfAccount? @relation("OrderItem_ReturnAccount", fields: [returnAccountId], references: [id])
+  returnAccountId String?         @map("return_account_id")
+
+  Quote   Quotation? @relation("OrderItem_Quotation", fields: [quoteId], references: [id])
+  quoteId String?
+
+  PurchaseOrder   PurchaseOrder? @relation("OrderItem_PurchaseOrder", fields: [purchaseOrderId], references: [id])
+  purchaseOrderId String?
+
+  SaleDiscountVoucher   SaleDiscountVoucher? @relation("OrderItem_SaleDiscountVoucher", fields: [saleDiscountVoucherId], references: [id])
+  saleDiscountVoucherId String?
+
+  SalesReturn   SalesReturn? @relation("OtherItem_SalesReturn", fields: [salesReturnId], references: [id])
+  salesReturnId String?
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Đơn đặt hàng
+model PurchaseOrder {
+  id String @id @default(uuid())
+
+  // Khách hàng (từ bảng Partner)
+  Customer   Partner? @relation("PurchaseOrder_Customer", fields: [customerId], references: [id])
+  customerId String?
+
+  // Nhân viên bán hàng
+  Employee   Employee? @relation("PurchaseOrder_Employee", fields: [employeeId], references: [id])
+  employeeId String?
+
+  // Mã số thuế
+  taxCode String?
+
+  // Tên người nhận hàng
+  recipientName String?
+
+  // Mô tả
+  description String?
+
+  // Điều khoản thanh toán
+  PaymentTerm   PaymentTerms? @relation("PurchaseOrder_PaymentTerm", fields: [paymentTermId], references: [id])
+  paymentTermId String?
+
+  // Số ngày được nợ
+  creditDays Int?
+
+  // Tính giá thành ?
+  isCosting Boolean @default(false)
+
+  // Tình trạng đơn hàng (pending, confirmed, canceled, etc.)
+  orderStatus String? @map("order_status")
+
+  // Tình trạng giao hàng (pending, shipped, delivered, etc.)
+  deliveryStatus String? @map("delivery_status")
+
+  // Ngày giao hàng dự kiến
+  deliveryDate DateTime? @map("delivery_date")
+
+  // Địa điểm giao hàng 
+  deliveryAddress String? @map("delivery_address")
+
+  // Danh sách hàng hóa trong đơn đặt hàng
+  OrderItem_Purchase OrderItem[] @relation("OrderItem_PurchaseOrder")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Giảm giá hàng bán - Hóa đơn
+model SaleDiscountVoucher {
+  id String @id @default(uuid())
+
+  voucherType String?
+  typeInside  String?
+
+  // Khách hàng (từ bảng Partner)
+  Customer   Partner? @relation("SaleDiscountVoucher_Customer", fields: [customerId], references: [id])
+  customerId String?
+
+  // Nhân viên bán hàng
+  Employee   Employee? @relation("SaleDiscountVoucher_Employee", fields: [employeeId], references: [id])
+  employeeId String?
+
+  Department   Department? @relation("SaleDiscountVoucher_Department", fields: [departmentId], references: [id])
+  departmentId String?
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
+  description String?
+
+  invoiceLookupCode String?
+  invoiceLookupPath String?
+
+  invoiceNo     String?
+  invoiceSymbol String?
+
+  taxCode     String?
+  paymentType String?
+
+  BankAccount   BankAccount? @relation("SaleDiscountVoucher_BankAccount", fields: [bankAccountId], references: [id])
+  bankAccountId String?
+
+  OrderItem_SaleDiscountVoucher OrderItem[] @relation("OrderItem_SaleDiscountVoucher")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Hợp đồng bán
+model SalesContract {
+  id String @id @default(uuid())
+
+  Project   Project? @relation("SalesContract_Project", fields: [projectId], references: [id])
+  projectId String?
+
+  contractValue  Float?
+  contractStatus String?
+  shipStatus     String?
+
+  Customer   Partner? @relation("SalesContract_Customer", fields: [customerId], references: [id])
+  customerId String?
+
+  ContactEmloyee    Employee? @relation("SalesContract_ContactEmloyee", fields: [contactEmployeeId], references: [id])
+  contactEmployeeId String?
+
+  deliveryDueDate DateTime?
+  paymentDueDate  DateTime?
+
+  liquidationValue Float?
+
+  otherTerms     String?
+  deliveryAdress String?
+
+  isCosting       Boolean @default(false)
+  isInvoiced      Boolean @default(false)
+  isPreSystemData Boolean @default(false)
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model Project {
+  id   String  @id @default(uuid())
+  code String?
+
+  description String?
+
+  Customer   Partner? @relation("Project_Customer", fields: [customerId], references: [id])
+  customerId String?
+
+  Company   Customer? @relation("Project_Company", fields: [companyId], references: [id])
+  companyId String?
+
+  SalesContract_Project SalesContract[] @relation("SalesContract_Project")
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Hàng bị trả lại
+model SalesReturn {
+  id String @id @default(uuid())
+
+  // --------------------- Chung
+  voucherGroup           String?
+  voucherTypeHigh        String? // Giảm trừ công nợ
+  voucherTypeMedium      String? // Giảm trừ công nợ - Phiếu nhập - Phiếu chi - Hóa đơn
+  isAlsoInventoryReceipt Boolean @default(true)
+  invoiceLookupCode      String?
+  invoiceLookupPath      String?
+  description            String?
+
+  Customer   Partner? @relation("SalesReturn_Customer", fields: [customerId], references: [id])
+  customerId String?
+  // Khách hàng
+
+  // Nhân viên
+  Employee   Employee? @relation("SalesReturn_Employee", fields: [employeeId], references: [id])
+  employeeId String?
+
+  // isPurchaseVoucher Boolean? @default(false)
+  // --------------------- Giảm trừ công nợ
+  Department   Department? @relation("SalesReturn_Department", fields: [departmentId], references: [id])
+  departmentId String?
+
+  // --------------------- Phiếu nhập
+  withOriginalVoucher String?
+  deliveryName        String? // Tên người giao hàng
+
+  // --------------------- Phiếu chi
+  recieptName String? // Tên người nhận
+
+  // ---- Hóa đơn
+  invoiceNo     String?
+  invoiceSymbol String?
+
+  OtherItem_SalesReturn       OrderItem[]       @relation("OtherItem_SalesReturn")
+  SalesReturnCost_SalesReturn SalesReturnCost[] @relation("SalesReturnCost_SalesReturn")
+
+  voucherId String?  @unique // Liên kết 1-1 với Voucher
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+// Hàng bị trả lại - giá vốn
+model SalesReturnCost {
+  id String @id @default(uuid())
+
+  Goods  GoodsAndServices? @relation("SalesReturnCost_Goods", fields: [goodId], references: [id])
+  goodId String?
+
+  Warehouse   Warehouse? @relation("SalesReturnCost_Warehouse", fields: [warehouseId], references: [id])
+  warehouseId String?
+
+  WarehouseAccount   ChartOfAccount? @relation("SalesReturnCost_WarehouseAccount", fields: [warehouseAccountId], references: [id])
+  warehouseAccountId String?
+
+  CogsAccount   ChartOfAccount? @relation("SalesReturnCost_CogsAccount", fields: [cogsAccountId], references: [id])
+  cogsAccountId String?
+
+  quantity  Int?
+  unitPrice Int?
+  totalCost Int? // tiền vốn
+
+  SalesReturn   SalesReturn? @relation("SalesReturnCost_SalesReturn", fields: [salesReturnId], references: [id])
+  salesReturnId String?
+
+  // Auditing
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 }

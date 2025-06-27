@@ -64,6 +64,14 @@ import { AssetRevaluationDetailModule } from './entities/asset_revaluation_detai
 import { AssetRevaluationPostingModule } from './entities/asset_revaluation_posting/asset_revaluation_posting.module';
 import { VoucherModule } from './entities/voucher/voucher.module';
 import { CircularModule } from './entities/circular/circular.module';
+import { QuotationModule } from './entities/quotation/quotation.module';
+import { OrderItemModule } from './entities/order_item/order_item.module';
+import { PurchaseOrderModule } from './entities/purchase_order/purchase_order.module';
+import { SaleDiscountVoucherModule } from './entities/sale_discount_voucher/sale_discount_voucher.module';
+import { SalesContractModule } from './entities/sales_contract/sales_contract.module';
+import { ProjectModule } from './entities/project/project.module';
+import { SalesReturnModule } from './entities/sales_return/sales_return.module';
+import { SalesReturnCostModule } from './entities/sales_return_cost/sales_return_cost.module';
 
 @Module({
   imports: [
@@ -129,6 +137,14 @@ import { CircularModule } from './entities/circular/circular.module';
     AssetRevaluationPostingModule,
     VoucherModule,
     CircularModule,
+    QuotationModule,
+    OrderItemModule,
+    PurchaseOrderModule,
+    SaleDiscountVoucherModule,
+    SalesContractModule,
+    ProjectModule,
+    SalesReturnModule,
+    SalesReturnCostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
