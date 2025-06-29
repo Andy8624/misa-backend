@@ -16,10 +16,7 @@ export class CashPaymentService {
     private readonly fileService: FileService,
   ) {}
 
-  async create(
-    createCashPaymentDto: CreateCashPaymentDto,
-    file: Express.Multer.File,
-  ) {
+  async create(createCashPaymentDto: CreateCashPaymentDto) {
     const {
       cashPaymentVoucherType,
       recipient,
@@ -34,47 +31,52 @@ export class CashPaymentService {
       supplier,
       companyId,
       circularId,
+      fileBase64, // Lấy trường fileBase64 từ DTO
+      originalFileName, // Lấy trường originalFileName từ DTO
     } = createCashPaymentDto;
 
     let uploadedFileId: string | undefined;
 
     const result = await this.prismaService.$transaction(async (tx) => {
-      // Handle file upload if present
-      if (file) {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        // Kiểm tra nếu có dữ liệu Base64
         try {
-          const uploadedFileInfo = await this.fileService.uploadFile(
-            file,
-            companyId,
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            // Gọi hàm upload Base64
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId
           );
-          uploadedFileId = uploadedFileInfo.id; // Get the ID of the uploaded file record
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
         } catch (error) {
           console.error(
-            'Failed to upload file during cash payment creation:',
+            'Failed to upload Base64 file during cash payment creation:',
             error,
           );
-
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
           throw error;
         }
       }
 
-      // Prepare data for Voucher creation
+      // Chuẩn bị dữ liệu cho việc tạo Voucher
       const createVoucherDto: CreateVoucherDto = {
-        voucherType: 'CASH_PAYMENT', // Set appropriate voucher type
+        voucherType: 'CASH_PAYMENT', // Loại chứng từ phù hợp
         postedDate,
         voucherDate,
         voucherNumber,
         companyId,
         circularId,
-        fileId: uploadedFileId, // Link the uploaded file to the voucher
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
       };
 
-      // Create the Voucher record within the transaction
+      // Tạo bản ghi Voucher trong transaction
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
       );
 
-      // Create the CashPayment record
+      // Tạo bản ghi CashPayment
       const createdCashPayment = await tx.cashPayment.create({
         data: {
           cashPaymentVoucherType,
@@ -82,31 +84,31 @@ export class CashPaymentService {
           supplierName,
           reason,
           withOriginalVoucher,
-          // Connect relationships based on provided IDs
+          // Kết nối các mối quan hệ dựa trên ID được cung cấp
           Employee: employee ? { connect: { id: employee } } : undefined,
           Subject: subject ? { connect: { id: subject } } : undefined,
-          Supplier: supplier ? { connect: { id: supplier } } : undefined, // Corrected to Supplier relation
-          company: companyId ? { connect: { id: companyId } } : undefined, // Use companyId from DTO
-          voucher: { connect: { id: newVoucher.id } }, // Connect to the newly created voucher
+          Supplier: supplier ? { connect: { id: supplier } } : undefined,
+          company: companyId ? { connect: { id: companyId } } : undefined, // Sử dụng companyId từ DTO
+          voucher: { connect: { id: newVoucher.id } }, // Kết nối với voucher vừa tạo
         },
         include: {
-          // Include related data for the response if needed
+          // Bao gồm dữ liệu liên quan cho phản hồi nếu cần
           voucher: {
             include: {
-              File: true, // Include File if you want its details in the response
+              File: true, // Bao gồm File nếu bạn muốn chi tiết của nó trong phản hồi
             },
           },
           Employee: true,
           Subject: true,
-          Supplier: true, // Include Supplier
-          company: true, // Include Company if it's a model
+          Supplier: true,
+          company: true, // Bao gồm Company nếu nó là một model
         },
       });
 
       return createdCashPayment;
     });
 
-    // Transform the result into a clean response DTO (assuming ResponseCashPaymentDto exists)
+    // Chuyển đổi kết quả thành DTO phản hồi (giả sử ResponseCashPaymentDto tồn tại)
     return plainToInstance(ResponseCashPaymentDto, result, {
       excludeExtraneousValues: true,
     });
@@ -125,7 +127,11 @@ export class CashPaymentService {
         Subject: true,
         Supplier: true,
         CashPaymentVoucherItem: true,
-        voucher: true,
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
       },
     });
 
@@ -142,7 +148,11 @@ export class CashPaymentService {
         Subject: true,
         Supplier: true,
         CashPaymentVoucherItem: true,
-        voucher: true,
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
       },
     });
 
@@ -210,7 +220,11 @@ export class CashPaymentService {
           Subject: true,
           Supplier: true,
           CashPaymentVoucherItem: true,
-          voucher: true,
+          voucher: {
+            include: {
+              File: true,
+            },
+          },
         },
       });
 

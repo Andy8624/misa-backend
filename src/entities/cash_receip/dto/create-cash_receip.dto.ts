@@ -7,10 +7,11 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { imageBase64 } from 'src/constants/base64-example'; // Assuming you still want this Base64 example
 
 export class CreateCashReceipDto {
   @ApiProperty({
-    description: 'Type of cash receipt voucher',
+    description: 'Type of cash receipt voucher.',
     example: 'SALES_COLLECTION',
     required: false,
   })
@@ -20,8 +21,8 @@ export class CreateCashReceipDto {
   cashReceiptVoucherType?: string;
 
   @ApiProperty({
-    description: 'Payer of the cash receipt',
-    example: 'John Doe',
+    description: 'Payer of the cash receipt.',
+    example: 'Nguyen Van A',
     required: false,
   })
   @Expose()
@@ -30,7 +31,7 @@ export class CreateCashReceipDto {
   payer?: string;
 
   @ApiProperty({
-    description: 'Posting date (ISO 8601)',
+    description: 'Posting date of the cash receipt voucher (ISO 8601).',
     example: '2025-06-27T12:00:00.000Z',
     type: 'string',
     format: 'date-time',
@@ -45,7 +46,7 @@ export class CreateCashReceipDto {
   postedDate?: Date;
 
   @ApiProperty({
-    description: 'Voucher date (ISO 8601)',
+    description: 'Voucher date of the cash receipt (ISO 8601).',
     example: '2025-06-27T12:00:00.000Z',
     type: 'string',
     format: 'date-time',
@@ -60,8 +61,8 @@ export class CreateCashReceipDto {
   voucherDate?: Date;
 
   @ApiProperty({
-    description: 'Voucher number',
-    example: 'CR0001',
+    description: 'Unique voucher number for the cash receipt.',
+    example: 'CR0001-2025',
     required: false,
   })
   @Expose()
@@ -70,8 +71,8 @@ export class CreateCashReceipDto {
   voucherNumber?: string;
 
   @ApiProperty({
-    description: 'Reason for cash collection',
-    example: 'Collection for ABC goods sales',
+    description: 'Reason for cash collection.',
+    example: 'Thu tiền bán hàng ABC',
     required: false,
   })
   @Expose()
@@ -80,8 +81,9 @@ export class CreateCashReceipDto {
   reason?: string;
 
   @ApiProperty({
-    description: 'Accompanying original voucher',
-    example: 'Invoice VAT 123',
+    description:
+      'Information about accompanying original vouchers (e.g., invoice numbers).',
+    example: 'Hóa đơn GTGT 12345, Biên bản bàn giao',
     required: false,
   })
   @Expose()
@@ -90,8 +92,8 @@ export class CreateCashReceipDto {
   withOriginalVoucher?: string;
 
   @ApiProperty({
-    description: 'Related employee ID',
-    example: '0810d32d-8206-4b95-b5e1-c93a79b6e73e',
+    description: 'ID of the employee related to this cash receipt.',
+    example: '0810d32d-8206-4b95-b5e1-c93a79b6e73e', // Example Employee ID
     required: false,
   })
   @Expose()
@@ -100,8 +102,9 @@ export class CreateCashReceipDto {
   employee?: string;
 
   @ApiProperty({
-    description: 'Related subject ID (e.g., vendor, other party)',
-    example: 'f930c655-d398-4031-ad86-077d4231b9fe',
+    description:
+      'ID of the subject (e.g., vendor, other party) for this cash receipt.',
+    example: 'f930c655-d398-4031-ad86-077d4231b9fe', // Using the remembered subject/partner ID
     required: false,
   })
   @Expose()
@@ -110,8 +113,8 @@ export class CreateCashReceipDto {
   subject?: string;
 
   @ApiProperty({
-    description: 'Related customer ID',
-    example: 'f930c655-d398-4031-ad86-077d4231b9fe',
+    description: 'ID of the customer related to this cash receipt.',
+    example: 'f930c655-d398-4031-ad86-077d4231b9fe', // Using the remembered customer ID
     required: false,
   })
   @Expose()
@@ -120,22 +123,44 @@ export class CreateCashReceipDto {
   customer?: string;
 
   @ApiProperty({
-    description: 'Company ID',
-    example: 'aeb395e2-5faf-44b0-8769-8aea89513612',
+    description: 'ID of the company receiving the cash.',
+    example: 'aeb395e2-5faf-44b0-8769-8aea89513612', // Example Company ID
     required: true,
   })
   @Expose()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Company ID cannot be empty' })
   @IsUUID()
   companyId: string;
 
   @ApiProperty({
-    description: 'Related circular ID (e.g., official letter)',
+    description:
+      'Related circular ID (e.g., official letter) for the cash receipt.',
     example: '5229f99c-4414-437a-beff-4711c4a473eb',
     required: false,
   })
   @Expose()
   @IsOptional()
   @IsUUID()
-  circularId: string;
+  circularId?: string; // Changed to optional as per your DTO's initial @IsOptional
+
+  @ApiProperty({
+    description: 'File content encoded in Base64 (optional, for attachments).',
+    example: imageBase64,
+    required: false,
+  })
+  @Expose()
+  @IsOptional()
+  @IsString()
+  fileBase64?: string;
+
+  @ApiProperty({
+    description:
+      'Original file name for the Base64 attachment (e.g., payment_proof.pdf).',
+    example: 'cash_receipt_document.pdf',
+    required: false,
+  })
+  @Expose()
+  @IsOptional()
+  @IsString()
+  originalFileName?: string;
 }

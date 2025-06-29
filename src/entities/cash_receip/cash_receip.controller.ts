@@ -6,19 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  UploadedFile,
 } from '@nestjs/common';
 import { CashReceipService } from './cash_receip.service';
 import { CreateCashReceipDto } from './dto/create-cash_receip.dto';
 import { UpdateCashReceipDto } from './dto/update-cash_receip.dto';
-import {
-  ApiBody,
-  ApiExtraModels,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
-import { ApiFileWithBody } from 'src/config/custom-decorator/file.decorator';
 
 @Controller('cash-receip')
 @ApiTags('CashReceip')
@@ -28,32 +21,8 @@ export class CashReceipController {
 
   @Post()
   @ApiProtectedEndpoint('Create CashReceip')
-  @ApiFileWithBody('file')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      allOf: [
-        // 1. Tham chiếu đến schema của CreateCashReceipDto
-        { $ref: getSchemaPath(CreateCashReceipDto) },
-        // 2. Thêm các thuộc tính bổ sung không có trong DTO (như 'file')
-        {
-          properties: {
-            file: {
-              type: 'string',
-              format: 'binary',
-              description: 'Tệp đính kèm cho phiếu thu.',
-            },
-          },
-        },
-      ],
-      required: ['file'],
-    },
-  })
-  create(
-    @Body() createCashReceipDto: CreateCashReceipDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.cashReceipService.create(createCashReceipDto, file);
+  create(@Body() createCashReceipDto: CreateCashReceipDto) {
+    return this.cashReceipService.create(createCashReceipDto);
   }
 
   @Get(':id')

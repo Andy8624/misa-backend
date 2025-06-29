@@ -16,10 +16,7 @@ export class CashReceipService {
     private readonly fileService: FileService,
   ) {}
 
-  async create(
-    createCashReceipDto: CreateCashReceipDto,
-    file: Express.Multer.File,
-  ) {
+  async create(createCashReceipDto: CreateCashReceipDto) {
     const {
       cashReceiptVoucherType,
       payer,
@@ -33,42 +30,52 @@ export class CashReceipService {
       customer,
       companyId,
       circularId,
+      fileBase64, // Lấy trường fileBase64 từ DTO
+      originalFileName, // Lấy trường originalFileName từ DTO
     } = createCashReceipDto;
 
     let uploadedFileId: string | undefined;
 
     const result = await this.prismaService.$transaction(async (tx) => {
-      if (file) {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        // Kiểm tra nếu có dữ liệu Base64
         try {
-          const uploadedFileInfo = await this.fileService.uploadFile(
-            file,
-            companyId,
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            // Gọi hàm upload Base64
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId
           );
-          uploadedFileId = uploadedFileInfo.id;
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
         } catch (error) {
           console.error(
-            'Failed to upload file during cash receipt creation:',
+            'Failed to upload Base64 file during cash receipt creation:',
             error,
           );
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
           throw error;
         }
       }
 
+      // Chuẩn bị dữ liệu cho việc tạo Voucher
       const createVoucherDto: CreateVoucherDto = {
-        voucherType: 'CASH_RECEIPT',
+        voucherType: 'CASH_RECEIPT', // Loại chứng từ phù hợp
         postedDate,
         voucherDate,
         voucherNumber,
         companyId,
         circularId,
-        fileId: uploadedFileId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
       };
 
+      // Tạo bản ghi Voucher trong transaction
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
       );
 
+      // Tạo bản ghi CashReceip
       const createdCashReceip = await tx.cashReceip.create({
         data: {
           cashReceiptVoucherType,
@@ -78,24 +85,27 @@ export class CashReceipService {
           Employee: employee ? { connect: { id: employee } } : undefined,
           Subject: subject ? { connect: { id: subject } } : undefined,
           Customer: customer ? { connect: { id: customer } } : undefined,
-          company: { connect: { id: companyId } },
-          voucher: { connect: { id: newVoucher.id } },
+          company: { connect: { id: companyId } }, // Sử dụng companyId từ DTO
+          voucher: { connect: { id: newVoucher.id } }, // Kết nối với voucher vừa tạo
         },
         include: {
+          // Bao gồm dữ liệu liên quan cho phản hồi nếu cần
           voucher: {
             include: {
-              File: true,
+              File: true, // Bao gồm File nếu bạn muốn chi tiết của nó trong phản hồi
             },
           },
           Employee: true,
           Subject: true,
           Customer: true,
+          // company: true, // Nếu bạn có quan hệ 'company' trong include
         },
       });
 
       return createdCashReceip;
     });
 
+    // Chuyển đổi kết quả thành DTO phản hồi (giả sử ResponseCashReceipDto tồn tại)
     return plainToInstance(ResponseCashReceipDto, result, {
       excludeExtraneousValues: true,
     });
