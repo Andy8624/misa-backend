@@ -6,12 +6,14 @@ import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { CreateDepositPaymentDto } from './dto/create-deposit_payment.dto';
 import { UpdateDepositPaymentDto } from './dto/update-deposit_payment.dto';
 import { ResponseDepositPaymentDto } from './dto/response-deposit_payment.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class DepositPaymentService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createDto: CreateDepositPaymentDto) {
@@ -32,18 +34,47 @@ export class DepositPaymentService {
       subject,
       companyId,
       circularId,
+      fileBase64, // Thêm trường fileBase64 từ DTO
+      originalFileName, // Thêm trường originalFileName từ DTO
+      // preUploadedFileId, // Nếu bạn muốn hỗ trợ file đã upload sẵn qua endpoint khác
     } = createDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'DEPOSIT_PAYMENT',
-      voucherDate,
-      postedDate: voucherDate,
-      voucherNumber,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined; // Biến để lưu ID của file đã upload
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId
+          );
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during deposit payment creation:',
+            error,
+          );
+          // Rerun lỗi để đảm bảo transaction được rollback nếu upload file thất bại
+          throw error;
+        }
+      }
+      // --- Hoặc nếu bạn muốn hỗ trợ preUploadedFileId, bạn có thể thêm logic này:
+      // else if (preUploadedFileId) {
+      //   uploadedFileId = preUploadedFileId;
+      // }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'DEPOSIT_PAYMENT',
+        voucherDate,
+        postedDate: voucherDate, // Giả định postedDate giống voucherDate
+        voucherNumber,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
+      };
+
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
@@ -63,7 +94,7 @@ export class DepositPaymentService {
           Bank: bank ? { connect: { id: bank } } : undefined,
           Supplier: supplier ? { connect: { id: supplier } } : undefined,
           Subject: subject ? { connect: { id: subject } } : undefined,
-          company: { connect: { id: companyId } },
+          company: { connect: { id: companyId } }, // Sử dụng 'company' nếu schema của bạn dùng chữ thường
           voucher: { connect: { id: newVoucher.id } },
         },
         include: {
@@ -71,7 +102,7 @@ export class DepositPaymentService {
           Bank: true,
           Supplier: true,
           Subject: true,
-          company: true,
+          company: true, // Sử dụng 'company' nếu schema của bạn dùng chữ thường
           voucher: true,
         },
       });

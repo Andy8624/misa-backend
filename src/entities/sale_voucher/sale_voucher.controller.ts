@@ -10,7 +10,7 @@ import {
 import { SaleVoucherService } from './sale_voucher.service';
 import { CreateSaleVoucherDto } from './dto/create-sale_voucher.dto';
 import { UpdateSaleVoucherDto } from './dto/update-sale_voucher.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
 @Controller('sale-voucher')
@@ -20,6 +20,11 @@ export class SaleVoucherController {
 
   @Post()
   @ApiProtectedEndpoint('Create SaleVoucher')
+  @ApiBody({
+    type: CreateSaleVoucherDto,
+    description:
+      'Create a new sale voucher, optionally including a Base64 file attachment.',
+  })
   create(@Body() createSaleVoucherDto: CreateSaleVoucherDto) {
     return this.saleVoucherService.create(createSaleVoucherDto);
   }

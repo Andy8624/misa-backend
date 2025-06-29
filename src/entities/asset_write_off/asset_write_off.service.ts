@@ -6,12 +6,14 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseAssetWriteOffDto } from './dto/response-asset_write_off.dto';
 import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { VoucherService } from '../voucher/voucher.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class AssetWriteOffService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createAssetWriteOffDto: CreateAssetWriteOffDto) {
@@ -22,18 +24,47 @@ export class AssetWriteOffService {
       voucherNumber,
       companyId,
       circularId,
+      fileBase64, // Thêm trường fileBase64 từ DTO
+      originalFileName, // Thêm trường originalFileName từ DTO
+      // preUploadedFileId, // Nếu bạn muốn hỗ trợ file đã upload sẵn qua endpoint khác
     } = createAssetWriteOffDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'ASSET_WRITE_OFF',
-      postedDate,
-      voucherDate,
-      voucherNumber,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined; // Biến để lưu ID của file đã upload
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId (nếu file model của bạn có companyId)
+          );
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during asset write-off creation:',
+            error,
+          );
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
+          throw error;
+        }
+      }
+      // --- Hoặc nếu bạn muốn hỗ trợ preUploadedFileId, bạn có thể thêm logic này:
+      // else if (preUploadedFileId) {
+      //   uploadedFileId = preUploadedFileId;
+      // }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'ASSET_WRITE_OFF',
+        postedDate,
+        voucherDate,
+        voucherNumber,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
+      };
+
       // Tạo voucher trước
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
@@ -45,13 +76,17 @@ export class AssetWriteOffService {
         data: {
           reason,
           Company: companyId ? { connect: { id: companyId } } : undefined,
-          voucher: { connect: { id: newVoucher.id } },
+          voucher: { connect: { id: newVoucher.id } }, // Liên kết AssetWriteOff với Voucher
         },
         include: {
           Company: true,
           assets: true,
           accountings: true,
-          voucher: true,
+          voucher: {
+            include: {
+              File: true, // Đảm bảo rằng bạn bao gồm thông tin File nếu có
+            },
+          },
         },
       });
 
@@ -75,7 +110,11 @@ export class AssetWriteOffService {
         Company: true,
         assets: true,
         accountings: true,
-        voucher: true,
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
       },
     });
 
@@ -91,7 +130,11 @@ export class AssetWriteOffService {
         Company: true,
         assets: true,
         accountings: true,
-        voucher: true,
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
       },
     });
 
@@ -108,7 +151,13 @@ export class AssetWriteOffService {
     // Kiểm tra tồn tại
     const existing = await this.prismaService.assetWriteOff.findUnique({
       where: { id },
-      include: { voucher: true },
+      include: {
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
+      },
     });
 
     if (!existing || existing.deletedAt) {
@@ -148,7 +197,11 @@ export class AssetWriteOffService {
           Company: true,
           assets: true,
           accountings: true,
-          voucher: true,
+          voucher: {
+            include: {
+              File: true,
+            },
+          },
         },
       });
 

@@ -835,11 +835,10 @@ model productionOrders {
 }
 
 model File {
-  id       String @id @default(uuid())
-  fileName String @map("file_name")
-  fileSize Int    @map("file_size")
-  mimeType String @map("mime_type")
-  path     String
+  id       String  @id @default(uuid())
+  fileName String? @map("file_name")
+  fileSize Int?    @map("file_size")
+  mimeType String? @map("mime_type")
 
   // Add these fields for Directus integration
   originalName String? @map("original_name")
@@ -847,8 +846,8 @@ model File {
   directusId   String? @map("directus_id")
 
   // Relations
-  company   Customer @relation(fields: [companyId], references: [id])
-  companyId String   @map("company_id")
+  company   Customer? @relation(fields: [companyId], references: [id])
+  companyId String?   @map("company_id")
 
   // Auditing
   createdAt DateTime  @default(now()) @map("created_at")
@@ -2332,9 +2331,6 @@ model AssetRevaluation {
   revaluationCode String? // Biên bản số
   revaluationDate DateTime? // Ngày
   reason          String? // Lý do
-  // postedDate      DateTime? // Ngày hạch toán
-  // voucherDate     DateTime? // Ngày chứng từ
-  // voucherNumber   String? // Số chứng từ
 
   // Quan hệ đến bảng con
   details   AssetRevaluationDetail[]  @relation("AssetRevaluationDetail_AssetRevaluation")

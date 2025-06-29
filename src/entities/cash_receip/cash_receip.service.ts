@@ -6,14 +6,20 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseCashReceipDto } from './dto/response-cash_receip.dto';
 import { VoucherService } from '../voucher/voucher.service';
 import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class CashReceipService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
-  async create(createCashReceipDto: CreateCashReceipDto) {
+
+  async create(
+    createCashReceipDto: CreateCashReceipDto,
+    file: Express.Multer.File,
+  ) {
     const {
       cashReceiptVoucherType,
       payer,
@@ -29,38 +35,58 @@ export class CashReceipService {
       circularId,
     } = createCashReceipDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'CASH_RECEIPT',
-      postedDate,
-      voucherDate,
-      voucherNumber,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined;
 
-    // Dùng transaction để đảm bảo cả hai thao tác đều thành công hoặc rollback
     const result = await this.prismaService.$transaction(async (tx) => {
-      // Tạo voucher
+      if (file) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadFile(
+            file,
+            companyId,
+          );
+          uploadedFileId = uploadedFileInfo.id;
+        } catch (error) {
+          console.error(
+            'Failed to upload file during cash receipt creation:',
+            error,
+          );
+          throw error;
+        }
+      }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'CASH_RECEIPT',
+        postedDate,
+        voucherDate,
+        voucherNumber,
+        companyId,
+        circularId,
+        fileId: uploadedFileId,
+      };
+
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
       );
 
-      // Tạo cash receip và gắn voucher
       const createdCashReceip = await tx.cashReceip.create({
         data: {
           cashReceiptVoucherType,
           payer,
           reason,
           withOriginalVoucher,
-          Employee: { connect: { id: employee } },
-          Subject: { connect: { id: subject } },
-          Customer: { connect: { id: customer } },
+          Employee: employee ? { connect: { id: employee } } : undefined,
+          Subject: subject ? { connect: { id: subject } } : undefined,
+          Customer: customer ? { connect: { id: customer } } : undefined,
           company: { connect: { id: companyId } },
           voucher: { connect: { id: newVoucher.id } },
         },
         include: {
-          voucher: true,
+          voucher: {
+            include: {
+              File: true,
+            },
+          },
           Employee: true,
           Subject: true,
           Customer: true,

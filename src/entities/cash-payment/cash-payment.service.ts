@@ -6,22 +6,29 @@ import { CreateCashPaymentDto } from './dto/create-cash-payment.dto';
 import { UpdateCashPaymentDto } from './dto/update-cash-payment.dto';
 import { VoucherService } from '../voucher/voucher.service';
 import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class CashPaymentService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
-  async create(createCashPaymentDto: CreateCashPaymentDto) {
+
+  async create(
+    createCashPaymentDto: CreateCashPaymentDto,
+    file: Express.Multer.File,
+  ) {
     const {
       cashPaymentVoucherType,
       recipient,
+      supplierName,
+      reason,
+      withOriginalVoucher,
       postedDate,
       voucherDate,
       voucherNumber,
-      reason,
-      withOriginalVoucher,
       employee,
       subject,
       supplier,
@@ -29,45 +36,77 @@ export class CashPaymentService {
       circularId,
     } = createCashPaymentDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'CASH_PAYMENT',
-      postedDate,
-      voucherDate,
-      voucherNumber,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined;
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // Handle file upload if present
+      if (file) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadFile(
+            file,
+            companyId,
+          );
+          uploadedFileId = uploadedFileInfo.id; // Get the ID of the uploaded file record
+        } catch (error) {
+          console.error(
+            'Failed to upload file during cash payment creation:',
+            error,
+          );
+
+          throw error;
+        }
+      }
+
+      // Prepare data for Voucher creation
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'CASH_PAYMENT', // Set appropriate voucher type
+        postedDate,
+        voucherDate,
+        voucherNumber,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Link the uploaded file to the voucher
+      };
+
+      // Create the Voucher record within the transaction
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
       );
 
+      // Create the CashPayment record
       const createdCashPayment = await tx.cashPayment.create({
         data: {
           cashPaymentVoucherType,
           recipient,
+          supplierName,
           reason,
           withOriginalVoucher,
+          // Connect relationships based on provided IDs
           Employee: employee ? { connect: { id: employee } } : undefined,
           Subject: subject ? { connect: { id: subject } } : undefined,
-          Supplier: supplier ? { connect: { id: supplier } } : undefined,
-          company: { connect: { id: companyId } },
-          voucher: { connect: { id: newVoucher.id } },
+          Supplier: supplier ? { connect: { id: supplier } } : undefined, // Corrected to Supplier relation
+          company: companyId ? { connect: { id: companyId } } : undefined, // Use companyId from DTO
+          voucher: { connect: { id: newVoucher.id } }, // Connect to the newly created voucher
         },
         include: {
+          // Include related data for the response if needed
+          voucher: {
+            include: {
+              File: true, // Include File if you want its details in the response
+            },
+          },
           Employee: true,
           Subject: true,
-          Supplier: true,
-          CashPaymentVoucherItem: true,
-          voucher: true,
+          Supplier: true, // Include Supplier
+          company: true, // Include Company if it's a model
         },
       });
 
       return createdCashPayment;
     });
 
+    // Transform the result into a clean response DTO (assuming ResponseCashPaymentDto exists)
     return plainToInstance(ResponseCashPaymentDto, result, {
       excludeExtraneousValues: true,
     });

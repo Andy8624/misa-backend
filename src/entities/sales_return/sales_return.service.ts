@@ -6,12 +6,14 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseSalesReturnDto } from './dto/response-sales_return.dto';
 import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { VoucherService } from '../voucher/voucher.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class SalesReturnService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createSalesReturnDto: CreateSalesReturnDto) {
@@ -37,18 +39,47 @@ export class SalesReturnService {
       voucherDate,
       voucherNumber,
       circularId,
+      fileBase64, // Thêm trường fileBase64 từ DTO
+      originalFileName, // Thêm trường originalFileName từ DTO
+      // preUploadedFileId, // Nếu bạn muốn hỗ trợ file đã upload sẵn qua endpoint khác
     } = createSalesReturnDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'SALES_RETURN', // Loại chứng từ là 'SALES_RETURN'
-      voucherDate: voucherDate,
-      postedDate: postedDate,
-      voucherNumber: voucherNumber,
-      companyId: companyId,
-      circularId: circularId,
-    };
+    let uploadedFileId: string | undefined; // Biến để lưu ID của file đã upload
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId (nếu file model của bạn có companyId)
+          );
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during sales return creation:',
+            error,
+          );
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
+          throw error;
+        }
+      }
+      // --- Hoặc nếu bạn muốn hỗ trợ preUploadedFileId, bạn có thể thêm logic này:
+      // else if (preUploadedFileId) {
+      //   uploadedFileId = preUploadedFileId;
+      // }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'SALES_RETURN', // Loại chứng từ là 'SALES_RETURN'
+        voucherDate: voucherDate,
+        postedDate: postedDate,
+        voucherNumber: voucherNumber,
+        companyId: companyId,
+        circularId: circularId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
+      };
+
       // Tạo voucher
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
@@ -81,7 +112,11 @@ export class SalesReturnService {
           Customer: true,
           Employee: true,
           Department: true,
-          voucher: true,
+          voucher: {
+            include: {
+              File: true, // Đảm bảo rằng bạn bao gồm thông tin File nếu có
+            },
+          },
           OtherItem_SalesReturn: true,
           SalesReturnCost_SalesReturn: true,
         },
@@ -107,7 +142,11 @@ export class SalesReturnService {
         Customer: true,
         Employee: true,
         Department: true,
-        voucher: true,
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
         SalesReturnCost_SalesReturn: true,
         OtherItem_SalesReturn: true,
       },
@@ -125,7 +164,11 @@ export class SalesReturnService {
         Customer: true,
         Employee: true,
         Department: true,
-        voucher: true,
+        voucher: {
+          include: {
+            File: true,
+          },
+        },
         SalesReturnCost_SalesReturn: true,
         OtherItem_SalesReturn: true,
       },
@@ -229,7 +272,11 @@ export class SalesReturnService {
           Customer: true,
           Employee: true,
           Department: true,
-          voucher: true,
+          voucher: {
+            include: {
+              File: true,
+            },
+          },
           OtherItem_SalesReturn: true,
           SalesReturnCost_SalesReturn: true,
         },

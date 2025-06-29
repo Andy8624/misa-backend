@@ -10,7 +10,7 @@ import {
 import { DepositPaymentService } from './deposit_payment.service';
 import { CreateDepositPaymentDto } from './dto/create-deposit_payment.dto';
 import { UpdateDepositPaymentDto } from './dto/update-deposit_payment.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
 @Controller('deposit-payment')
@@ -20,6 +20,11 @@ export class DepositPaymentController {
 
   @Post()
   @ApiProtectedEndpoint('Create DepositPayment')
+  @ApiBody({
+    type: CreateDepositPaymentDto,
+    description:
+      'Create a new deposit payment record, optionally including a Base64 file attachment.',
+  })
   create(@Body() createDepositPaymentDto: CreateDepositPaymentDto) {
     return this.depositPaymentService.create(createDepositPaymentDto);
   }

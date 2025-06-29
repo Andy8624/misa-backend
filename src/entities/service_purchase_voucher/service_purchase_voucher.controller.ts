@@ -10,7 +10,7 @@ import {
 import { ServicePurchaseVoucherService } from './service_purchase_voucher.service';
 import { CreateServicePurchaseVoucherDto } from './dto/create-service_purchase_voucher.dto';
 import { UpdateServicePurchaseVoucherDto } from './dto/update-service_purchase_voucher.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
 @Controller('service-purchase-voucher')
@@ -22,6 +22,11 @@ export class ServicePurchaseVoucherController {
 
   @Post()
   @ApiProtectedEndpoint('Create ServicePurchaseVoucher')
+  @ApiBody({
+    type: CreateServicePurchaseVoucherDto,
+    description:
+      'Create a new service purchase voucher, optionally including a Base64 file attachment.',
+  })
   create(
     @Body() createServicePurchaseVoucherDto: CreateServicePurchaseVoucherDto,
   ) {

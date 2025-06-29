@@ -4,12 +4,22 @@ import {
   UseInterceptors,
   UploadedFile,
   Body,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Param,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
 @Controller('files')
@@ -32,17 +42,6 @@ export class FileController {
           type: 'string',
           description: 'ID of the company uploading this file',
         },
-        // relatedType: {
-        //   type: 'string',
-        //   description:
-        //     'Type of record this file is attached to (e.g. inventory_in, invoice)',
-        //   example: 'inventory_in',
-        // },
-        // relatedId: {
-        //   type: 'string',
-        //   description: 'ID of the related record (e.g. inventory record ID)',
-        //   example: 'inv_abc123',
-        // },
       },
       required: ['file', 'companyId'],
     },
@@ -52,19 +51,51 @@ export class FileController {
       storage: diskStorage({
         destination: './uploads/temp',
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
+          const timestamp = Date.now();
+
+          const safeOriginalName = file.originalname.replace(
+            /[^a-zA-Z0-9.\-_]/g,
+            '_',
+          );
+          callback(null, `${timestamp}-${safeOriginalName}`);
         },
       }),
     }),
   )
-  uploadFile(
+  UploadedFileInfo(
     @UploadedFile() file: Express.Multer.File,
     @Body('companyId') companyId: string,
-    // @Body('relatedType') relatedType: string,
-    // @Body('relatedId') relatedId: string,
   ) {
     return this.fileService.uploadFile(file, companyId);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT) // Indicate successful deletion with 204 No Content
+  @ApiProtectedEndpoint('Delete File') // Apply your authentication/authorization decorator
+  @ApiOperation({ summary: 'Delete a file by its ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the file to delete (from your database)',
+    type: String,
+    format: 'uuid',
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'File successfully deleted.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid request or file not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access.',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Forbidden access.',
+  })
+  async deleteFile(@Param('id') fileId: string): Promise<void> {
+    await this.fileService.deleteFile(fileId);
   }
 }

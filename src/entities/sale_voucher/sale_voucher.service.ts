@@ -6,12 +6,14 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseSaleVoucherDto } from './dto/response-sale_voucher.dto';
 import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { VoucherService } from '../voucher/voucher.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class SaleVoucherService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createDto: CreateSaleVoucherDto) {
@@ -38,19 +40,48 @@ export class SaleVoucherService {
       cash_receipt_voucher_principal,
       customer,
       circularId,
-      ...rest
+      fileBase64, // Thêm trường fileBase64 từ DTO
+      originalFileName, // Thêm trường originalFileName từ DTO
+      // preUploadedFileId, // Nếu bạn muốn hỗ trợ file đã upload sẵn qua endpoint khác
+      ...rest // Giữ lại các trường còn lại không cần kết nối quan hệ
     } = createDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'SALE',
-      postedDate: posted_date,
-      voucherDate: voucher_date,
-      voucherNumber: voucher_number,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined; // Biến để lưu ID của file đã upload
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId
+          );
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during sale voucher creation:',
+            error,
+          );
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
+          throw error;
+        }
+      }
+      // --- Hoặc nếu bạn muốn hỗ trợ preUploadedFileId, bạn có thể thêm logic này:
+      // else if (preUploadedFileId) {
+      //   uploadedFileId = preUploadedFileId;
+      // }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'SALE',
+        postedDate: posted_date,
+        voucherDate: voucher_date,
+        voucherNumber: voucher_number,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
+      };
+
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
@@ -58,7 +89,7 @@ export class SaleVoucherService {
 
       const created = await tx.saleVoucher.create({
         data: {
-          ...rest,
+          ...rest, // Bao gồm các trường còn lại không được destructure riêng
           PaymentTAndC: payment_t_and_c
             ? { connect: { id: payment_t_and_c } }
             : undefined,
@@ -80,6 +111,7 @@ export class SaleVoucherService {
           DebtVoucherStoreperson: debt_voucher_storeperson
             ? { connect: { id: debt_voucher_storeperson } }
             : undefined,
+          // Lưu ý: Đảm bảo các trường này là ID hợp lệ nếu chúng kết nối đến các bảng khác
           DebtVoucherPrincipal: debt_voucher_principal
             ? { connect: { id: debt_voucher_principal } }
             : undefined,
@@ -89,12 +121,14 @@ export class SaleVoucherService {
           CashReceiptCustomer: cash_receipt_customer_id
             ? { connect: { id: cash_receipt_customer_id } }
             : undefined,
+          // Lưu ý: Đảm bảo các trường này là ID hợp lệ nếu chúng kết nối đến các bảng khác
           CashReceiptCashInBankReceipt: cash_receipt_cash_in_bank_receipt
             ? { connect: { id: cash_receipt_cash_in_bank_receipt } }
             : undefined,
           CashReceiptStoreperson: cash_receipt_storeperson
             ? { connect: { id: cash_receipt_storeperson } }
             : undefined,
+          // Lưu ý: Đảm bảo các trường này là ID hợp lệ nếu chúng kết nối đến các bảng khác
           CashReceiptPrincipal: cash_receipt_principal
             ? { connect: { id: cash_receipt_principal } }
             : undefined,
@@ -104,6 +138,7 @@ export class SaleVoucherService {
           CashReceiptVoucherStoreperson: cash_receipt_voucher_storeperson
             ? { connect: { id: cash_receipt_voucher_storeperson } }
             : undefined,
+          // Lưu ý: Đảm bảo các trường này là ID hợp lệ nếu chúng kết nối đến các bảng khác
           CashReceiptVoucherPrincipal: cash_receipt_voucher_principal
             ? { connect: { id: cash_receipt_voucher_principal } }
             : undefined,
@@ -119,6 +154,7 @@ export class SaleVoucherService {
           InventoryOutVoucherStorePerson: true,
           DebtVoucherCustomer: true,
           DebtVoucherStoreperson: true,
+          // Kiểm tra lại các quan hệ này trong Prisma schema của bạn
           DebtVoucherPrincipal: true,
           DebtVoucherTrustor: true,
           CashReceiptCustomer: true,

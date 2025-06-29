@@ -6,12 +6,14 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseAssetRevaluationDto } from './dto/response-asset_revaluation.dto';
 import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { VoucherService } from '../voucher/voucher.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class AssetRevaluationService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createAssetRevaluationDto: CreateAssetRevaluationDto) {
@@ -24,19 +26,48 @@ export class AssetRevaluationService {
       voucherNumber,
       companyId,
       circularId,
+      fileBase64, // Thêm trường fileBase64 từ DTO
+      originalFileName, // Thêm trường originalFileName từ DTO
+      // preUploadedFileId, // Nếu bạn muốn hỗ trợ file đã upload sẵn qua endpoint khác
     } = createAssetRevaluationDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'ASSET_REVALUATION', // giả sử loại voucher này
-      voucherNumber,
-      voucherDate,
-      postedDate,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined; // Biến để lưu ID của file đã upload
 
     const result = await this.prismaService.$transaction(async (tx) => {
-      // Tạo voucher
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId (nếu file model của bạn có companyId)
+          );
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during asset revaluation creation:',
+            error,
+          );
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
+          throw error;
+        }
+      }
+      // --- Hoặc nếu bạn muốn hỗ trợ preUploadedFileId, bạn có thể thêm logic này:
+      // else if (preUploadedFileId) {
+      //   uploadedFileId = preUploadedFileId;
+      // }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'ASSET_REVALUATION', // Giả sử loại voucher này
+        voucherNumber,
+        voucherDate,
+        postedDate,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
+      };
+
+      // Tạo voucher trước
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
@@ -49,13 +80,17 @@ export class AssetRevaluationService {
           revaluationDate,
           reason,
           Company: companyId ? { connect: { id: companyId } } : undefined,
-          voucher: { connect: { id: newVoucher.id } },
+          voucher: { connect: { id: newVoucher.id } }, // Liên kết AssetRevaluation với Voucher
         },
         include: {
           Company: true,
           details: true,
           postings: true,
-          voucher: true,
+          voucher: {
+            include: {
+              File: true, // Đảm bảo rằng bạn bao gồm thông tin File nếu có
+            },
+          },
         },
       });
 

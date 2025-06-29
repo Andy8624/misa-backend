@@ -6,12 +6,14 @@ import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { CreateDepositReceipDto } from './dto/create-deposit_receip.dto';
 import { ResponseDepositReceipDto } from './dto/response-deposit_receip.dto';
 import { UpdateDepositReceipDto } from './dto/update-deposit_receip.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class DepositReceipService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createDepositReceipDto: CreateDepositReceipDto) {
@@ -28,18 +30,43 @@ export class DepositReceipService {
       bank,
       companyId,
       circularId,
+      fileBase64,
+      originalFileName,
     } = createDepositReceipDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'DEPOSIT_RECEIPT',
-      postedDate,
-      voucherDate,
-      voucherNumber,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined;
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // --- Handle Base64 file upload if present ---
+      if (fileBase64) {
+        try {
+          // CALL THE NEW uploadBase64File FUNCTION
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file',
+            companyId,
+          );
+          uploadedFileId = uploadedFileInfo.id; // Get the ID of the uploaded file record
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during deposit receipt creation:',
+            error,
+          );
+          // Re-throw the error to ensure the transaction is rolled back
+          throw error;
+        }
+      }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'DEPOSIT_RECEIPT',
+        postedDate,
+        voucherDate,
+        voucherNumber,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Link the uploaded file to the voucher
+      };
+
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
@@ -67,7 +94,6 @@ export class DepositReceipService {
           Customer: true,
           Bank: true,
           voucher: true,
-          DepositReceipItem: true,
         },
       });
 

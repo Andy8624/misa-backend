@@ -10,16 +10,22 @@ import {
 import { DepositReceipService } from './deposit_receip.service';
 import { CreateDepositReceipDto } from './dto/create-deposit_receip.dto';
 import { UpdateDepositReceipDto } from './dto/update-deposit_receip.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { ApiProtectedEndpoint } from 'src/config/custom-decorator/api-security.decorator';
 
 @Controller('deposit-receip')
 @ApiTags('DepositReceip')
+@ApiExtraModels(CreateDepositReceipDto, UpdateDepositReceipDto)
 export class DepositReceipController {
   constructor(private readonly depositReceipService: DepositReceipService) {}
 
   @Post()
   @ApiProtectedEndpoint('Create DepositReceip')
+  @ApiBody({
+    type: CreateDepositReceipDto,
+    description:
+      'Create a new deposit receipt with optional Base64 file attachment.',
+  })
   create(@Body() createDepositReceipDto: CreateDepositReceipDto) {
     return this.depositReceipService.create(createDepositReceipDto);
   }

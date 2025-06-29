@@ -3,9 +3,10 @@ import { DepositReceipService } from './deposit_receip.service';
 import { DepositReceipController } from './deposit_receip.controller';
 import { PrismaService } from 'src/prisma.service';
 import { VoucherService } from '../voucher/voucher.service';
+import { FileService } from '../file/file.service';
 
 @Module({
   controllers: [DepositReceipController],
-  providers: [DepositReceipService, PrismaService, VoucherService],
+  providers: [DepositReceipService, PrismaService, VoucherService, FileService],
 })
 export class DepositReceipModule {}

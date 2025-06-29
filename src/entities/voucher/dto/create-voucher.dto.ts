@@ -20,4 +20,7 @@ export class CreateVoucherDto {
 
   @Expose()
   circularId?: string;
+
+  @Expose()
+  fileId?: string;
 }

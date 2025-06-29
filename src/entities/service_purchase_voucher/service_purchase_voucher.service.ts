@@ -6,12 +6,14 @@ import { CreateVoucherDto } from '../voucher/dto/create-voucher.dto';
 import { ResponseServicePurchaseVoucherDto } from './dto/response-service_purchase_voucher.dto';
 import { UpdateServicePurchaseVoucherDto } from './dto/update-service_purchase_voucher.dto';
 import { CreateServicePurchaseVoucherDto } from './dto/create-service_purchase_voucher.dto';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class ServicePurchaseVoucherService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly voucherService: VoucherService,
+    private readonly fileService: FileService,
   ) {}
 
   async create(createDto: CreateServicePurchaseVoucherDto) {
@@ -26,19 +28,48 @@ export class ServicePurchaseVoucherService {
       paymentAccount,
       paymentTerm,
       circularId,
-      ...rest
+      fileBase64, // Thêm trường fileBase64 từ DTO
+      originalFileName, // Thêm trường originalFileName từ DTO
+      // preUploadedFileId, // Nếu bạn muốn hỗ trợ file đã upload sẵn qua endpoint khác
+      ...rest // Giữ lại các trường còn lại
     } = createDto;
 
-    const createVoucherDto: CreateVoucherDto = {
-      voucherType: 'SERVICE_PURCHASE',
-      voucherDate,
-      postedDate,
-      voucherNumber,
-      companyId,
-      circularId,
-    };
+    let uploadedFileId: string | undefined; // Biến để lưu ID của file đã upload
 
     const result = await this.prismaService.$transaction(async (tx) => {
+      // --- Xử lý upload file Base64 nếu có ---
+      if (fileBase64) {
+        try {
+          const uploadedFileInfo = await this.fileService.uploadBase64File(
+            fileBase64,
+            originalFileName || 'uploaded_file', // Sử dụng tên gốc hoặc tên mặc định
+            companyId, // Liên kết file với companyId
+          );
+          uploadedFileId = uploadedFileInfo.id; // Lấy ID của bản ghi file đã tạo
+        } catch (error) {
+          console.error(
+            'Failed to upload Base64 file during service purchase voucher creation:',
+            error,
+          );
+          // Re-throw lỗi để đảm bảo transaction được rollback nếu upload file thất bại
+          throw error;
+        }
+      }
+      // --- Hoặc nếu bạn muốn hỗ trợ preUploadedFileId, bạn có thể thêm logic này:
+      // else if (preUploadedFileId) {
+      //   uploadedFileId = preUploadedFileId;
+      // }
+
+      const createVoucherDto: CreateVoucherDto = {
+        voucherType: 'SERVICE_PURCHASE',
+        voucherDate,
+        postedDate,
+        voucherNumber,
+        companyId,
+        circularId,
+        fileId: uploadedFileId, // Liên kết file đã upload với voucher
+      };
+
       const newVoucher = await this.voucherService.createWithTransaction(
         createVoucherDto,
         tx,
@@ -46,7 +77,7 @@ export class ServicePurchaseVoucherService {
 
       const created = await tx.servicePurchaseVoucher.create({
         data: {
-          ...rest,
+          ...rest, // Bao gồm các trường còn lại không được destructure riêng
           RecipientAccount: recipientAccount
             ? { connect: { id: recipientAccount } }
             : undefined,
@@ -81,7 +112,6 @@ export class ServicePurchaseVoucherService {
       excludeExtraneousValues: true,
     });
   }
-
   async findAll() {
     const list = await this.prismaService.servicePurchaseVoucher.findMany({
       where: { deletedAt: null },

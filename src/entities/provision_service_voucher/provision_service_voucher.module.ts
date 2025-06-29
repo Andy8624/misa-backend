@@ -3,9 +3,15 @@ import { ProvisionServiceVoucherService } from './provision_service_voucher.serv
 import { ProvisionServiceVoucherController } from './provision_service_voucher.controller';
 import { PrismaService } from 'src/prisma.service';
 import { VoucherService } from '../voucher/voucher.service';
+import { FileService } from '../file/file.service';
 
 @Module({
   controllers: [ProvisionServiceVoucherController],
-  providers: [ProvisionServiceVoucherService, PrismaService, VoucherService],
+  providers: [
+    ProvisionServiceVoucherService,
+    PrismaService,
+    VoucherService,
+    FileService,
+  ],
 })
 export class ProvisionServiceVoucherModule {}
